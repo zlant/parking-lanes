@@ -69,7 +69,7 @@ function drawLanes() {
 
     document.getElementById("info").style.visibility = 'hidden';
     
-    getContent('http://overpass-api.de/api/interpreter?data=' + encodeURIComponent(getQuery()), function (x) {
+    getContent('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(getQuery()), function (x) {
         var nodes = {};
 
         for (var obj of x.elements) {

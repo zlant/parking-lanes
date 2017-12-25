@@ -34,6 +34,18 @@ function showDisclaimer() {
         .join("<br />");
 }
 
+//------------- GitHub control ------------------
+
+L.Control.Link = L.Control.extend({
+    onAdd: map => {
+        var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding');
+        div.innerHTML = '<a target="_blank" href="https://github.com/zetx16/parking-lanes">GitHub</a>';
+        return div;
+    }
+});
+
+new L.Control.Link({ position: 'topright' }).addTo(map);
+
 //------------- Info control --------------------
 
 L.Control.Info = L.Control.extend({

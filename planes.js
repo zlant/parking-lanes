@@ -92,12 +92,12 @@ function drawLanes() {
                 if (lanes[obj.id])
                     continue;
 
-                var line = obj.nodes.map(x => nodes[x]);
+                var polyline = obj.nodes.map(x => nodes[x]);
 
                 for (var side of ['right', 'left']) {
                     var condition = getCondition(side, obj.tags);
                     if (condition != null)
-                        addLane(line, condition, side, obj, offset);
+                        addLane(polyline, condition, side, obj, offset);
                 }
             }
         }
@@ -123,16 +123,62 @@ function getCondition(side, tags) {
     return null;
 }
 
+function getConditions(side, tags) {
+    var conditions = { intervals: [] };
+   
+    var laneRegex = new RegExp('^parking:lane:(' + side + '|both)$');
+    var defaultRegex = new RegExp('^parking:condition:(' + side + '|both):default$');
+    
+    for (var tag in tags) {
+        if (laneRegex.test(tag))
+            conditions.default = tags[tag];
+        else if (defaultRegex.test(tag)) {
+            conditions.default = tags[tag];
+            break;
+        }
+    }
+
+    for (var i = 1; i < 10; i++) {
+        var index = i > 1 ? ':' + i : '';
+
+        var conditionRegex = new RegExp('^parking:condition:(' + side + '|both)' + index + '$');
+        var intervalRegex = new RegExp('^parking:condition:(' + side + '|both)' + index + ':time_interval$');
+
+        cond = {};
+
+        for (var tag in tags) {
+            if (conditionRegex.test(tag))
+                cond.condition = tags[tag];
+            else if (intervalRegex.test(tag))
+                cond.interval = tags[tag];
+        }
+
+        if (i == 1 && cond.interval == undefined) {
+            if (cond.condition != undefined)
+                conditions.default = cond.condition;
+            break;
+        }
+
+        if (cond.condition != undefined)
+            conditions.intervals[i - 1] = cond;
+        else
+            break;
+    }
+    
+    return conditions;
+}
+
 function addLane(line, condition, side, osm, offset) {
     lanes[side == 'right' ? osm.id : -osm.id] = L.polyline(line,
         {
             color: getColour(condition),
             weight: 3,
             offset: side == 'right' ? offset : -offset,
+            conditions: getConditions(side, osm.tags),
             osm: osm
         })
         .addTo(map)
-        .bindPopup('', { osm: osm });
+        .bindPopup('', { conditions: getConditions(side, osm.tags), osm: osm });
 }
 
 function getColour(condition) {
@@ -147,18 +193,25 @@ function getQuery() {
     return '[out:json];(way[~"^parking:lane:.*"~"."](' + bbox + ');>;);out body;';
 }
 
-function getPopupContent(osm) {
+function getPopupContent(options) {
     var regex = new RegExp('^parking:');
     var result = '';
 
-    for (var tag in osm.tags)
-        if (regex.test(tag))
-            result += tag + ' = ' + osm.tags[tag] + '<br />';
+    result += options.conditions.default + ' = default<br />';
+    
+    for (var interval of options.conditions.intervals)
+        result += interval.condition + ' = ' + interval.interval + '<br />';
 
+    result += '<hr>';
+
+    for (var tag in options.osm.tags)
+        if (regex.test(tag))
+            result += tag + ' = ' + options.osm.tags[tag] + '<br />';
+        
     return result;
 }
 
 
 map.on('moveend', drawLanes);
-map.on('popupopen', e => e.popup.setContent(getPopupContent(e.popup.options.osm)));
+map.on('popupopen', e => e.popup.setContent(getPopupContent(e.popup.options)));
 drawLanes();

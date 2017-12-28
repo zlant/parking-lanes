@@ -197,7 +197,7 @@ function addLane(line, conditions, side, osm, offset) {
             osm: osm
         })
         .addTo(map)
-        .bindPopup('', { conditions: conditions, osm: osm });
+        .bindPopup('', { osm: osm });
 }
 
 function getColor(condition) {
@@ -219,25 +219,18 @@ function getQuery() {
     return '[out:json];(way[~"^parking:lane:.*"~"."](' + bbox + ');>;);out body;';
 }
 
-function getPopupContent(options) {
+function getPopupContent(osm) {
     var regex = new RegExp('^parking:');
     var result = '';
 
-    result += options.conditions.default + ' = default<br />';
-    
-    for (var interval of options.conditions.intervals)
-        result += interval.condition + ' = ' + interval.interval + '<br />';
-
-    result += '<hr>';
-
-    for (var tag in options.osm.tags)
+    for (var tag in osm.tags)
         if (regex.test(tag))
-            result += tag + ' = ' + options.osm.tags[tag] + '<br />';
+            result += tag + ' = ' + osm.tags[tag] + '<br />';
         
     return result;
 }
 
 
 map.on('moveend', drawLanes);
-map.on('popupopen', e => e.popup.setContent(getPopupContent(e.popup.options)));
+map.on('popupopen', e => e.popup.setContent(getPopupContent(e.popup.options.osm)));
 drawLanes();

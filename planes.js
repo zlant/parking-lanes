@@ -9,6 +9,18 @@ L.tileLayer.grayscale('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     maxZoom: 18,
 }).addTo(map);
 
+//------------- GitHub control ------------------
+
+L.Control.Link = L.Control.extend({
+    onAdd: map => {
+        var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding');
+        div.innerHTML = '<a target="_blank" href="https://wiki.openstreetmap.org/wiki/Key:parking:lane">Tagging</a> | <a target="_blank" href="https://github.com/zetx16/parking-lanes">GitHub</a>';
+        return div;
+    }
+});
+
+new L.Control.Link({ position: 'bottomright' }).addTo(map);
+
 //------------- Legend control --------------------
 
 L.Control.Legend = L.Control.extend({
@@ -34,17 +46,18 @@ function showDisclaimer() {
         .join("<br />");
 }
 
-//------------- GitHub control ------------------
+//------------- Datetime control --------------------
 
-L.Control.Link = L.Control.extend({
+L.Control.Datetime = L.Control.extend({
     onAdd: map => {
         var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding');
-        div.innerHTML = '<a target="_blank" href="https://github.com/zetx16/parking-lanes">GitHub</a>';
+        div.innerHTML = 'Date and time: <input id="datetime-input"></input><button type="button" onclick="setDate()">Apply</button>';
+        div.id = 'datetime';
         return div;
     }
 });
 
-new L.Control.Link({ position: 'topright' }).addTo(map);
+new L.Control.Datetime({ position: 'topright' }).addTo(map);
 
 //------------- Info control --------------------
 
@@ -59,7 +72,7 @@ L.Control.Info = L.Control.extend({
 
 new L.Control.Info({ position: 'topright' }).addTo(map);
 
-// --------------------
+// ---------------------------------------------
 
 var legend = [
     { condition: 'no_parking',  color: 'darkorange',    text: 'No parking'    },
@@ -72,6 +85,13 @@ var legend = [
 
 var lanes = {};
 var offset = 6;
+
+var datetime = new Date();
+document.getElementById('datetime-input').value =
+    datetime.getFullYear() + '-' + (datetime.getMonth() + 1) + '-' + datetime.getDate() + ' ' +
+    datetime.getHours() + ':' + datetime.getMinutes();
+
+// ------------- functions -------------------
 
 function drawLanes() {
     if (map.getZoom() < 15) {
@@ -95,13 +115,23 @@ function drawLanes() {
                 var polyline = obj.nodes.map(x => nodes[x]);
 
                 for (var side of ['right', 'left']) {
-                    var condition = getCondition(side, obj.tags);
-                    if (condition != null)
-                        addLane(polyline, condition, side, obj, offset);
+                    var conditions = getConditions(side, obj.tags);
+                    if (conditions.default != null)
+                        addLane(polyline, conditions, side, obj, offset);
                 }
             }
         }
     });
+}
+
+function setDate() {
+    datetime = new Date(document.getElementById('datetime-input').value);
+    redraw();
+}
+
+function redraw() {
+    for (var lane in lanes)
+        lanes[lane].setStyle({ color: getColorByDate(lanes[lane].options.conditions) });
 }
 
 function getContent(url, callback)
@@ -112,19 +142,8 @@ function getContent(url, callback)
     xhr.send();
 }
 
-function getCondition(side, tags) {
-    var conditionRegex = new RegExp('^parking:condition:(' + side + '|both)$');
-    var laneRegex = new RegExp('^parking:lane:(' + side + '|both)$');
-
-    for (var tag in tags)
-        if (conditionRegex.test(tag) || laneRegex.test(tag))
-            return tags[tag];
-
-    return null;
-}
-
 function getConditions(side, tags) {
-    var conditions = { intervals: [] };
+    var conditions = { intervals: [], default: null };
    
     var laneRegex = new RegExp('^parking:lane:(' + side + '|both)$');
     var defaultRegex = new RegExp('^parking:condition:(' + side + '|both):default$');
@@ -144,13 +163,13 @@ function getConditions(side, tags) {
         var conditionRegex = new RegExp('^parking:condition:(' + side + '|both)' + index + '$');
         var intervalRegex = new RegExp('^parking:condition:(' + side + '|both)' + index + ':time_interval$');
 
-        cond = {};
+        var cond = {};
 
         for (var tag in tags) {
             if (conditionRegex.test(tag))
                 cond.condition = tags[tag];
             else if (intervalRegex.test(tag))
-                cond.interval = tags[tag];
+                cond.interval = new opening_hours(tags[tag], null, 0);
         }
 
         if (i == 1 && cond.interval == undefined) {
@@ -168,23 +187,30 @@ function getConditions(side, tags) {
     return conditions;
 }
 
-function addLane(line, condition, side, osm, offset) {
+function addLane(line, conditions, side, osm, offset) {
     lanes[side == 'right' ? osm.id : -osm.id] = L.polyline(line,
         {
-            color: getColour(condition),
+            color: getColorByDate(conditions),
             weight: 3,
             offset: side == 'right' ? offset : -offset,
-            conditions: getConditions(side, osm.tags),
+            conditions: conditions,
             osm: osm
         })
         .addTo(map)
-        .bindPopup('', { conditions: getConditions(side, osm.tags), osm: osm });
+        .bindPopup('', { conditions: conditions, osm: osm });
 }
 
-function getColour(condition) {
+function getColor(condition) {
     for (var element of legend)
         if (condition == element.condition)
             return element.color;
+}
+
+function getColorByDate(conditions) {
+    for (var interval of conditions.intervals)
+        if (interval.interval.getState(datetime))
+            return getColor(interval.condition);
+    return getColor(conditions.default);
 }
 
 function getQuery() {

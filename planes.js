@@ -101,7 +101,7 @@ var urlID = 'https://www.openstreetmap.org/edit?editor=id';
 
 // ------------- functions -------------------
 
-function drawLanes() {
+function mapMoveEnd() {
     document.getElementById('josm-bbox').href = urlJosm + urlOverpass + getQueryHighways();
     document.getElementById('id-bbox').href = urlID + '#map=' +
         document.location.href.substring(document.location.href.indexOf('#') + 1);
@@ -113,27 +113,29 @@ function drawLanes() {
 
     document.getElementById("info").style.visibility = 'hidden';
 
-    getContent(urlOverpass + encodeURIComponent(getQueryParkingLanes()), function (x) {
-        var nodes = {};
+    getContent(urlOverpass + encodeURIComponent(getQueryParkingLanes()), parseContent);
+}
 
-        for (var obj of x.elements) {
-            if (obj.type == 'node')
-                nodes[obj.id] = [obj.lat, obj.lon];
+function parseContent(content) {
+    var nodes = {};
 
-            if (obj.type == 'way') {
-                if (lanes[obj.id])
-                    continue;
+    for (var obj of content.elements) {
+        if (obj.type == 'node')
+            nodes[obj.id] = [obj.lat, obj.lon];
 
-                var polyline = obj.nodes.map(x => nodes[x]);
+        if (obj.type == 'way') {
+            if (lanes[obj.id])
+                continue;
 
-                for (var side of ['right', 'left']) {
-                    var conditions = getConditions(side, obj.tags);
-                    if (conditions.default != null)
-                        addLane(polyline, conditions, side, obj, offset);
-                }
+            var polyline = obj.nodes.map(x => nodes[x]);
+
+            for (var side of ['right', 'left']) {
+                var conditions = getConditions(side, obj.tags);
+                if (conditions.default != null)
+                    addLane(polyline, conditions, side, obj, offset);
             }
         }
-    });
+    }
 }
 
 function setDate() {
@@ -263,6 +265,6 @@ function getPopupContent(osm) {
 }
 
 
-map.on('moveend', drawLanes);
+map.on('moveend', mapMoveEnd);
 map.on('popupopen', e => e.popup.setContent(getPopupContent(e.popup.options.osm)));
-drawLanes();
+mapMoveEnd();

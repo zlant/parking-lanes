@@ -79,7 +79,7 @@ new L.Control.Info({ position: 'topright' }).addTo(map);
 // ---------------------------------------------
 
 var legend = [
-    { condition: 'no_parking',  color: 'darkorange',    text: 'No parking'    },
+    { condition: 'no_parking',  color: 'gold',          text: 'No parking'    },
     { condition: 'no_stopping', color: 'salmon',        text: 'No stopping'   },
     { condition: 'free',        color: 'limegreen',     text: 'Free parking'  },
     { condition: 'ticket',      color: 'dodgerblue',    text: 'Paid parking'  },

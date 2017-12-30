@@ -156,32 +156,30 @@ function getContent(url, callback)
 
 function getConditions(side, tags) {
     var conditions = { intervals: [], default: null };
-   
-    var laneRegex = new RegExp('^parking:lane:(' + side + '|both)$');
-    var defaultRegex = new RegExp('^parking:condition:(' + side + '|both):default$');
-    
-    for (var tag in tags) {
-        if (laneRegex.test(tag))
-            conditions.default = tags[tag];
-        else if (defaultRegex.test(tag)) {
+    var sides = [side, 'both'];
+
+    var defaultTags = sides.map(side => 'parking:condition:' + side + ':default')
+        .concat(sides.map(side => 'parking:lane:' + side));
+
+    for (var tag of defaultTags)
+        if (tags[tag] != undefined) {
             conditions.default = tags[tag];
             break;
         }
-    }
 
     for (var i = 1; i < 10; i++) {
         var index = i > 1 ? ':' + i : '';
 
-        var conditionRegex = new RegExp('^parking:condition:(' + side + '|both)' + index + '$');
-        var intervalRegex = new RegExp('^parking:condition:(' + side + '|both)' + index + ':time_interval$');
+        var conditionTags = sides.map(side => 'parking:condition:' + side + index);
+        var intervalTags = sides.map(side => 'parking:condition:' + side + index + ':time_interval');
 
         var cond = {};
 
-        for (var tag in tags) {
-            if (conditionRegex.test(tag))
-                cond.condition = tags[tag];
-            else if (intervalRegex.test(tag))
-                cond.interval = new opening_hours(tags[tag], null, 0);
+        for (var j = 0; j < sides.length; j++) {
+            if (tags[conditionTags[j]] != undefined)
+                cond.condition = tags[conditionTags[j]];
+            if (tags[intervalTags[j]] != undefined)
+                cond.interval = new opening_hours(tags[intervalTags[j]], null, 0);
         }
 
         if (i == 1 && cond.interval == undefined) {

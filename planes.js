@@ -14,7 +14,11 @@ L.tileLayer.grayscale('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 L.Control.Link = L.Control.extend({
     onAdd: map => {
         var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding');
-        div.innerHTML = '<a target="_blank" href="https://wiki.openstreetmap.org/wiki/Key:parking:lane">Tagging</a> | <a target="_blank" href="https://github.com/zetx16/parking-lanes">GitHub</a>';
+        div.innerHTML = 'Edit:';
+        div.innerHTML += ' <a id="josm-bbox" target="_blank">Josm</a>';
+        div.innerHTML += ', <a id="id-bbox" target="_blank">iD</a>';
+        div.innerHTML += ' | <a target="_blank" href="https://wiki.openstreetmap.org/wiki/Key:parking:lane">Tagging</a>';
+        div.innerHTML += ' | <a target="_blank" href="https://github.com/zetx16/parking-lanes">GitHub</a>';
         return div;
     }
 });
@@ -91,17 +95,25 @@ document.getElementById('datetime-input').value =
     datetime.getFullYear() + '-' + (datetime.getMonth() + 1) + '-' + datetime.getDate() + ' ' +
     datetime.getHours() + ':' + datetime.getMinutes();
 
+var urlOverpass = 'https://overpass-api.de/api/interpreter?data=';
+var urlJosm = 'http://127.0.0.1:8111/import?url=';
+var urlID = 'https://www.openstreetmap.org/edit?editor=id';
+
 // ------------- functions -------------------
 
 function drawLanes() {
+    document.getElementById('josm-bbox').href = urlJosm + urlOverpass + getQueryHighways();
+    document.getElementById('id-bbox').href = urlID + '#map=' +
+        document.location.href.substring(document.location.href.indexOf('#') + 1);
+
     if (map.getZoom() < 15) {
         document.getElementById("info").style.visibility = 'visible';
         return;
     }
 
     document.getElementById("info").style.visibility = 'hidden';
-    
-    getContent('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(getQuery()), function (x) {
+
+    getContent(urlOverpass + encodeURIComponent(getQueryParkingLanes()), function (x) {
         var nodes = {};
 
         for (var obj of x.elements) {
@@ -213,15 +225,37 @@ function getColorByDate(conditions) {
     return getColor(conditions.default);
 }
 
-function getQuery() {
+function getQueryParkingLanes() {
     var bounds = map.getBounds();
     var bbox = [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',');
     return '[out:json];(way[~"^parking:lane:.*"~"."](' + bbox + ');>;);out body;';
 }
 
+function getQueryHighways() {
+    var bounds = map.getBounds();
+    var bbox = [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',');
+    var tag = 'highway~"^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street"';
+    return '[out:xml];(way[' + tag + '](' + bbox + ');>;way[' + tag + '](' + bbox + ');<;);out meta;';
+}
+
+function getQueryOsmId(id) {
+    return '[out:xml];(way(id:' + id + ');>;way(id:' + id + ');<;);out meta;';
+}
+
+
 function getPopupContent(osm) {
     var regex = new RegExp('^parking:');
     var result = '';
+
+    result += '<div style="min-width:200px">';
+    result += '<a target="_blank" href="https://openstreetmap.org/way/' + osm.id + '">View in OSM</a>';
+    result += '<span style="float:right">Edit: ';
+    result += '<a target="_blank" href="' + urlJosm + urlOverpass + getQueryOsmId(osm.id) + '">Josm</a>';
+    result += ', <a target="_blank" href="' + urlID + '&way=' + osm.id + '">iD</a>';
+    result += '</span>';
+    result += '</div>';
+
+    result += '<hr>';
 
     for (var tag in osm.tags)
         if (regex.test(tag))

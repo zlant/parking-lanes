@@ -9,6 +9,8 @@ L.tileLayer.grayscale('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     maxZoom: 18,
 }).addTo(map);
 
+L.control.locate({ drawCircle: false, drawMarker: false }).addTo(map);
+
 //------------- GitHub control ------------------
 
 L.Control.Link = L.Control.extend({

@@ -31,8 +31,7 @@ L.Control.Legend = L.Control.extend({
     onAdd: map => {
         var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding');
         div.innerHTML = "Legend";
-        div.setAttribute("onmouseenter", "showDisclaimer()");
-        div.setAttribute("onmouseleave", "hideDisclaimer()");
+        div.onmouseenter = div.onmouseleave = div.onclick = changeLegendText;
         div.id = 'legend';
         return div;
     }
@@ -40,23 +39,23 @@ L.Control.Legend = L.Control.extend({
 
 new L.Control.Legend({ position: 'bottomright' }).addTo(map);
 
-function hideDisclaimer() {
-    document.getElementById("legend").innerHTML = "Legend";
-}
-
-function showDisclaimer() {
-    document.getElementById("legend").innerHTML = legend
-        .map(x => "<div class='legend-element' style='background-color:" + x.color + ";'></div> " + x.text)
-        .join("<br />");
+function changeLegendText() {
+    document.getElementById("legend").innerHTML = document.getElementById("legend").innerHTML == "Legend"
+        ? legend
+            .map(x => "<div class='legend-element' style='background-color:" + x.color + ";'></div> " + x.text)
+            .join("<br />")
+        : "Legend";
 }
 
 //------------- Datetime control --------------------
 
 L.Control.Datetime = L.Control.extend({
     onAdd: map => {
-        var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding');
-        div.innerHTML = 'Date and time: <input id="datetime-input"></input><button type="button" onclick="setDate()">Apply</button>';
-        div.id = 'datetime';
+        var div = L.DomUtil.create('input', 'leaflet-control-layers control-padding');
+        div.style.width = '115px';
+        div.id = 'datetime-input';
+        div.onmousedown = div.ondblclick = div.onpointerdown = L.DomEvent.stopPropagation;
+        div.oninput = setDate;
         return div;
     }
 });
@@ -99,13 +98,15 @@ var urlOverpass = 'https://overpass-api.de/api/interpreter?data=';
 var urlJosm = 'http://127.0.0.1:8111/import?url=';
 var urlID = 'https://www.openstreetmap.org/edit?editor=id';
 
+var lastBounds;
+
 // ------------- functions -------------------
 
 function mapMoveEnd() {
     document.getElementById('josm-bbox').href = urlJosm + urlOverpass + getQueryHighways();
     document.getElementById('id-bbox').href = urlID + '#map=' +
         document.location.href.substring(document.location.href.indexOf('#') + 1);
-
+    
     if (map.getZoom() < 15) {
         document.getElementById("info").style.visibility = 'visible';
         return;
@@ -113,7 +114,21 @@ function mapMoveEnd() {
 
     document.getElementById("info").style.visibility = 'hidden';
 
+    if (withinLastBbox())
+        return;
+
+    lastBounds = map.getBounds();
     getContent(urlOverpass + encodeURIComponent(getQueryParkingLanes()), parseContent);
+}
+
+function withinLastBbox()
+{
+    if (lastBounds == undefined)
+        return false;
+
+    var bounds = map.getBounds();
+    return bounds.getWest() > lastBounds.getWest() && bounds.getSouth() > lastBounds.getSouth() &&
+        bounds.getEast() < lastBounds.getEast() && bounds.getNorth() < lastBounds.getNorth();
 }
 
 function parseContent(content) {
@@ -178,9 +193,9 @@ function getConditions(side, tags) {
         var cond = {};
 
         for (var j = 0; j < sides.length; j++) {
-            if (tags[conditionTags[j]] != undefined)
+            if (tags[conditionTags[j]])
                 cond.condition = tags[conditionTags[j]];
-            if (tags[intervalTags[j]] != undefined)
+            if (tags[intervalTags[j]])
                 cond.interval = new opening_hours(tags[intervalTags[j]], null, 0);
         }
 

@@ -2,7 +2,8 @@ var map = L.map('map', { fadeAnimation: false });
 var hash = new L.Hash(map);
 
 if (document.location.href.indexOf('#') == -1)
-    map.setView([51.591, 24.609], 5);
+    if (!setViewFromCookie())
+        map.setView([51.591, 24.609], 5);
 
 L.tileLayer.grayscale('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
@@ -80,6 +81,7 @@ new L.Control.Info({ position: 'topright' }).addTo(map);
 // ---------------------------------------------
 
 var legend = [
+    { condition: 'disc',        color: 'gold',          text: 'Disc'          },
     { condition: 'no_parking',  color: 'gold',          text: 'No parking'    },
     { condition: 'no_stopping', color: 'salmon',        text: 'No stopping'   },
     { condition: 'free',        color: 'limegreen',     text: 'Free parking'  },
@@ -108,6 +110,7 @@ function mapMoveEnd() {
     document.getElementById('josm-bbox').href = urlJosm + urlOverpass + getQueryHighways();
     document.getElementById('id-bbox').href = urlID + '#map=' +
         document.location.href.substring(document.location.href.indexOf('#') + 1);
+    setLocationCookie();
     
     if (map.getZoom() < 15) {
         document.getElementById("info").style.visibility = 'visible';
@@ -153,6 +156,22 @@ function parseContent(content) {
             }
         }
     }
+}
+
+function setLocationCookie() {
+    var center = map.getCenter();
+    var date = new Date(new Date().getTime() + 10 * 365 * 24 * 60 * 60 * 1000);
+    document.cookie = 'location=' + map.getZoom() + '/' + center.lat + '/' + center.lng + '; expires=' + date;
+}
+
+function setViewFromCookie() {
+    var location = document.cookie.split('; ').find((e, i, a) => e.startsWith('location='));
+    if (location == undefined)
+        return false;
+    location = location.split('=')[1].split('/');
+
+    map.setView([location[1], location[2]], location[0]);
+    return true;
 }
 
 function setDate() {

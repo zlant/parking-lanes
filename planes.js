@@ -34,7 +34,9 @@ L.Control.Legend = L.Control.extend({
     onAdd: map => {
         var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding');
         div.innerHTML = "Legend";
-        div.onmouseenter = div.onmouseleave = div.onclick = changeLegendText;
+        div.onmouseenter = setLegendBody;
+        div.onmouseleave = setLegendHead;
+        div.onclick = changeLegend;
         div.id = 'legend';
         return div;
     }
@@ -42,12 +44,25 @@ L.Control.Legend = L.Control.extend({
 
 new L.Control.Legend({ position: 'bottomright' }).addTo(map);
 
-function changeLegendText() {
-    document.getElementById("legend").innerHTML = document.getElementById("legend").innerHTML == "Legend"
-        ? legend
-            .map(x => "<div class='legend-element' style='background-color:" + x.color + ";'></div> " + x.text)
-            .join("<br />")
-        : "Legend";
+function changeLegend(e) {
+    if (this.onmouseenter == null) {
+        setLegendHead(e);
+        this.onmouseenter = setLegendBody;
+        this.onmouseleave = setLegendHead;
+    } else {
+        setLegendBody(e);
+        this.onmouseenter = this.onmouseleave = null;
+    }
+}
+
+function setLegendBody(e) {
+    e.currentTarget.innerHTML = legend
+        .map(x => "<div class='legend-element' style='background-color:" + x.color + ";'></div> " + x.text)
+        .join("<br />");
+}
+
+function setLegendHead(e) {
+    e.currentTarget.innerHTML = "Legend";
 }
 
 //------------- Datetime control --------------------
@@ -200,7 +215,7 @@ function getConditions(side, tags) {
         .concat(sides.map(side => 'parking:lane:' + side));
 
     for (var tag of defaultTags)
-        if (tags[tag] != undefined) {
+        if (tag in tags) {
             conditions.default = tags[tag];
             break;
         }
@@ -214,19 +229,19 @@ function getConditions(side, tags) {
         var cond = {};
 
         for (var j = 0; j < sides.length; j++) {
-            if (tags[conditionTags[j]])
+            if (conditionTags[j] in tags)
                 cond.condition = tags[conditionTags[j]];
-            if (tags[intervalTags[j]])
+            if (intervalTags[j] in tags)
                 cond.interval = new opening_hours(tags[intervalTags[j]], null, 0);
         }
 
         if (i == 1 && cond.interval == undefined) {
-            if (cond.condition != undefined)
+            if ('condition' in cond)
                 conditions.default = cond.condition;
             break;
         }
 
-        if (cond.condition != undefined)
+        if ('condition' in cond)
             conditions.intervals[i - 1] = cond;
         else
             break;

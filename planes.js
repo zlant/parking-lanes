@@ -126,12 +126,19 @@ function mapMoveEnd() {
     document.getElementById('id-bbox').href = urlID + '#map=' +
         document.location.href.substring(document.location.href.indexOf('#') + 1);
     setLocationCookie();
+
+    var newOffset = map.getZoom() < 15 ? 2 : offset;
+    for (var lane in lanes) {
+        var sideOffset = lanes[lane].options.offset > 0 ? 1 : -1;
+        lanes[lane].setOffset(sideOffset * newOffset);
+        lanes[lane].setStyle({ weight: (map.getZoom() < 15 ? 2 : 3) });
+    }
     
     if (map.getZoom() < 15) {
         document.getElementById("info").style.visibility = 'visible';
         return;
     }
-
+    
     document.getElementById("info").style.visibility = 'hidden';
 
     if (withinLastBbox())
@@ -154,21 +161,20 @@ function withinLastBbox()
 function parseContent(content) {
     var nodes = {};
 
-    for (var obj of content.elements) {
-        if (obj.type == 'node')
-            nodes[obj.id] = [obj.lat, obj.lon];
+    for (var obj of content.osm.node) {
+        nodes[obj.$id] = [obj.$lat, obj.$lon];
+    }
 
-        if (obj.type == 'way') {
-            if (lanes[obj.id])
-                continue;
+    for (var obj of content.osm.way) {
+        if (lanes[obj.$id.toString()] || lanes['-'+obj.$id])
+            continue;
 
-            var polyline = obj.nodes.map(x => nodes[x]);
+        var polyline = obj.nd.map(x => nodes[x.$ref]);
 
-            for (var side of ['right', 'left']) {
-                var conditions = getConditions(side, obj.tags);
-                if (conditions.default != null)
-                    addLane(polyline, conditions, side, obj, offset);
-            }
+        for (var side of ['right', 'left']) {
+            var conditions = getConditions(side, obj.tag);
+            if (conditions.default != null)
+                addLane(polyline, conditions, side, obj, offset);
         }
     }
 }
@@ -203,7 +209,7 @@ function getContent(url, callback)
 {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
-    xhr.onload = () => callback(JSON.parse(xhr.responseText));
+    xhr.onload = () => callback(JXON.stringToJs(xhr.responseText));
     xhr.send();
 }
 
@@ -214,11 +220,14 @@ function getConditions(side, tags) {
     var defaultTags = sides.map(side => 'parking:condition:' + side + ':default')
         .concat(sides.map(side => 'parking:lane:' + side));
 
-    for (var tag of defaultTags)
-        if (tag in tags) {
-            conditions.default = tags[tag];
+    var findResult;
+    for (var tag of defaultTags) {
+        findResult = tags.find(x => x.$k == tag);
+        if (findResult)
+            conditions.default = findResult.$v;
+        if (conditions.default)
             break;
-        }
+    }
 
     for (var i = 1; i < 10; i++) {
         var index = i > 1 ? ':' + i : '';
@@ -229,10 +238,12 @@ function getConditions(side, tags) {
         var cond = {};
 
         for (var j = 0; j < sides.length; j++) {
-            if (conditionTags[j] in tags)
-                cond.condition = tags[conditionTags[j]];
-            if (intervalTags[j] in tags)
-                cond.interval = new opening_hours(tags[intervalTags[j]], null, 0);
+            findResult = tags.find(x => x.$k == conditionTags[j]);
+            if (findResult)
+                cond.condition = findResult.$v;
+            findResult = tags.find(x => x.$k == intervalTags[j]);
+            if (findResult)
+                cond.interval = new opening_hours(findResult.$v, null, 0);
         }
 
         if (i == 1 && cond.interval == undefined) {
@@ -251,7 +262,7 @@ function getConditions(side, tags) {
 }
 
 function addLane(line, conditions, side, osm, offset) {
-    lanes[side == 'right' ? osm.id : -osm.id] = L.polyline(line,
+    lanes[side == 'right' ? osm.$id.toString() : ('-' + osm.$id)] = L.polyline(line,
         {
             color: getColorByDate(conditions),
             weight: 3,
@@ -279,7 +290,7 @@ function getColorByDate(conditions) {
 function getQueryParkingLanes() {
     var bounds = map.getBounds();
     var bbox = [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',');
-    return '[out:json];(way[~"^parking:lane:.*"~"."](' + bbox + ');>;);out body;';
+    return '[out:xml];(way[~"^parking:lane:.*"~"."](' + bbox + ');>;);out body;';
 }
 
 function getQueryHighways() {
@@ -299,18 +310,18 @@ function getPopupContent(osm) {
     var result = '';
 
     result += '<div style="min-width:200px">';
-    result += '<a target="_blank" href="https://openstreetmap.org/way/' + osm.id + '">View in OSM</a>';
+    result += '<a target="_blank" href="https://openstreetmap.org/way/' + osm.$id + '">View in OSM</a>';
     result += '<span style="float:right">Edit: ';
-    result += '<a target="_blank" href="' + urlJosm + urlOverpass + getQueryOsmId(osm.id) + '">Josm</a>';
-    result += ', <a target="_blank" href="' + urlID + '&way=' + osm.id + '">iD</a>';
+    result += '<a target="_blank" href="' + urlJosm + urlOverpass + getQueryOsmId(osm.$id) + '">Josm</a>';
+    result += ', <a target="_blank" href="' + urlID + '&way=' + osm.$id + '">iD</a>';
     result += '</span>';
     result += '</div>';
 
     result += '<hr>';
 
-    for (var tag in osm.tags)
-        if (regex.test(tag))
-            result += tag + ' = ' + osm.tags[tag] + '<br />';
+    for (var tag of osm.tag)
+        if (regex.test(tag.$k))
+            result += tag.$k + ' = ' + tag.$v + '<br />';
         
     return result;
 }

@@ -93,59 +93,36 @@ L.Control.Info = L.Control.extend({
 
 new L.Control.Info({ position: 'topright' }).addTo(map);
 
-// ---------------------------------------------
+//------------- Save control --------------------
 
-var osmstatic = `<?xml version="1.0" encoding="UTF-8"?>
-<osm version="0.6" generator="Overpass API 0.7.54.12 054bb0bb">
-<note>The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.</note>
-<meta osm_base="2018-01-23T17:47:02Z"/>
-<node id="4301705340" changeset="69643" timestamp="2016-01-08T14:40:04Z" version="1" visible="true" user="Zverik" uid="221" lat="55.7965727" lon="49.1250105">
-<tag k="historic" v="memorial"/>
-<tag k="name" v="Памятник В.И. Ленину"/>
-</node>
-<node id="4301705355" changeset="69643" timestamp="2016-01-08T14:40:05Z" version="1" visible="true" user="Zverik" uid="221" lat="55.7912044" lon="49.1222602">
-<tag k="historic" v="memorial"/>
-<tag k="name" v="Памятник В.И. Ульянову-Ленину"/>
-</node>
-<node id="4301705402" changeset="69643" timestamp="2016-01-08T14:40:08Z" version="1" visible="true" user="Zverik" uid="221" lat="55.7910116" lon="49.1303252">
-<tag k="historic" v="memorial"/>
-<tag k="name" v="Памятник-бюст Ленину"/>
-</node>
-<node id="4307727993" changeset="109495" timestamp="2018-01-08T17:50:13Z" version="1" visible="true" user="acsd" uid="6277" lat="55.7879536" lon="49.1233323"/>
-<node id="4307727994" changeset="109495" timestamp="2018-01-08T17:50:13Z" version="1" visible="true" user="acsd" uid="6277" lat="55.7883596" lon="49.1237711"/>
-<node id="4307727995" changeset="109495" timestamp="2018-01-08T17:50:13Z" version="1" visible="true" user="acsd" uid="6277" lat="55.7898878" lon="49.1245002"/>
-<node id="4307727996" changeset="109495" timestamp="2018-01-08T17:50:13Z" version="1" visible="true" user="acsd" uid="6277" lat="55.7924735" lon="49.1248956"/>
-<node id="4307727997" changeset="109495" timestamp="2018-01-08T17:50:13Z" version="1" visible="true" user="acsd" uid="6277" lat="55.7944425" lon="49.1251198"/>
-<node id="4307727998" changeset="109495" timestamp="2018-01-08T17:50:13Z" version="1" visible="true" user="acsd" uid="6277" lat="55.7940067" lon="49.1293788"/>
-<node id="4307727999" changeset="109495" timestamp="2018-01-08T17:50:13Z" version="1" visible="true" user="acsd" uid="6277" lat="55.7949098" lon="49.1216080"/>
-<node id="4307733510" changeset="109530" timestamp="2018-01-10T20:21:49Z" version="1" visible="true" user="acsd" uid="6277" lat="55.7877700" lon="49.1277900">
-<tag k="test" v="testing"/>
-</node>
-<node id="4307742318" changeset="109557" timestamp="2018-01-11T15:52:11Z" version="1" visible="true" user="acsd" uid="6277" lat="55.7877700" lon="49.1277900">
-<tag k="test" v="testing"/>
-</node>
-<node id="4307742382" changeset="109560" timestamp="2018-01-11T18:31:51Z" version="1" visible="true" user="acsd" uid="6277" lat="55.7897700" lon="49.1297900"/>
-<node id="4307742383" changeset="109560" timestamp="2018-01-11T18:31:51Z" version="1" visible="true" user="acsd" uid="6277" lat="55.7807700" lon="49.1207900"/>
-<way id="4304212395" changeset="109496" timestamp="2018-01-08T17:51:28Z" version="2" visible="true" user="acsd" uid="6277">
-<nd ref="4307727993"/>
-<nd ref="4307727994"/>
-<nd ref="4307727995"/>
-<nd ref="4307727996"/>
-<nd ref="4307727997"/>
-<tag k="highway" v="secondary"/>
-<tag k="parking:condition:both" v="ticket"/>
-<tag k="parking:lane:both" v="parallel"/>
-</way>
-<way id="4304212396" changeset="109496" timestamp="2018-01-08T17:51:28Z" version="2" visible="true" user="acsd" uid="6277">
-<nd ref="4307727998"/>
-<nd ref="4307727997"/>
-<nd ref="4307727999"/>
-<tag k="highway" v="tertiary"/>
-<tag k="parking:lane:right" v="no_parking"/>
-</way>
+L.Control.Save = L.Control.extend({
+    onAdd: map => {
+        var div = L.DomUtil.create('button', 'leaflet-control-layers control-padding');
+        div.id = 'saveChangeset';
+        div.innerText = 'Save';
+        div.style.background = 'yellow';
+        div.style.display = 'none';
+        div.onclick = createChangset;
+        return div;
+    }
+});
 
-</osm>
-`
+new L.Control.Save({ position: 'topright' }).addTo(map);
+
+//------------- Auth control --------------------
+
+L.Control.Auth = L.Control.extend({
+    onAdd: map => {
+        var div = L.DomUtil.create('button', 'leaflet-control-layers control-padding');
+        div.id = 'auth';
+        div.innerText = 'Auth';
+        return div;
+    }
+});
+
+new L.Control.Auth({ position: 'topright' }).addTo(map);
+
+//----------------------------------------------------
 
 var legend = [
     { condition: 'disc',        color: 'gold',          text: 'Disc'          },
@@ -174,6 +151,11 @@ var urlOverpass = 'https://overpass-api.de/api/interpreter?data=';
 var urlJosm = 'http://127.0.0.1:8111/import?url=';
 var urlID = 'https://www.openstreetmap.org/edit?editor=id';
 
+var useTestServer = true;
+var urlOsmTest = useTestServer
+    ? 'https://master.apis.dev.openstreetmap.org'
+    : 'https://www.openstreetmap.org';
+
 var lastBounds;
 
 // ------------- functions -------------------
@@ -192,17 +174,18 @@ function mapMoveEnd() {
     }
     
     if (map.getZoom() < 15) {
-        document.getElementById("info").style.visibility = 'visible';
+        document.getElementById("info").style.display = 'block';
         return;
     }
     
-    document.getElementById("info").style.visibility = 'hidden';
+    document.getElementById("info").style.display = 'none';
 
     if (withinLastBbox())
         return;
 
     lastBounds = map.getBounds();
-    getContent(urlOverpass + encodeURIComponent(getQueryParkingLanes()), parseContent);
+    getContent(urlOsmTest + getQueryParkingLanes(), parseContent);
+    //getContent(urlOverpass + encodeURIComponent(getQueryParkingLanes()), parseContent);
 }
 
 function withinLastBbox()
@@ -218,11 +201,14 @@ function withinLastBbox()
 function parseContent(content) {
     var nodes = {};
 
-    for (var obj of content.osm.node) {
+    for (var obj of Array.isArray(content.osm.node) ? content.osm.node : [content.osm.node] ) {
         nodes[obj.$id] = [obj.$lat, obj.$lon];
     }
 
-    for (var obj of content.osm.way) {
+    content.osm.way = Array.isArray(content.osm.way) ? content.osm.way : [content.osm.way];
+    for (var obj of content.osm.way.filter(x => x.tag != undefined)) {
+        if (!Array.isArray(obj.tag))
+            obj.tag = [obj.tag];
         if (lanes[obj.$id.toString()] || lanes['-'+obj.$id])
             continue;
 
@@ -269,13 +255,12 @@ function getContent(url, callback)
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.onload = () => callback(JXON.stringToJs(xhr.responseText));
-    //xhr.send();
-    callback(JXON.stringToJs(osmstatic));
+    xhr.send();
 }
 
 function getConditions(side, tags) {
     var conditions = { intervals: [], default: null };
-    var sides = [side, 'both'];
+    var sides = ['both', side];
 
     var defaultTags = sides.map(side => 'parking:condition:' + side + ':default')
         .concat(sides.map(side => 'parking:lane:' + side));
@@ -349,8 +334,12 @@ function getColorByDate(conditions) {
 
 function getQueryParkingLanes() {
     var bounds = map.getBounds();
-    var bbox = [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',');
-    return '[out:xml];(way[~"^parking:lane:.*"~"."](' + bbox + ');>;);out meta;';
+
+    var bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()].join(',');
+    return '/api/0.6/map?bbox=' + bbox;
+
+    //var bbox = [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',');
+    //return '[out:xml];(way[~"^parking:lane:.*"~"."](' + bbox + ');>;);out meta;';
 }
 
 function getQueryHighways() {
@@ -363,6 +352,13 @@ function getQueryHighways() {
 function getQueryOsmId(id) {
     return '[out:xml];(way(id:' + id + ');>;way(id:' + id + ');<;);out meta;';
 }
+
+var tagsBlock = [
+    "parking:lane:{side}",
+    "parking:condition:{side}",
+    "parking:condition:{side}:time_interval",
+    "parking:condition:{side}:capacity"
+];
 
 function getPopupContent(osm) {
     var head = document.createElement('div');
@@ -396,39 +392,56 @@ function getPopupContent(osm) {
     var form = document.createElement("form");
     form.setAttribute('id', osm.$id);
     form.onsubmit = save;
+
+    var checkBoth = document.createElement('input');
+    checkBoth.setAttribute('type', 'checkbox');
+    checkBoth.setAttribute('id', 'checkboth');
+    checkBoth.onchange = (ch) => {
+        if (ch.currentTarget.checked) {
+            document.getElementById("right").style.display = 'none';
+            document.getElementById("left").style.display = 'none';
+            document.getElementById("both").style.display = 'block';
+        } else {
+            document.getElementById("right").style.display = 'block';
+            document.getElementById("left").style.display = 'block';
+            document.getElementById("both").style.display = 'none';
+        }
+    };
+    form.appendChild(checkBoth);
+
+    var label = document.createElement('label');
+    label.setAttribute('for', 'checkboth');
+    label.innerText = 'Both';
+    form.appendChild(label);
     
     var regex = new RegExp('^parking:');
-    var tagsText = [];
     var dl = document.createElement('dl');
-    for (var tag of osm.tag)
-        if (regex.test(tag.$k)) {
-
-            var label = document.createElement('label');
-            label.innerText = tag.$k;
-            var dt = document.createElement('dt');
-            dt.appendChild(label);
-
-            var tagval = document.createElement('input');
-            tagval.setAttribute('type', 'text');
-            tagval.setAttribute('name', tag.$k);
-            tagval.setAttribute('value', tag.$v);
-            var dd = document.createElement('dd');
-            dd.appendChild(tagval);
-
-            dl.appendChild(dt);
-            dl.appendChild(dd);
-        }
+    for (var side of ['both', 'right', 'left'].map(x => getTagsBlock(x, osm)))
+        dl.appendChild(side);
     form.appendChild(dl);
 
     var submit = document.createElement('input');
     submit.setAttribute('type', 'submit');
-    submit.setAttribute('value', 'Save');
+    submit.setAttribute('value', 'Apply');
     form.appendChild(submit);
 
     var cancel = document.createElement('input');
     cancel.setAttribute('type', 'reset');
     cancel.setAttribute('value', 'Cancel');
     form.appendChild(cancel);
+
+    if ((chooseSideTags(form, 'right') || chooseSideTags(form, 'left')) || !chooseSideTags(form, 'both')) {
+        form[0].checked = false;
+        form.childNodes[2].childNodes[0].style.display = 'none';
+        form.childNodes[2].childNodes[1].style.display = 'block';
+        form.childNodes[2].childNodes[2].style.display = 'block';
+    } else {
+        form[0].checked = true;
+        form.childNodes[2].childNodes[0].style.display = 'block';
+        form.childNodes[2].childNodes[1].style.display = 'none';
+        form.childNodes[2].childNodes[2].style.display = 'none';
+    }
+
 
     var div = document.createElement('div');
     div.appendChild(head);
@@ -438,13 +451,48 @@ function getPopupContent(osm) {
     return div;
 }
 
+function getTagsBlock(side, osm) {
+    var div = document.createElement('div');
+    div.setAttribute('id', side);
+    for (var tag of tagsBlock) {
+        tag = tag.replace('{side}', side);
+
+        var label = document.createElement('label');
+        label.innerText = tag.replace('parking:', '');
+        var dt = document.createElement('dt');
+        dt.appendChild(label);
+
+        var tagval = document.createElement('input');
+        tagval.setAttribute('type', 'text');
+        tagval.setAttribute('name', tag);
+        var value = osm.tag.filter(x => x.$k === tag)[0];
+        tagval.setAttribute('value', value != undefined ? value.$v : '');
+        var dd = document.createElement('dd');
+        dd.appendChild(tagval);
+
+        div.appendChild(dt);
+        div.appendChild(dd);
+    }
+    return div;
+}
+
+function chooseSideTags(form, side) {
+    var regex = new RegExp('^parking:.*' + side);
+
+    for (var input of form)
+        if (regex.test(input.name) && input.value != '') 
+            return true;
+        
+    return false;
+}
+
 function save(form) {
     var regex = new RegExp('^parking:');
     var osm = ways[form.target.id];
     osm.tag = osm.tag.filter(tag => !regex.test(tag.$k));
 
     for (var input of form.target)
-        if (input.value != '') {
+        if (regex.test(input.name) && input.value != '') {
             osm.tag.push({ $k: input.name, $v: input.value })
         }
 
@@ -452,10 +500,111 @@ function save(form) {
     delete osm.$uid;
     delete osm.$timestamp;
 
-    change.osmChange.modify.way.push(osm);
-    document.getElementById(osm.$id).innerText = JXON.jsToString(change);
+    var index = change.osmChange.modify.way.findIndex(x => x.$id == osm.$id);
+
+    if (index > -1)
+        change.osmChange.modify.way[index] = osm;
+    else
+        change.osmChange.modify.way.push(osm);
+
+    document.getElementById('saveChangeset').style.display = 'block';
+
+    return false;
 }
 
+function saveChangesets(changesetId) {
+    for (var way of change.osmChange.modify.way)
+        way.$changeset = changesetId;
+
+    var path = '/api/0.6/changeset/' + changesetId + '/upload';
+    var text = JXON.jsToString(change);
+
+    auth.xhr({
+        method: 'POST',
+        path: path,
+        options: { header: { 'Content-Type': 'text/xml' } },
+        content: text
+    }, function (err, details) {
+        closeChangset(changesetId);
+        });
+}
+
+function closeChangset(changesetId) {
+    var path = '/api/0.6/changeset/' + changesetId + '/close';
+
+    auth.xhr({
+        method: 'PUT',
+        options: { header: { 'Content-Type': 'text/xml' } },
+        path: path
+    }, function (err, details) {
+        document.getElementById('saveChangeset').style.display = 'none';
+    });
+}
+function createChangset() {
+    var path = '/api/0.6/changeset/create';
+
+    var change = {
+        osm: {
+            changeset: {
+                tag: [
+                    {
+                        $k: 'created_by',
+                        $v: 'Planes ' + version
+                    },
+                    {
+                        $k: 'comment',
+                        $v: 'Parking lanes'
+                    }
+                ]
+            }
+        }
+    };
+
+    var text = JXON.jsToString(change);
+
+    auth.xhr({
+        method: 'PUT',
+        path: path,
+        options: { header: { 'Content-Type': 'text/xml' } },
+        content: text
+    }, function (err, details) {
+        if (!err)
+            saveChangesets(details);
+    });
+}
+
+var auth = useTestServer
+    ? osmAuth({
+        url: urlOsmTest,
+        oauth_consumer_key: 'ZSneUbP6ZQROcwbTT09ihsUPeDPWnvj1PoRWEAsa',
+        oauth_secret: 'BcqBWMzRzuYIRHGZqsS81nsD07h3pTjY3A4bbAQA',
+        auto: true,
+        singlepage: true
+    })
+    : osmAuth({
+        url: urlOsmTest,
+        oauth_consumer_key: '44puUDhiBVg8gzyXTVeUEwBaaOQvIaJaZk271cYy',
+        oauth_secret: 'ryi5BcUVOIkgkcalQBQg4SQPjAHNqwiNlgpcrhAR',
+        auto: true,
+        singlepage: true
+    });
+
+
+document.getElementById('auth').onclick = function () {
+    var getUserName = () =>
+        auth.xhr({
+            method: 'GET',
+            path: '/api/0.6/user/details'
+        }, function (err, details) {
+            var user = JXON.xmlToJs(details);
+            document.getElementById('auth').innerText = user.osm.user.$display_name;
+        });
+    
+    if (auth.authenticated())
+        getUserName();
+    else
+        auth.authenticate(getUserName);
+};
 
 map.on('moveend', mapMoveEnd);
 map.on('popupopen', e => e.popup.setContent(getPopupContent(e.popup.options.osm)));

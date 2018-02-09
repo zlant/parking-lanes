@@ -17,11 +17,36 @@ L.control.locate({ drawCircle: false, drawMarker: false }).addTo(map);
 L.Control.Link = L.Control.extend({
     onAdd: map => {
         var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding');
-        div.innerHTML = 'Edit:';
-        div.innerHTML += ' <a id="josm-bbox" target="_blank">Josm</a>';
-        div.innerHTML += ', <a id="id-bbox" target="_blank">iD</a>';
-        div.innerHTML += ' | <a target="_blank" href="https://wiki.openstreetmap.org/wiki/Key:parking:lane">Tagging</a>';
+
+        var editorCheckBox = document.createElement('input');
+        editorCheckBox.setAttribute('type', 'checkbox');
+        editorCheckBox.setAttribute('id', 'editorcb');
+        editorCheckBox.style.display = 'inline';
+        editorCheckBox.style.verticalAlign = 'top';
+        editorCheckBox.onchange = (ch) => {
+            editorMode = !editorMode;
+        };
+        div.appendChild(editorCheckBox);
+
+
+        var label = document.createElement('label');
+        label.setAttribute('for', 'editorcb');
+        label.innerText = 'Editor';
+        label.style.display = 'inline';
+        div.appendChild(label);
+
+        var editors = document.createElement('span');
+        editors.id = 'editors';
+        editors.style.display = 'none';
+        editors.innerHTML += ', <a id="josm-bbox" target="_blank">Josm</a>';
+        editors.innerHTML += ', <a id="id-bbox" target="_blank">iD</a>';
+        editors.innerHTML += ' | <a target="_blank" href="https://wiki.openstreetmap.org/wiki/Key:parking:lane">Tagging</a>';
+        div.appendChild(editors);
+        
         div.innerHTML += ' | <a target="_blank" href="https://github.com/zetx16/parking-lanes">GitHub</a>';
+
+        div.onmouseenter = e => document.getElementById('editors').style.display = 'inline';
+        div.onmouseleave = e => document.getElementById('editors').style.display = 'none';
         return div;
     }
 });
@@ -138,6 +163,7 @@ var ways = {};
 var lanes = {};
 var offset = 6;
 
+var editorName = 'PLanes'
 var version = '0.1'
 
 var change = { osmChange: { $version: '0.6', $generator: 'Parking lane ' + version, modify: { way: [] } } };
@@ -158,6 +184,11 @@ var urlOsmTest = useTestServer
 
 var lastBounds;
 
+var editorMode = false;
+
+var valuesLane = ['parallel', 'diagonal', 'perpendicular', 'no_parking', 'no_stopping', 'marked', 'fire_lane'];
+var valuesCond = ['free', 'ticket', 'disc', 'residents', 'customers', 'private'];
+
 // ------------- functions -------------------
 
 function mapMoveEnd() {
@@ -168,6 +199,8 @@ function mapMoveEnd() {
 
     var newOffset = map.getZoom() < 15 ? 2 : offset;
     for (var lane in lanes) {
+        if (lane === 'right' || lane === 'left')
+            continue;
         var sideOffset = lanes[lane].options.offset > 0 ? 1 : -1;
         lanes[lane].setOffset(sideOffset * newOffset);
         lanes[lane].setStyle({ weight: (map.getZoom() < 15 ? 2 : 3) });
@@ -361,6 +394,8 @@ var tagsBlock = [
 ];
 
 function getPopupContent(osm) {
+    setBacklight(osm);
+
     var head = document.createElement('div');
     head.setAttribute('style', 'min-width:250px');
 
@@ -451,9 +486,46 @@ function getPopupContent(osm) {
     return div;
 }
 
+function setBacklight(osm) {
+    var polyline = lanes[osm.$id]
+        ? lanes[osm.$id].getLatLngs()
+        : lanes[-osm.$id].getLatLngs();
+
+    var n = 3;
+
+    lanes['right'] = L.polyline(polyline,
+        {
+            color: 'fuchsia',
+            weight: offset * n - 4,
+            offset: offset * n,
+            opacity: 0.4
+        })
+        .addTo(map);
+
+    lanes['left'] = L.polyline(polyline,
+        {
+            color: 'cyan',
+            weight: offset * n - 4,
+            offset: -offset * n,
+            opacity: 0.4
+        })
+        .addTo(map);
+}
+
 function getTagsBlock(side, osm) {
     var div = document.createElement('div');
     div.setAttribute('id', side);
+
+    var listValLane = document.createElement('datalist');
+    listValLane.setAttribute('id', 'lanesList');
+    listValLane.innerHTML = valuesLane.map(x => '<option value="' + x + '"></option>').join('');
+    div.appendChild(listValLane);
+
+    var listValCond = document.createElement('datalist');
+    listValCond.setAttribute('id', 'condsList');
+    listValCond.innerHTML = valuesCond.map(x => '<option value="' + x + '"></option>').join('');
+    div.appendChild(listValCond);
+
     for (var tag of tagsBlock) {
         tag = tag.replace('{side}', side);
 
@@ -461,10 +533,14 @@ function getTagsBlock(side, osm) {
         label.innerText = tag.replace('parking:', '');
         var dt = document.createElement('dt');
         dt.appendChild(label);
-
+        
         var tagval = document.createElement('input');
         tagval.setAttribute('type', 'text');
         tagval.setAttribute('name', tag);
+        if (tag == 'parking:lane:' + side)
+            tagval.setAttribute('list', 'lanesList');
+        else if (tag == 'parking:condition:' + side)
+            tagval.setAttribute('list', 'condsList');
         var value = osm.tag.filter(x => x.$k === tag)[0];
         tagval.setAttribute('value', value != undefined ? value.$v : '');
         var dd = document.createElement('dd');
@@ -547,15 +623,8 @@ function createChangset() {
         osm: {
             changeset: {
                 tag: [
-                    {
-                        $k: 'created_by',
-                        $v: 'Planes ' + version
-                    },
-                    {
-                        $k: 'comment',
-                        $v: 'Parking lanes'
-                    }
-                ]
+                    { $k: 'created_by', $v: editorName + ' ' + version },
+                    { $k: 'comment', $v: 'Parking lanes' }]
             }
         }
     };
@@ -606,6 +675,12 @@ document.getElementById('auth').onclick = function () {
         auth.authenticate(getUserName);
 };
 
+function deleteBacklight() {
+    lanes['right'].remove();
+    lanes['left'].remove();
+}
+
 map.on('moveend', mapMoveEnd);
 map.on('popupopen', e => e.popup.setContent(getPopupContent(e.popup.options.osm)));
+map.on('popupclose', e => deleteBacklight());
 mapMoveEnd();

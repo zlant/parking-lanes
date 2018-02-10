@@ -18,30 +18,32 @@ L.Control.Link = L.Control.extend({
     onAdd: map => {
         var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding');
 
+        var editors = document.createElement('span');
+        editors.id = 'editors';
+        editors.style.display = 'none';
+        editors.innerHTML += '<a target="_blank" href="https://wiki.openstreetmap.org/wiki/Key:parking:lane">Tagging</a>';
+        editors.innerHTML += ' | <a id="id-bbox" target="_blank">iD</a>, ';
+        editors.innerHTML += '<a id="josm-bbox" target="_blank">Josm</a>, ';
+        div.appendChild(editors);
+
+        var editorActivation = document.createElement('span');
+        editorActivation.id = 'editorActive';
+        
         var editorCheckBox = document.createElement('input');
         editorCheckBox.setAttribute('type', 'checkbox');
         editorCheckBox.setAttribute('id', 'editorcb');
         editorCheckBox.style.display = 'inline';
         editorCheckBox.style.verticalAlign = 'top';
-        editorCheckBox.onchange = (ch) => {
-            editorMode = !editorMode;
-        };
-        div.appendChild(editorCheckBox);
+        editorActivation.appendChild(editorCheckBox);
 
 
         var label = document.createElement('label');
         label.setAttribute('for', 'editorcb');
         label.innerText = 'Editor';
         label.style.display = 'inline';
-        div.appendChild(label);
+        editorActivation.appendChild(label);
 
-        var editors = document.createElement('span');
-        editors.id = 'editors';
-        editors.style.display = 'none';
-        editors.innerHTML += ', <a id="josm-bbox" target="_blank">Josm</a>';
-        editors.innerHTML += ', <a id="id-bbox" target="_blank">iD</a>';
-        editors.innerHTML += ' | <a target="_blank" href="https://wiki.openstreetmap.org/wiki/Key:parking:lane">Tagging</a>';
-        div.appendChild(editors);
+        div.appendChild(editorActivation);
         
         div.innerHTML += ' | <a target="_blank" href="https://github.com/zetx16/parking-lanes">GitHub</a>';
 
@@ -134,19 +136,6 @@ L.Control.Save = L.Control.extend({
 
 new L.Control.Save({ position: 'topright' }).addTo(map);
 
-//------------- Auth control --------------------
-
-L.Control.Auth = L.Control.extend({
-    onAdd: map => {
-        var div = L.DomUtil.create('button', 'leaflet-control-layers control-padding');
-        div.id = 'auth';
-        div.innerText = 'Auth';
-        return div;
-    }
-});
-
-new L.Control.Auth({ position: 'topright' }).addTo(map);
-
 //----------------------------------------------------
 
 var legend = [
@@ -191,6 +180,27 @@ var valuesCond = ['free', 'ticket', 'disc', 'residents', 'customers', 'private']
 
 // ------------- functions -------------------
 
+document.getElementById('editorcb').onchange = (chb) => {
+
+    var checkAuth = function (err) {
+        if (err) {
+            document.getElementById('editorActive').style.color = 'red';
+            auth.authenticate(checkAuth);
+        }
+        else {
+            editorMode = true;
+            document.getElementById('editorActive').style.color = 'green';
+        }
+    };
+
+    if (chb.currentTarget.checked)
+        auth.authenticate(checkAuth);
+    else {
+        editorMode = false;
+        document.getElementById('editorActive').style.color = 'black';
+    }
+};
+
 function mapMoveEnd() {
     document.getElementById('josm-bbox').href = urlJosm + urlOverpass + getQueryHighways();
     document.getElementById('id-bbox').href = urlID + '#map=' +
@@ -199,7 +209,7 @@ function mapMoveEnd() {
 
     var newOffset = map.getZoom() < 15 ? 2 : offset;
     for (var lane in lanes) {
-        if (lane === 'right' || lane === 'left')
+        if (lane === 'right' || lane === 'left' || lane.startsWith('empty'))
             continue;
         var sideOffset = lanes[lane].options.offset > 0 ? 1 : -1;
         lanes[lane].setOffset(sideOffset * newOffset);
@@ -233,6 +243,7 @@ function withinLastBbox()
 
 function parseContent(content) {
     var nodes = {};
+    var regex = new RegExp('^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street');
 
     for (var obj of Array.isArray(content.osm.node) ? content.osm.node : [content.osm.node] ) {
         nodes[obj.$id] = [obj.$lat, obj.$lon];
@@ -248,12 +259,17 @@ function parseContent(content) {
         ways[obj.$id] = obj;
 
         var polyline = obj.nd.map(x => nodes[x.$ref]);
+        var emptyway = true;
 
         for (var side of ['right', 'left']) {
             var conditions = getConditions(side, obj.tag);
-            if (conditions.default != null)
+            if (conditions.default != null) {
                 addLane(polyline, conditions, side, obj, offset);
+                emptyway = false;
+            }
         }
+        if (/*editorMode && */emptyway && obj.tag.filter(x => x.$k == 'highway' && regex.test(x.$v)).length > 0)
+            addLane(polyline, null, 'right', obj, 0);
     }
 }
 
@@ -340,7 +356,13 @@ function getConditions(side, tags) {
 }
 
 function addLane(line, conditions, side, osm, offset) {
-    lanes[side == 'right' ? osm.$id.toString() : ('-' + osm.$id)] = L.polyline(line,
+    var id = !conditions
+        ? 'empty' + osm.$id
+        : side == 'right'
+            ? osm.$id
+            : -osm.$id
+
+    lanes[id] = L.polyline(line,
         {
             color: getColorByDate(conditions),
             weight: 3,
@@ -359,6 +381,8 @@ function getColor(condition) {
 }
 
 function getColorByDate(conditions) {
+    if (!conditions)
+        return 'black';
     for (var interval of conditions.intervals)
         if (interval.interval.getState(datetime))
             return getColor(interval.condition);
@@ -394,102 +418,126 @@ var tagsBlock = [
 ];
 
 function getPopupContent(osm) {
-    setBacklight(osm);
+    if (true) {//(editorMode) {
+        setBacklight(osm);
 
-    var head = document.createElement('div');
-    head.setAttribute('style', 'min-width:250px');
+        var head = document.createElement('div');
+        head.setAttribute('style', 'min-width:250px');
 
-    var linkOsm = document.createElement('a');
-    linkOsm.setAttribute('target', '_blank');
-    linkOsm.setAttribute('href', 'https://openstreetmap.org/way/' + osm.$id);
-    linkOsm.innerText = 'View in OSM';
-    head.appendChild(linkOsm);
+        var linkOsm = document.createElement('a');
+        linkOsm.setAttribute('target', '_blank');
+        linkOsm.setAttribute('href', 'https://openstreetmap.org/way/' + osm.$id);
+        linkOsm.innerText = 'View in OSM';
+        head.appendChild(linkOsm);
 
-    var editorBlock = document.createElement('span');
-    editorBlock.setAttribute('style', 'float:right');
-    editorBlock.innerText = 'Edit: ';
+        var editorBlock = document.createElement('span');
+        editorBlock.setAttribute('style', 'float:right');
+        editorBlock.innerText = 'Edit: ';
 
-    var linkJosm = document.createElement('a');
-    linkJosm.setAttribute('target', '_blank');
-    linkJosm.setAttribute('href', urlJosm + urlOverpass + getQueryOsmId(osm.$id));
-    linkJosm.innerText = 'Josm';
-    editorBlock.appendChild(linkJosm);
-    editorBlock.innerHTML += ', ';
+        var linkJosm = document.createElement('a');
+        linkJosm.setAttribute('target', '_blank');
+        linkJosm.setAttribute('href', urlJosm + urlOverpass + getQueryOsmId(osm.$id));
+        linkJosm.innerText = 'Josm';
+        editorBlock.appendChild(linkJosm);
+        editorBlock.innerHTML += ', ';
 
-    var linkID = document.createElement('a');
-    linkID.setAttribute('target', '_blank');
-    linkID.setAttribute('href', urlID + '&way=' + osm.$id);
-    linkID.innerText = 'iD';
-    editorBlock.appendChild(linkID);
+        var linkID = document.createElement('a');
+        linkID.setAttribute('target', '_blank');
+        linkID.setAttribute('href', urlID + '&way=' + osm.$id);
+        linkID.innerText = 'iD';
+        editorBlock.appendChild(linkID);
 
-    head.appendChild(editorBlock);
+        head.appendChild(editorBlock);
 
-    var form = document.createElement("form");
-    form.setAttribute('id', osm.$id);
-    form.onsubmit = save;
+        var form = document.createElement("form");
+        form.setAttribute('id', osm.$id);
+        form.onsubmit = save;
 
-    var checkBoth = document.createElement('input');
-    checkBoth.setAttribute('type', 'checkbox');
-    checkBoth.setAttribute('id', 'checkboth');
-    checkBoth.onchange = (ch) => {
-        if (ch.currentTarget.checked) {
-            document.getElementById("right").style.display = 'none';
-            document.getElementById("left").style.display = 'none';
-            document.getElementById("both").style.display = 'block';
+        var checkBoth = document.createElement('input');
+        checkBoth.setAttribute('type', 'checkbox');
+        checkBoth.setAttribute('id', 'checkboth');
+        checkBoth.onchange = (ch) => {
+            if (ch.currentTarget.checked) {
+                document.getElementById("right").style.display = 'none';
+                document.getElementById("left").style.display = 'none';
+                document.getElementById("both").style.display = 'block';
+            } else {
+                document.getElementById("right").style.display = 'block';
+                document.getElementById("left").style.display = 'block';
+                document.getElementById("both").style.display = 'none';
+            }
+        };
+        form.appendChild(checkBoth);
+
+        var label = document.createElement('label');
+        label.setAttribute('for', 'checkboth');
+        label.innerText = 'Both';
+        form.appendChild(label);
+
+        var regex = new RegExp('^parking:');
+        var dl = document.createElement('dl');
+        for (var side of ['both', 'right', 'left'].map(x => getTagsBlock(x, osm)))
+            dl.appendChild(side);
+        form.appendChild(dl);
+
+        var submit = document.createElement('input');
+        submit.setAttribute('type', 'submit');
+        submit.setAttribute('value', 'Apply');
+        form.appendChild(submit);
+
+        var cancel = document.createElement('input');
+        cancel.setAttribute('type', 'reset');
+        cancel.setAttribute('value', 'Cancel');
+        form.appendChild(cancel);
+
+        if ((chooseSideTags(form, 'right') || chooseSideTags(form, 'left')) || !chooseSideTags(form, 'both')) {
+            form[0].checked = false;
+            form.childNodes[2].childNodes[0].style.display = 'none';
+            form.childNodes[2].childNodes[1].style.display = 'block';
+            form.childNodes[2].childNodes[2].style.display = 'block';
         } else {
-            document.getElementById("right").style.display = 'block';
-            document.getElementById("left").style.display = 'block';
-            document.getElementById("both").style.display = 'none';
+            form[0].checked = true;
+            form.childNodes[2].childNodes[0].style.display = 'block';
+            form.childNodes[2].childNodes[1].style.display = 'none';
+            form.childNodes[2].childNodes[2].style.display = 'none';
         }
-    };
-    form.appendChild(checkBoth);
 
-    var label = document.createElement('label');
-    label.setAttribute('for', 'checkboth');
-    label.innerText = 'Both';
-    form.appendChild(label);
-    
-    var regex = new RegExp('^parking:');
-    var dl = document.createElement('dl');
-    for (var side of ['both', 'right', 'left'].map(x => getTagsBlock(x, osm)))
-        dl.appendChild(side);
-    form.appendChild(dl);
 
-    var submit = document.createElement('input');
-    submit.setAttribute('type', 'submit');
-    submit.setAttribute('value', 'Apply');
-    form.appendChild(submit);
+        var div = document.createElement('div');
+        div.appendChild(head);
+        div.appendChild(document.createElement('hr'));
+        div.appendChild(form);
 
-    var cancel = document.createElement('input');
-    cancel.setAttribute('type', 'reset');
-    cancel.setAttribute('value', 'Cancel');
-    form.appendChild(cancel);
-
-    if ((chooseSideTags(form, 'right') || chooseSideTags(form, 'left')) || !chooseSideTags(form, 'both')) {
-        form[0].checked = false;
-        form.childNodes[2].childNodes[0].style.display = 'none';
-        form.childNodes[2].childNodes[1].style.display = 'block';
-        form.childNodes[2].childNodes[2].style.display = 'block';
-    } else {
-        form[0].checked = true;
-        form.childNodes[2].childNodes[0].style.display = 'block';
-        form.childNodes[2].childNodes[1].style.display = 'none';
-        form.childNodes[2].childNodes[2].style.display = 'none';
+        return div;
     }
+    else {
+        var regex = new RegExp('^parking:');
+        var result = '';
 
+        result += '<div style="min-width:200px">';
+        result += '<a target="_blank" href="https://openstreetmap.org/way/' + osm.$id + '">View in OSM</a>';
+        result += '<span style="float:right">Edit: ';
+        result += '<a target="_blank" href="' + urlJosm + urlOverpass + getQueryOsmId(osm.$id) + '">Josm</a>';
+        result += ', <a target="_blank" href="' + urlID + '&way=' + osm.$id + '">iD</a>';
+        result += '</span>';
+        result += '</div>';
 
-    var div = document.createElement('div');
-    div.appendChild(head);
-    div.appendChild(document.createElement('hr'));
-    div.appendChild(form);
+        result += '<hr>';
 
-    return div;
+        for (var tag of osm.tag)
+            if (regex.test(tag.$k))
+                result += tag.$k + ' = ' + tag.$v + '<br />';
+
+        return result;
+    }
 }
 
 function setBacklight(osm) {
     var polyline = lanes[osm.$id]
         ? lanes[osm.$id].getLatLngs()
-        : lanes[-osm.$id].getLatLngs();
+        : lanes[-osm.$id]
+            ? lanes[-osm.$id].getLatLngs()
+            : lanes['empty' + osm.$id].getLatLngs();
 
     var n = 3;
 
@@ -530,12 +578,14 @@ function getTagsBlock(side, osm) {
         tag = tag.replace('{side}', side);
 
         var label = document.createElement('label');
-        label.innerText = tag.replace('parking:', '');
+        var tagSplit = tag.split(':');
+        label.innerText = tagSplit[Math.floor(tagSplit.length / 2) * 2 - 1];//tag.replace('parking:', ''); 0 1 2 | 3/2 | 1 | 2 - 1
         var dt = document.createElement('dt');
         dt.appendChild(label);
         
         var tagval = document.createElement('input');
         tagval.setAttribute('type', 'text');
+        tagval.setAttribute('placeholder', tag);
         tagval.setAttribute('name', tag);
         if (tag == 'parking:lane:' + side)
             tagval.setAttribute('list', 'lanesList');
@@ -544,12 +594,48 @@ function getTagsBlock(side, osm) {
         var value = osm.tag.filter(x => x.$k === tag)[0];
         tagval.setAttribute('value', value != undefined ? value.$v : '');
         var dd = document.createElement('dd');
+        tagval.onchange = addOrUpdate;
         dd.appendChild(tagval);
 
         div.appendChild(dt);
         div.appendChild(dd);
     }
     return div;
+}
+
+function addOrUpdate() {
+    var obj = formToOsmWay(this.form);
+    var polyline;
+    if (lanes[obj.$id])
+        polyline = lanes[obj.$id].getLatLngs();
+    else if (lanes[-obj.$id])
+        polyline = lanes[-obj.$id].getLatLngs();
+    else if (lanes['empty' + obj.$id])
+        polyline = lanes['empty' + obj.$id].getLatLngs();
+
+
+    var emptyway = true;
+    for (var side of ['right', 'left']) {
+        var conditions = getConditions(side, obj.tag);
+        var id = side == 'right' ? obj.$id : -obj.$id;
+        if (conditions.default != null) {
+            if (lanes[id]) {
+                lanes[id].conditions = conditions;
+                lanes[id].setStyle({ color: getColorByDate(conditions) });
+            } else {
+                addLane(polyline, conditions, side, obj, offset);
+            }
+            emptyway = false;
+        } else if (lanes[id]) {
+            lanes[id].remove();
+        }
+    }
+    if (emptyway) {
+        if (!lanes['empty' + obj.$id])
+            addLane(polyline, null, 'right', obj, 0);
+    } else if (lanes['empty' + obj.$id]) {
+        lanes['empty' + obj.$id].setStyle({ color: 'white' });
+    }
 }
 
 function chooseSideTags(form, side) {
@@ -562,15 +648,20 @@ function chooseSideTags(form, side) {
     return false;
 }
 
-function save(form) {
+function formToOsmWay(form) {
     var regex = new RegExp('^parking:');
-    var osm = ways[form.target.id];
+    var osm = ways[form.id];
     osm.tag = osm.tag.filter(tag => !regex.test(tag.$k));
 
-    for (var input of form.target)
+    for (var input of form)
         if (regex.test(input.name) && input.value != '') {
             osm.tag.push({ $k: input.name, $v: input.value })
         }
+    return osm;
+}
+
+function save(form) {
+    var osm = formToOsmWay(form.target);
 
     delete osm.$user;
     delete osm.$uid;
@@ -658,26 +749,11 @@ var auth = useTestServer
         singlepage: true
     });
 
-
-document.getElementById('auth').onclick = function () {
-    var getUserName = () =>
-        auth.xhr({
-            method: 'GET',
-            path: '/api/0.6/user/details'
-        }, function (err, details) {
-            var user = JXON.xmlToJs(details);
-            document.getElementById('auth').innerText = user.osm.user.$display_name;
-        });
-    
-    if (auth.authenticated())
-        getUserName();
-    else
-        auth.authenticate(getUserName);
-};
-
 function deleteBacklight() {
-    lanes['right'].remove();
-    lanes['left'].remove();
+    if (lanes['right'])
+        lanes['right'].remove();
+    if (lanes['left'])
+        lanes['left'].remove();
 }
 
 map.on('moveend', mapMoveEnd);

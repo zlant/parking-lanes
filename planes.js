@@ -414,6 +414,7 @@ var tagsBlock = [
     "parking:lane:{side}",
     "parking:condition:{side}",
     "parking:condition:{side}:time_interval",
+    "parking:condition:{side}:default",
     "parking:condition:{side}:capacity"
 ];
 
@@ -574,12 +575,18 @@ function getTagsBlock(side, osm) {
     listValCond.innerHTML = valuesCond.map(x => '<option value="' + x + '"></option>').join('');
     div.appendChild(listValCond);
 
+    var hideDefault = false;
+    var regexTimeInt = new RegExp('parking:condition:.+:time_interval');
+    var regexDefault = new RegExp('parking:condition:.+:default');
+
     for (var tag of tagsBlock) {
         tag = tag.replace('{side}', side);
 
         var label = document.createElement('label');
         var tagSplit = tag.split(':');
         label.innerText = tagSplit[Math.floor(tagSplit.length / 2) * 2 - 1];//tag.replace('parking:', ''); 0 1 2 | 3/2 | 1 | 2 - 1
+        var inputdiv = document.createElement('div');
+        inputdiv.id = tag;
         var dt = document.createElement('dt');
         dt.appendChild(label);
         
@@ -597,13 +604,28 @@ function getTagsBlock(side, osm) {
         tagval.onchange = addOrUpdate;
         dd.appendChild(tagval);
 
-        div.appendChild(dt);
-        div.appendChild(dd);
+        if (regexTimeInt.test(tag))
+            hideDefault = tagval.value === '';
+        else if (regexDefault.test(tag) && hideDefault)
+            inputdiv.style.display = 'none';
+
+        inputdiv.appendChild(dt);
+        inputdiv.appendChild(dd);
+        div.appendChild(inputdiv);
     }
     return div;
 }
 
 function addOrUpdate() {
+    var regex = new RegExp('parking:condition:.+:time_interval');
+    if (regex.test(this.name)) {
+        var side = this.name.split(':')[2];
+        if (this.value === '')
+            document.getElementById('parking:condition:' + side + ':default').style.display = 'none';
+        else
+            document.getElementById('parking:condition:' + side + ':default').style.display = 'block';
+    }
+
     var obj = formToOsmWay(this.form);
     var polyline;
     if (lanes[obj.$id])

@@ -199,6 +199,9 @@ document.getElementById('editorcb').onchange = (chb) => {
     else {
         editorMode = false;
         document.getElementById('editorActive').style.color = 'black';
+        for (var lane in lanes)
+            if (lane.startsWith('empty'))
+                lanes[lane].remove();
     }
 };
 

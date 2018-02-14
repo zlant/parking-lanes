@@ -166,7 +166,7 @@ var urlOverpass = 'https://overpass-api.de/api/interpreter?data=';
 var urlJosm = 'http://127.0.0.1:8111/import?url=';
 var urlID = 'https://www.openstreetmap.org/edit?editor=id';
 
-var useTestServer = true;
+var useTestServer = false;
 var urlOsmTest = useTestServer
     ? 'https://master.apis.dev.openstreetmap.org'
     : 'https://www.openstreetmap.org';
@@ -190,6 +190,7 @@ document.getElementById('editorcb').onchange = (chb) => {
         else {
             editorMode = true;
             document.getElementById('editorActive').style.color = 'green';
+            mapMoveEnd();
         }
     };
 
@@ -215,20 +216,22 @@ function mapMoveEnd() {
         lanes[lane].setOffset(sideOffset * newOffset);
         lanes[lane].setStyle({ weight: (map.getZoom() < 15 ? 2 : 3) });
     }
-    
+
     if (map.getZoom() < 15) {
         document.getElementById("info").style.display = 'block';
         return;
     }
-    
+
     document.getElementById("info").style.display = 'none';
 
     if (withinLastBbox())
         return;
 
     lastBounds = map.getBounds();
-    getContent(urlOsmTest + getQueryParkingLanes(), parseContent);
-    //getContent(urlOverpass + encodeURIComponent(getQueryParkingLanes()), parseContent);
+    if (useTestServer)
+        getContent(urlOsmTest + getQueryParkingLanes(), parseContent);
+    else
+        getContent(urlOverpass + encodeURIComponent(getQueryParkingLanes()), parseContent);
 }
 
 function withinLastBbox()
@@ -238,7 +241,7 @@ function withinLastBbox()
 
     var bounds = map.getBounds();
     return bounds.getWest() > lastBounds.getWest() && bounds.getSouth() > lastBounds.getSouth() &&
-        bounds.getEast() < lastBounds.getEast() && bounds.getNorth() < lastBounds.getNorth();
+           bounds.getEast() < lastBounds.getEast() && bounds.getNorth() < lastBounds.getNorth();
 }
 
 function parseContent(content) {
@@ -268,7 +271,7 @@ function parseContent(content) {
                 emptyway = false;
             }
         }
-        if (/*editorMode && */emptyway && obj.tag.filter(x => x.$k == 'highway' && regex.test(x.$v)).length > 0)
+        if (editorMode && emptyway && obj.tag.filter(x => x.$k == 'highway' && regex.test(x.$v)).length > 0)
             addLane(polyline, null, 'right', obj, 0);
     }
 }
@@ -391,12 +394,15 @@ function getColorByDate(conditions) {
 
 function getQueryParkingLanes() {
     var bounds = map.getBounds();
-
-    var bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()].join(',');
-    return '/api/0.6/map?bbox=' + bbox;
-
-    //var bbox = [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',');
-    //return '[out:xml];(way[~"^parking:lane:.*"~"."](' + bbox + ');>;);out meta;';
+    if (useTestServer) {
+        var bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()].join(',');
+        return '/api/0.6/map?bbox=' + bbox;
+    } else {
+        var bbox = [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',');
+        return editorMode
+            ? '[out:xml];(way[highway~"^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street"](' + bbox + ');>;);out meta;'
+            : '[out:xml];(way[~"^parking:lane:.*"~"."](' + bbox + ');>;);out meta;';
+    }
 }
 
 function getQueryHighways() {
@@ -419,7 +425,7 @@ var tagsBlock = [
 ];
 
 function getPopupContent(osm) {
-    if (true) {//(editorMode) {
+    if (editorMode) {
         setBacklight(osm);
 
         var head = document.createElement('div');
@@ -453,6 +459,7 @@ function getPopupContent(osm) {
         var form = document.createElement("form");
         form.setAttribute('id', osm.$id);
         form.onsubmit = save;
+        form.onreset = removeFromOsmChangeset;
 
         var checkBoth = document.createElement('input');
         checkBoth.setAttribute('type', 'checkbox');
@@ -589,17 +596,42 @@ function getTagsBlock(side, osm) {
         inputdiv.id = tag;
         var dt = document.createElement('dt');
         dt.appendChild(label);
-        
-        var tagval = document.createElement('input');
-        tagval.setAttribute('type', 'text');
-        tagval.setAttribute('placeholder', tag);
-        tagval.setAttribute('name', tag);
-        if (tag == 'parking:lane:' + side)
-            tagval.setAttribute('list', 'lanesList');
-        else if (tag == 'parking:condition:' + side)
-            tagval.setAttribute('list', 'condsList');
+
         var value = osm.tag.filter(x => x.$k === tag)[0];
-        tagval.setAttribute('value', value != undefined ? value.$v : '');
+        var tagval;
+
+        if (tag == 'parking:lane:' + side) {
+            tagval = document.createElement('select');
+            var additVals = value && valuesLane.indexOf(value.$v) >= 0 ? ['', value.$v] : [''];
+
+            for (var x of additVals.concat(valuesLane)) {
+                var option = document.createElement('option');
+                option.value = x;
+                option.innerText = x;
+                tagval.appendChild(option);
+            }
+            tagval.value = value ? value.$v : '';
+        }
+        else if (tag == 'parking:condition:' + side) {
+            tagval = document.createElement('select');
+            var additVals = value && valuesLane.indexOf(value.$v) >= 0 ? ['', value.$v] : [''];
+
+            for (var x of additVals.concat(valuesCond)) {
+                var option = document.createElement('option');
+                option.value = x;
+                option.innerText = x;
+                tagval.appendChild(option);
+            }
+            tagval.value = value ? value.$v : '';
+        }
+        else {
+            tagval = document.createElement('input');
+            tagval.setAttribute('type', 'text');
+            tagval.setAttribute('placeholder', tag);
+            tagval.setAttribute('name', tag);
+            tagval.setAttribute('value', value != undefined ? value.$v : '');
+        }
+        tagval.setAttribute('name', tag);
         var dd = document.createElement('dd');
         tagval.onchange = addOrUpdate;
         dd.appendChild(tagval);
@@ -701,6 +733,16 @@ function save(form) {
     return false;
 }
 
+function removeFromOsmChangeset(form) {
+    var index = change.osmChange.modify.way.findIndex(x => x.$id == form.target.id);
+
+    if (index > -1)
+        change.osmChange.modify.way.splice(index, 1);
+
+    if (change.osmChange.modify.way.length == 0)
+        document.getElementById('saveChangeset').style.display = 'none';
+}
+
 function saveChangesets(changesetId) {
     for (var way of change.osmChange.modify.way)
         way.$changeset = changesetId;
@@ -758,17 +800,17 @@ function createChangset() {
 var auth = useTestServer
     ? osmAuth({
         url: urlOsmTest,
-        oauth_consumer_key: 'ZSneUbP6ZQROcwbTT09ihsUPeDPWnvj1PoRWEAsa',
-        oauth_secret: 'BcqBWMzRzuYIRHGZqsS81nsD07h3pTjY3A4bbAQA',
+        oauth_consumer_key: 'FhbDyU5roZ0wAPffly1yfiYChg8RaNuFlJTB0SE1',
+        oauth_secret: 'gTzuFDWUqmZnwho2NIaVoxpgSX47Xyqq65lTw8do',
         auto: true,
-        singlepage: true
+        //singlepage: true
     })
     : osmAuth({
         url: urlOsmTest,
-        oauth_consumer_key: '44puUDhiBVg8gzyXTVeUEwBaaOQvIaJaZk271cYy',
-        oauth_secret: 'ryi5BcUVOIkgkcalQBQg4SQPjAHNqwiNlgpcrhAR',
+        oauth_consumer_key: 'Np0gmfYoqo6Ronla4wuFTXEUgypODL0jPRzjiFW6',
+        oauth_secret: 'KnUDQ3sL3T7LZjvwi5OJj1hxNBz0UiSpTr0T0fLs',
         auto: true,
-        singlepage: true
+        //singlepage: true
     });
 
 function deleteBacklight() {

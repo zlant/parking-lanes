@@ -223,14 +223,19 @@ function mapMoveEnd() {
     } else if (zoom == 15) {
         offset = 3;
         weight = 2;
-    } else if (zoom == 15)
+    } else if (zoom == 15) {
         offset = 3;
-    else if (zoom == 16)
+        weight = 3;
+    } else if (zoom == 16) {
         offset = 5;
-    else if (zoom == 17)
+        weight = 3;
+    } else if (zoom == 17) {
         offset = 7;
-    else if (zoom >= 18)
+        weight = 3;
+    } else if (zoom >= 18) {
         offset = 8;
+        weight = 3;
+    }
 
     for (var lane in lanes) {
         if (lane === 'right' || lane === 'left' || lane.startsWith('empty'))

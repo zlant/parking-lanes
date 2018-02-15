@@ -693,6 +693,8 @@ function addOrUpdate() {
     } else if (lanes['empty' + obj.$id]) {
         lanes['empty' + obj.$id].setStyle({ color: 'white' });
     }
+
+    save({ target: this.form });
 }
 
 function chooseSideTags(form, side) {

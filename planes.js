@@ -151,6 +151,7 @@ var legend = [
 var ways = {};
 var lanes = {};
 var offset = 6;
+var weight = 3;
 
 var editorName = 'PLanes'
 var version = '0.1'
@@ -210,14 +211,33 @@ function mapMoveEnd() {
     document.getElementById('id-bbox').href = urlID + '#map=' +
         document.location.href.substring(document.location.href.indexOf('#') + 1);
     setLocationCookie();
+    
+    var zoom = map.getZoom();
 
-    var newOffset = map.getZoom() < 15 ? 2 : offset;
+    if (zoom <= 12) {
+        offset = 1;
+        weight = 1;
+    } else if (zoom >= 13 && zoom <= 14) {
+        offset = 1.5;
+        weight = 1.5;
+    } else if (zoom == 15) {
+        offset = 3;
+        weight = 2;
+    } else if (zoom == 15)
+        offset = 3;
+    else if (zoom == 16)
+        offset = 5;
+    else if (zoom == 17)
+        offset = 7;
+    else if (zoom >= 18)
+        offset = 8;
+
     for (var lane in lanes) {
         if (lane === 'right' || lane === 'left' || lane.startsWith('empty'))
             continue;
         var sideOffset = lanes[lane].options.offset > 0 ? 1 : -1;
-        lanes[lane].setOffset(sideOffset * newOffset);
-        lanes[lane].setStyle({ weight: (map.getZoom() < 15 ? 2 : 3) });
+        lanes[lane].setOffset(sideOffset * offset);
+        lanes[lane].setStyle({ weight: weight });
     }
 
     if (map.getZoom() < 15) {
@@ -371,7 +391,7 @@ function addLane(line, conditions, side, osm, offset) {
     lanes[id] = L.polyline(line,
         {
             color: getColorByDate(conditions),
-            weight: 3,
+            weight: weight,
             offset: side == 'right' ? offset : -offset,
             conditions: conditions,
             osm: osm

@@ -193,6 +193,7 @@ document.getElementById('editorcb').onchange = (chb) => {
         else {
             editorMode = true;
             document.getElementById('editorActive').style.color = 'green';
+            lastBounds = undefined;
             mapMoveEnd();
         }
     };

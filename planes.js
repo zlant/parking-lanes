@@ -179,6 +179,8 @@ var editorMode = false;
 var valuesLane = ['parallel', 'diagonal', 'perpendicular', 'no_parking', 'no_stopping', 'marked', 'fire_lane'];
 var valuesCond = ['free', 'ticket', 'disc', 'residents', 'customers', 'private'];
 
+var saving = false;
+
 // ------------- functions -------------------
 
 document.getElementById('editorcb').onchange = (chb) => {
@@ -799,9 +801,14 @@ function closeChangset(changesetId) {
         path: path
     }, function (err, details) {
         document.getElementById('saveChangeset').style.display = 'none';
+        saving = false;
     });
 }
 function createChangset() {
+    if (saving)
+        return;
+    saving = true;
+
     var path = '/api/0.6/changeset/create';
 
     var change = {

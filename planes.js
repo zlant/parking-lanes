@@ -138,23 +138,10 @@ new L.Control.Save({ position: 'topright' }).addTo(map);
 
 //----------------------------------------------------
 
-var legend = [
-    { condition: 'disc',        color: 'gold',          text: 'Disc'          },
-    { condition: 'no_parking',  color: 'gold',          text: 'No parking'    },
-    { condition: 'no_stopping', color: 'salmon',        text: 'No stopping'   },
-    { condition: 'free',        color: 'limegreen',     text: 'Free parking'  },
-    { condition: 'ticket',      color: 'dodgerblue',    text: 'Paid parking'  },
-    { condition: 'customers',   color: 'greenyellow',   text: 'For customers' },
-    { condition: 'residents',   color: 'hotpink',       text: 'For residents' }
-];
-
 var ways = {};
 var lanes = {};
 var offset = 6;
 var weight = 3;
-
-var editorName = 'PLanes'
-var version = '0.1'
 
 var change = { osmChange: { $version: '0.6', $generator: 'Parking lane ' + version, modify: { way: [] } } };
 
@@ -163,22 +150,9 @@ document.getElementById('datetime-input').value =
     datetime.getFullYear() + '-' + (datetime.getMonth() + 1) + '-' + datetime.getDate() + ' ' +
     datetime.getHours() + ':' + datetime.getMinutes();
 
-var urlOverpass = 'https://overpass-api.de/api/interpreter?data=';
-var urlJosm = 'http://127.0.0.1:8111/import?url=';
-var urlID = 'https://www.openstreetmap.org/edit?editor=id';
-
-var useTestServer = false;
-var urlOsmTest = useTestServer
-    ? 'https://master.apis.dev.openstreetmap.org'
-    : 'https://www.openstreetmap.org';
-
 var lastBounds;
 
 var editorMode = false;
-
-var valuesLane = ['parallel', 'diagonal', 'perpendicular', 'no_parking', 'no_stopping', 'marked', 'fire_lane'];
-var valuesCond = ['free', 'ticket', 'disc', 'residents', 'customers', 'private'];
-
 var saving = false;
 
 // ------------- functions -------------------
@@ -394,7 +368,7 @@ function addLane(line, conditions, side, osm, offset) {
         ? 'empty' + osm.$id
         : side == 'right'
             ? osm.$id
-            : -osm.$id
+            : -osm.$id;
 
     lanes[id] = L.polyline(line,
         {
@@ -834,22 +808,6 @@ function createChangset() {
             saveChangesets(details);
     });
 }
-
-var auth = useTestServer
-    ? osmAuth({
-        url: urlOsmTest,
-        oauth_consumer_key: 'FhbDyU5roZ0wAPffly1yfiYChg8RaNuFlJTB0SE1',
-        oauth_secret: 'gTzuFDWUqmZnwho2NIaVoxpgSX47Xyqq65lTw8do',
-        auto: true,
-        //singlepage: true
-    })
-    : osmAuth({
-        url: urlOsmTest,
-        oauth_consumer_key: 'Np0gmfYoqo6Ronla4wuFTXEUgypODL0jPRzjiFW6',
-        oauth_secret: 'KnUDQ3sL3T7LZjvwi5OJj1hxNBz0UiSpTr0T0fLs',
-        auto: true,
-        //singlepage: true
-    });
 
 function deleteBacklight() {
     if (lanes['right'])

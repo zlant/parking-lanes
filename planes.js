@@ -359,6 +359,9 @@ function getConditions(side, tags) {
         else
             break;
     }
+
+    if (legend.findIndex(x => x.condition === conditions.default) == -1)
+        conditions.default = null;
     
     return conditions;
 }

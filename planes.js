@@ -141,8 +141,10 @@ new L.Control.Save({ position: 'topright' }).addTo(map);
 
 var ways = {};
 var lanes = {};
-var offset = 6;
-var weight = 3;
+var offsetMajor = 6;
+var weightMajor = 3;
+var offsetMinor = 6;
+var weightMinor = 3;
 
 var change = { osmChange: { $version: '0.6', $generator: 'Parking lane ' + version, modify: { way: [] } } };
 
@@ -195,34 +197,49 @@ function mapMoveEnd() {
     var zoom = map.getZoom();
 
     if (zoom <= 12) {
-        offset = 1;
-        weight = 1;
+        offsetMajor = 1;
+        weightMajor = 1;
+        offsetMinor = 0.5;
+        weightMinor = 0.5;
     } else if (zoom >= 13 && zoom <= 14) {
-        offset = 1.5;
-        weight = 1.5;
+        offsetMajor = 1.5;
+        weightMajor = 1.5;
+        offsetMinor = 1;
+        weightMinor = 0.75;
     } else if (zoom == 15) {
-        offset = 3;
-        weight = 2;
+        offsetMajor = 3;
+        weightMajor = 2;
+        offsetMinor = 2;
+        weightMinor = 1;
     } else if (zoom == 15) {
-        offset = 3;
-        weight = 3;
+        offsetMajor = 3;
+        weightMajor = 3;
+        offsetMinor = 2;
+        weightMinor = 1.5;
     } else if (zoom == 16) {
-        offset = 5;
-        weight = 3;
+        offsetMajor = 5;
+        weightMajor = 3;
+        offsetMinor = 3;
+        weightMinor = 1.5;
     } else if (zoom == 17) {
-        offset = 7;
-        weight = 3;
+        offsetMajor = 7;
+        weightMajor = 3;
+        offsetMinor = 3;
+        weightMinor = 1.5;
     } else if (zoom >= 18) {
-        offset = 8;
-        weight = 3;
+        offsetMajor = 8;
+        weightMajor = 3;
+        offsetMinor = 3;
+        weightMinor = 2;
     }
 
     for (var lane in lanes) {
         if (lane === 'right' || lane === 'left' || lane.startsWith('empty'))
             continue;
         var sideOffset = lanes[lane].options.offset > 0 ? 1 : -1;
-        lanes[lane].setOffset(sideOffset * offset);
-        lanes[lane].setStyle({ weight: weight });
+        var isMajor = lanes[lane].options.isMajor;
+        lanes[lane].setOffset(sideOffset * (isMajor ? offsetMajor : offsetMinor));
+        lanes[lane].setStyle({ weight: (isMajor ? weightMajor : weightMinor) });
     }
 
     if (map.getZoom() < viewMinZoom) {
@@ -264,7 +281,12 @@ function parseContent(content) {
     for (var obj of content.osm.way.filter(x => x.tag != undefined)) {
         if (!Array.isArray(obj.tag))
             obj.tag = [obj.tag];
-        if (lanes[obj.$id.toString()] || lanes['-'+obj.$id])
+        if (lanes[obj.$id.toString()] || lanes['-' + obj.$id] || lanes['empty' + obj.$id])
+            continue;
+
+        var isMajor = wayIsMajor(obj.tag);
+
+        if (typeof isMajor !== 'boolean')
             continue;
 
         ways[obj.$id] = obj;
@@ -275,12 +297,23 @@ function parseContent(content) {
         for (var side of ['right', 'left']) {
             var conditions = getConditions(side, obj.tag);
             if (conditions.default != null) {
-                addLane(polyline, conditions, side, obj, offset);
+                addLane(polyline, conditions, side, obj, isMajor ? offsetMajor : offsetMinor, isMajor);
                 emptyway = false;
             }
         }
         if (editorMode && emptyway && obj.tag.filter(x => x.$k == 'highway' && regex.test(x.$v)).length > 0)
-            addLane(polyline, null, 'right', obj, 0);
+            addLane(polyline, null, 'right', obj, 0, isMajor);
+    }
+}
+
+function wayIsMajor(tags)
+{
+    var findResult = tags.find(x => x.$k == 'highway');
+    if (findResult) {
+        if (findResult.$v.search(/^motorway|trunk|primary|secondary|tertiary|unclassified|residential/) >= 0)
+            return true;
+        else
+            return false;
     }
 }
 
@@ -369,7 +402,7 @@ function getConditions(side, tags) {
     return conditions;
 }
 
-function addLane(line, conditions, side, osm, offset) {
+function addLane(line, conditions, side, osm, offset, isMajor) {
     var id = !conditions
         ? 'empty' + osm.$id
         : side == 'right'
@@ -379,10 +412,11 @@ function addLane(line, conditions, side, osm, offset) {
     lanes[id] = L.polyline(line,
         {
             color: getColorByDate(conditions),
-            weight: weight,
+            weight: isMajor ? weightMajor : weightMinor,
             offset: side == 'right' ? offset : -offset,
             conditions: conditions,
-            osm: osm
+            osm: osm,
+            isMajor: isMajor
         })
         .addTo(map)
         .bindPopup('', { osm: osm });
@@ -563,8 +597,8 @@ function setBacklight(osm) {
     lanes['right'] = L.polyline(polyline,
         {
             color: 'fuchsia',
-            weight: offset * n - 4,
-            offset: offset * n,
+            weight: offsetMajor * n - 4,
+            offset: offsetMajor * n,
             opacity: 0.4
         })
         .addTo(map);
@@ -572,8 +606,8 @@ function setBacklight(osm) {
     lanes['left'] = L.polyline(polyline,
         {
             color: 'cyan',
-            weight: offset * n - 4,
-            offset: -offset * n,
+            weight: offsetMajor * n - 4,
+            offset: -offsetMajor * n,
             opacity: 0.4
         })
         .addTo(map);
@@ -688,7 +722,8 @@ function addOrUpdate() {
                 lanes[id].conditions = conditions;
                 lanes[id].setStyle({ color: getColorByDate(conditions) });
             } else {
-                addLane(polyline, conditions, side, obj, offset);
+                var isMajor = wayIsMajor(obj.tag);
+                addLane(polyline, conditions, side, obj, (isMajor ? offsetMajor : offsetMinor), isMajor);
             }
             emptyway = false;
         } else if (lanes[id]) {
@@ -696,8 +731,10 @@ function addOrUpdate() {
         }
     }
     if (emptyway) {
-        if (!lanes['empty' + obj.$id])
-            addLane(polyline, null, 'right', obj, 0);
+        if (!lanes['empty' + obj.$id]) {
+            var isMajor = wayIsMajor(obj.tag);
+            addLane(polyline, null, 'right', obj, 0, isMajor);
+        }
     } else if (lanes['empty' + obj.$id]) {
         lanes['empty' + obj.$id].setStyle({ color: 'white' });
     }

@@ -114,6 +114,7 @@ L.Control.Info = L.Control.extend({
         var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding');
         div.innerHTML = 'Zoom in on the map.';
         div.id = 'info';
+        div.onclick = () => map.setZoom(viewMinZoom);
         return div;
     }
 });
@@ -154,6 +155,8 @@ var lastBounds;
 
 var editorMode = false;
 var saving = false;
+
+var viewMinZoom = 15;
 
 // ------------- functions -------------------
 
@@ -222,7 +225,7 @@ function mapMoveEnd() {
         lanes[lane].setStyle({ weight: weight });
     }
 
-    if (map.getZoom() < 15) {
+    if (map.getZoom() < viewMinZoom) {
         document.getElementById("info").style.display = 'block';
         return;
     }

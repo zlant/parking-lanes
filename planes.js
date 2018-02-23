@@ -293,7 +293,7 @@ function parseContent(content) {
 
         for (var side of ['right', 'left']) {
             var conditions = getConditions(side, obj.tag);
-            if (conditions.default != null) {
+            if (conditions.default != null || conditions.intervals.length > 0) {
                 addLane(polyline, conditions, side, obj, isMajor ? offsetMajor : offsetMinor, isMajor);
                 emptyway = false;
             }
@@ -377,14 +377,14 @@ function getConditions(side, tags) {
 
         for (var j = 0; j < sides.length; j++) {
             findResult = tags.find(x => x.$k == laneTags[j]);
-            if (findResult)
+            if (findResult && legend.findIndex(x => x.condition === findResult.$v) >= 0)
                 cond.condition = findResult.$v;
             findResult = tags.find(x => x.$k == conditionTags[j]);
             if (findResult)
                 cond.condition = findResult.$v;
             findResult = tags.find(x => x.$k == intervalTags[j]);
             if (findResult)
-                cond.interval = oddEvenRegex.test(findResult.$v)==-1
+                cond.interval = !oddEvenRegex.test(findResult.$v)
                     ? new opening_hours(findResult.$v, null, 0)
                     : parseInt(findResult.$v.match(/\d+/g)[0]) % 2 == 0
                         ? 'even'
@@ -443,8 +443,7 @@ function getColorByDate(conditions) {
             if ((interval.interval == 'even' && datetime.getDate() % 2 == 0) ||
                 (interval.interval == 'odd' && datetime.getDate() % 2 == 1))
                 return getColor(interval.condition);
-        }
-        else if (interval.interval.getState(datetime))
+        } else if (interval.interval && interval.interval.getState(datetime))
             return getColor(interval.condition);
     return getColor(conditions.default);
 }

@@ -872,6 +872,7 @@ function save(form) {
     else
         change.osmChange.modify.way.push(osm);
 
+    document.getElementById('saveChangeset').innerText = 'Save (' + change.osmChange.modify.way.length + ')';
     document.getElementById('saveChangeset').style.display = 'block';
 
     return false;
@@ -885,6 +886,7 @@ function removeFromOsmChangeset(form) {
 
     if (change.osmChange.modify.way.length == 0)
         document.getElementById('saveChangeset').style.display = 'none';
+    document.getElementById('saveChangeset').innerText = 'Save (' + change.osmChange.modify.way.length + ')';
 
     map.closePopup();
 }

@@ -5,8 +5,8 @@ var valuesLane = ['parallel', 'diagonal', 'perpendicular', 'no_parking', 'no_sto
 var valuesCond = ['free', 'ticket', 'disc', 'residents', 'customers', 'private'];
 
 var legend = [
-    { condition: 'disc', color: 'gold', text: 'Disc' },
-    { condition: 'no_parking', color: 'gold', text: 'No parking' },
+    { condition: 'disc', color: 'yellowgreen', text: 'Disc' },
+    { condition: 'no_parking', color: 'orange', text: 'No parking' },
     { condition: 'no_stopping', color: 'salmon', text: 'No stopping' },
     { condition: 'free', color: 'limegreen', text: 'Free parking' },
     { condition: 'ticket', color: 'dodgerblue', text: 'Paid parking' },

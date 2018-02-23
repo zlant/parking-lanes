@@ -790,6 +790,7 @@ function save(form) {
         change.osmChange.modify.way.push(osm);
 
     document.getElementById('saveChangeset').style.display = 'block';
+    map.closePopup();
 
     return false;
 }
@@ -802,6 +803,8 @@ function removeFromOsmChangeset(form) {
 
     if (change.osmChange.modify.way.length == 0)
         document.getElementById('saveChangeset').style.display = 'none';
+
+    map.closePopup();
 }
 
 function saveChangesets(changesetId) {

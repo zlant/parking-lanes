@@ -514,7 +514,10 @@ function getPopupContent(osm) {
 
         var form = document.createElement("form");
         form.setAttribute('id', osm.$id);
-        form.onsubmit = save;
+        form.onsubmit = (e) => {
+            save(e);
+            map.closePopup();
+        };
         form.onreset = removeFromOsmChangeset;
 
         var checkBoth = document.createElement('input');
@@ -627,7 +630,7 @@ function setBacklight(osm) {
 function getTagsBlock(side, osm) {
     var div = document.createElement('div');
     div.setAttribute('id', side);
-
+    /*
     var listValLane = document.createElement('datalist');
     listValLane.setAttribute('id', 'lanesList');
     listValLane.innerHTML = valuesLane.map(x => '<option value="' + x + '"></option>').join('');
@@ -637,17 +640,95 @@ function getTagsBlock(side, osm) {
     listValCond.setAttribute('id', 'condsList');
     listValCond.innerHTML = valuesCond.map(x => '<option value="' + x + '"></option>').join('');
     div.appendChild(listValCond);
-
+    */
     var hideDefault = false;
     var regexTimeInt = new RegExp('parking:condition:.+:time_interval');
     var regexDefault = new RegExp('parking:condition:.+:default');
+
+    var sign = document.createElement('img');
+    sign.src = 'https://upload.wikimedia.org/wikipedia/commons/9/98/3.27_Russian_road_sign.svg';
+    sign.height = 20;
+    sign.width = 20;
+    sign.onclick = () => {
+        document.getElementById(osm.$id)['parking:lane:' + side].value = 'no_stopping';
+        document.getElementById(osm.$id)['parking:condition:' + side].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':default'].value = '';
+        document.getElementById(osm.$id)['parking:lane:' + side].onchange();
+    };
+    div.appendChild(sign);
+
+    var sign = document.createElement('img');
+    sign.src = 'https://upload.wikimedia.org/wikipedia/commons/8/81/3.28_Russian_road_sign.svg';
+    sign.height = 20;
+    sign.width = 20;
+    sign.onclick = () => {
+        document.getElementById(osm.$id)['parking:lane:' + side].value = 'no_parking';
+        document.getElementById(osm.$id)['parking:condition:' + side].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':default'].value = '';
+        document.getElementById(osm.$id)['parking:lane:' + side].onchange();
+    };
+    div.appendChild(sign);
+
+    var sign = document.createElement('img');
+    sign.src = 'https://upload.wikimedia.org/wikipedia/commons/f/f4/3.29_Russian_road_sign.svg';
+    sign.height = 20;
+    sign.width = 20;
+    sign.onclick = () => {
+        document.getElementById(osm.$id)['parking:lane:' + side].value = 'no_parking';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '1-31/2';
+        document.getElementById(osm.$id)['parking:condition:' + side].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':default'].value = '';
+        document.getElementById(osm.$id)['parking:lane:' + side].onchange();
+    };
+    div.appendChild(sign);
+
+    var sign = document.createElement('img');
+    sign.src = 'https://upload.wikimedia.org/wikipedia/commons/7/76/3.30_Russian_road_sign.svg';
+    sign.height = 20;
+    sign.width = 20;
+    sign.onclick = () => {
+        document.getElementById(osm.$id)['parking:lane:' + side].value = 'no_parking';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '2-30/2';
+        document.getElementById(osm.$id)['parking:condition:' + side].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':default'].value = '';
+        document.getElementById(osm.$id)['parking:lane:' + side].onchange();
+    };
+    div.appendChild(sign);
+
+    var sign = document.createElement('img');
+    sign.src = 'https://upload.wikimedia.org/wikipedia/commons/e/eb/6.4_Russian_road_sign.svg';
+    sign.height = 20;
+    sign.width = 20;
+    sign.onclick = () => {
+        document.getElementById(osm.$id)['parking:lane:' + side].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side].value = 'free';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':default'].value = '';
+        document.getElementById(osm.$id)['parking:lane:' + side].onchange();
+    };
+    div.appendChild(sign);
+
+    var sign = document.createElement('img');
+    sign.src = 'https://upload.wikimedia.org/wikipedia/commons/f/f3/8.8_Russian_road_sign.svg';
+    sign.height = 20;
+    sign.width = 40;
+    sign.onclick = () => {
+        document.getElementById(osm.$id)['parking:lane:' + side].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side].value = 'ticket';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':default'].value = '';
+        document.getElementById(osm.$id)['parking:lane:' + side].onchange();
+    };
+    div.appendChild(sign);
 
     for (var tag of tagsBlock) {
         tag = tag.replace('{side}', side);
 
         var label = document.createElement('label');
         var tagSplit = tag.split(':');
-        label.innerText = tagSplit[Math.floor(tagSplit.length / 2) * 2 - 1];//tag.replace('parking:', ''); 0 1 2 | 3/2 | 1 | 2 - 1
+        label.innerText = tagSplit[Math.floor(tagSplit.length / 2) * 2 - 1];
         var inputdiv = document.createElement('div');
         inputdiv.id = tag;
         var dt = document.createElement('dt');
@@ -666,6 +747,7 @@ function getTagsBlock(side, osm) {
                 option.innerText = x;
                 tagval.appendChild(option);
             }
+            tagval.setAttribute('name', tag);
             tagval.value = value ? value.$v : '';
         }
         else if (tag == 'parking:condition:' + side) {
@@ -678,6 +760,7 @@ function getTagsBlock(side, osm) {
                 option.innerText = x;
                 tagval.appendChild(option);
             }
+            tagval.setAttribute('name', tag);
             tagval.value = value ? value.$v : '';
         }
         else {
@@ -790,7 +873,6 @@ function save(form) {
         change.osmChange.modify.way.push(osm);
 
     document.getElementById('saveChangeset').style.display = 'block';
-    map.closePopup();
 
     return false;
 }

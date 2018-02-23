@@ -10,7 +10,7 @@ L.tileLayer.grayscale('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     maxZoom: 18,
 }).addTo(map);
 
-L.control.locate({ drawCircle: false, drawMarker: false }).addTo(map);
+L.control.locate({ drawCircle: false, drawMarker: true }).addTo(map);
 
 //------------- GitHub control ------------------
 
@@ -183,8 +183,10 @@ document.getElementById('editorcb').onchange = (chb) => {
         editorMode = false;
         document.getElementById('editorActive').style.color = 'black';
         for (var lane in lanes)
-            if (lane.startsWith('empty'))
+            if (lane.startsWith('empty')) {
                 lanes[lane].remove();
+                delete lanes[lane];
+            }
     }
 };
 
@@ -205,21 +207,16 @@ function mapMoveEnd() {
         offsetMajor = 1.5;
         weightMajor = 1.5;
         offsetMinor = 1;
-        weightMinor = 0.75;
-    } else if (zoom == 15) {
-        offsetMajor = 3;
-        weightMajor = 2;
-        offsetMinor = 2;
         weightMinor = 1;
     } else if (zoom == 15) {
         offsetMajor = 3;
-        weightMajor = 3;
-        offsetMinor = 2;
-        weightMinor = 1.5;
+        weightMajor = 2;
+        offsetMinor = 1.25;
+        weightMinor = 1.25;
     } else if (zoom == 16) {
         offsetMajor = 5;
         weightMajor = 3;
-        offsetMinor = 3;
+        offsetMinor = 2;
         weightMinor = 1.5;
     } else if (zoom == 17) {
         offsetMajor = 7;
@@ -367,21 +364,31 @@ function getConditions(side, tags) {
             break;
     }
 
+    var oddEvenRegex = new RegExp('^\d+-\d+\/\d+$');
+
     for (var i = 1; i < 10; i++) {
         var index = i > 1 ? ':' + i : '';
 
+        var laneTags = sides.map(side => 'parking:lane:' + side + index);
         var conditionTags = sides.map(side => 'parking:condition:' + side + index);
         var intervalTags = sides.map(side => 'parking:condition:' + side + index + ':time_interval');
 
         var cond = {};
 
         for (var j = 0; j < sides.length; j++) {
+            findResult = tags.find(x => x.$k == laneTags[j]);
+            if (findResult)
+                cond.condition = findResult.$v;
             findResult = tags.find(x => x.$k == conditionTags[j]);
             if (findResult)
                 cond.condition = findResult.$v;
             findResult = tags.find(x => x.$k == intervalTags[j]);
             if (findResult)
-                cond.interval = new opening_hours(findResult.$v, null, 0);
+                cond.interval = oddEvenRegex.test(findResult.$v)==-1
+                    ? new opening_hours(findResult.$v, null, 0)
+                    : parseInt(findResult.$v.match(/\d+/g)[0]) % 2 == 0
+                        ? 'even'
+                        : 'odd';
         }
 
         if (i == 1 && cond.interval == undefined) {
@@ -432,7 +439,12 @@ function getColorByDate(conditions) {
     if (!conditions)
         return 'black';
     for (var interval of conditions.intervals)
-        if (interval.interval.getState(datetime))
+        if (interval.interval == 'even' || interval.interval == 'odd') {
+            if ((interval.interval == 'even' && datetime.getDate() % 2 == 0) ||
+                (interval.interval == 'odd' && datetime.getDate() % 2 == 1))
+                return getColor(interval.condition);
+        }
+        else if (interval.interval.getState(datetime))
             return getColor(interval.condition);
     return getColor(conditions.default);
 }

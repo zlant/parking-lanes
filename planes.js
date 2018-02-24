@@ -364,8 +364,6 @@ function getConditions(side, tags) {
             break;
     }
 
-    var oddEvenRegex = new RegExp('^\d+-\d+\/\d+$');
-
     for (var i = 1; i < 10; i++) {
         var index = i > 1 ? ':' + i : '';
 
@@ -384,7 +382,7 @@ function getConditions(side, tags) {
                 cond.condition = findResult.$v;
             findResult = tags.find(x => x.$k == intervalTags[j]);
             if (findResult)
-                cond.interval = !oddEvenRegex.test(findResult.$v)
+                cond.interval = !/\d+-\d+\/\d+$/.test(findResult.$v)
                     ? new opening_hours(findResult.$v, null, 0)
                     : parseInt(findResult.$v.match(/\d+/g)[0]) % 2 == 0
                         ? 'even'
@@ -518,7 +516,7 @@ function getPopupContent(osm) {
             save(e);
             map.closePopup();
         };
-        form.onreset = removeFromOsmChangeset;
+        //form.onreset = removeFromOsmChangeset;
 
         var checkBoth = document.createElement('input');
         checkBoth.setAttribute('type', 'checkbox');
@@ -555,6 +553,7 @@ function getPopupContent(osm) {
         var cancel = document.createElement('input');
         cancel.setAttribute('type', 'reset');
         cancel.setAttribute('value', 'Cancel');
+        cancel.onclick =  () => removeFromOsmChangeset(osm.$id);
         form.appendChild(cancel);
 
         if ((chooseSideTags(form, 'right') || chooseSideTags(form, 'left')) || !chooseSideTags(form, 'both')) {
@@ -739,29 +738,31 @@ function getTagsBlock(side, osm) {
 
         if (tag == 'parking:lane:' + side) {
             tagval = document.createElement('select');
-            var additVals = value && valuesLane.indexOf(value.$v) >= 0 ? ['', value.$v] : [''];
+            var additVals = value && valuesLane.indexOf(value.$v) == -1 ? ['', value.$v] : [''];
 
             for (var x of additVals.concat(valuesLane)) {
                 var option = document.createElement('option');
                 option.value = x;
                 option.innerText = x;
+                if (value && value.$v === x)
+                    option.setAttribute('selected', 'selected');
                 tagval.appendChild(option);
             }
             tagval.setAttribute('name', tag);
-            tagval.value = value ? value.$v : '';
         }
         else if (tag == 'parking:condition:' + side) {
             tagval = document.createElement('select');
-            var additVals = value && valuesLane.indexOf(value.$v) >= 0 ? ['', value.$v] : [''];
+            var additVals = value && valuesCond.indexOf(value.$v) == -1 ? ['', value.$v] : [''];
 
             for (var x of additVals.concat(valuesCond)) {
                 var option = document.createElement('option');
                 option.value = x;
                 option.innerText = x;
+                if (value && value.$v === x)
+                    option.setAttribute('selected', 'selected');
                 tagval.appendChild(option);
             }
             tagval.setAttribute('name', tag);
-            tagval.value = value ? value.$v : '';
         }
         else {
             tagval = document.createElement('input');
@@ -878,8 +879,12 @@ function save(form) {
     return false;
 }
 
-function removeFromOsmChangeset(form) {
-    var index = change.osmChange.modify.way.findIndex(x => x.$id == form.target.id);
+function removeFromOsmChangeset(id) {
+    var form = document.getElementById(id);
+    form.reset();
+    form['parking:lane:both'].onchange();
+
+    var index = change.osmChange.modify.way.findIndex(x => x.$id == id);
 
     if (index > -1)
         change.osmChange.modify.way.splice(index, 1);

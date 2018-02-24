@@ -648,6 +648,7 @@ function getTagsBlock(side, osm) {
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/9/98/3.27_Russian_road_sign.svg';
     sign.height = 20;
     sign.width = 20;
+    sign.className = 'sign';
     sign.onclick = () => {
         document.getElementById(osm.$id)['parking:lane:' + side].value = 'no_stopping';
         document.getElementById(osm.$id)['parking:condition:' + side].value = '';
@@ -661,6 +662,7 @@ function getTagsBlock(side, osm) {
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/8/81/3.28_Russian_road_sign.svg';
     sign.height = 20;
     sign.width = 20;
+    sign.className = 'sign';
     sign.onclick = () => {
         document.getElementById(osm.$id)['parking:lane:' + side].value = 'no_parking';
         document.getElementById(osm.$id)['parking:condition:' + side].value = '';
@@ -674,6 +676,7 @@ function getTagsBlock(side, osm) {
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/f/f4/3.29_Russian_road_sign.svg';
     sign.height = 20;
     sign.width = 20;
+    sign.className = 'sign';
     sign.onclick = () => {
         document.getElementById(osm.$id)['parking:lane:' + side].value = 'no_parking';
         document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '1-31/2';
@@ -687,6 +690,7 @@ function getTagsBlock(side, osm) {
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/7/76/3.30_Russian_road_sign.svg';
     sign.height = 20;
     sign.width = 20;
+    sign.className = 'sign';
     sign.onclick = () => {
         document.getElementById(osm.$id)['parking:lane:' + side].value = 'no_parking';
         document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '2-30/2';
@@ -700,6 +704,7 @@ function getTagsBlock(side, osm) {
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/e/eb/6.4_Russian_road_sign.svg';
     sign.height = 20;
     sign.width = 20;
+    sign.className = 'sign';
     sign.onclick = () => {
         document.getElementById(osm.$id)['parking:lane:' + side].value = '';
         document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '';
@@ -713,6 +718,7 @@ function getTagsBlock(side, osm) {
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/f/f3/8.8_Russian_road_sign.svg';
     sign.height = 20;
     sign.width = 40;
+    sign.className = 'sign';
     sign.onclick = () => {
         document.getElementById(osm.$id)['parking:lane:' + side].value = '';
         document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '';

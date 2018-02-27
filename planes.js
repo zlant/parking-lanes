@@ -16,7 +16,7 @@ L.control.locate({ drawCircle: false, drawMarker: true }).addTo(map);
 
 L.Control.Link = L.Control.extend({
     onAdd: map => {
-        var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding');
+        var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding control-bigfont');
 
         var editors = document.createElement('span');
         editors.id = 'editors';
@@ -59,7 +59,7 @@ new L.Control.Link({ position: 'bottomright' }).addTo(map);
 
 L.Control.Legend = L.Control.extend({
     onAdd: map => {
-        var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding');
+        var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding control-bigfont');
         div.innerHTML = "Legend";
         div.onmouseenter = setLegendBody;
         div.onmouseleave = setLegendHead;
@@ -96,7 +96,7 @@ function setLegendHead(e) {
 
 L.Control.Datetime = L.Control.extend({
     onAdd: map => {
-        var div = L.DomUtil.create('input', 'leaflet-control-layers control-padding');
+        var div = L.DomUtil.create('input', 'leaflet-control-layers control-padding control-bigfont');
         div.style.width = '115px';
         div.id = 'datetime-input';
         div.onmousedown = div.ondblclick = div.onpointerdown = L.DomEvent.stopPropagation;
@@ -111,7 +111,7 @@ new L.Control.Datetime({ position: 'topright' }).addTo(map);
 
 L.Control.Info = L.Control.extend({
     onAdd: map => {
-        var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding');
+        var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding control-bigfont');
         div.innerHTML = 'Zoom in on the map.';
         div.id = 'info';
         div.onclick = () => map.setZoom(viewMinZoom);
@@ -125,7 +125,7 @@ new L.Control.Info({ position: 'topright' }).addTo(map);
 
 L.Control.Save = L.Control.extend({
     onAdd: map => {
-        var div = L.DomUtil.create('button', 'leaflet-control-layers control-padding');
+        var div = L.DomUtil.create('button', 'leaflet-control-layers control-padding control-bigfont');
         div.id = 'saveChangeset';
         div.innerText = 'Save';
         div.style.background = 'yellow';
@@ -136,6 +136,20 @@ L.Control.Save = L.Control.extend({
 });
 
 new L.Control.Save({ position: 'topright' }).addTo(map);
+
+//------------- LaneInfo control --------------------
+
+L.Control.LaneInfo = L.Control.extend({
+    onAdd: map => {
+        var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding');
+        div.id = 'laneinfo';
+        div.onclick = div.onpointerdown = div.onmousedown = div.ondblclick = L.DomEvent.stopPropagation;
+        div.style.display = 'none';
+        return div;
+    }
+});
+
+new L.Control.LaneInfo({ position: 'topright' }).addTo(map);
 
 //----------------------------------------------------
 
@@ -423,8 +437,16 @@ function addLane(line, conditions, side, osm, offset, isMajor) {
             osm: osm,
             isMajor: isMajor
         })
-        .addTo(map)
-        .bindPopup('', { osm: osm });
+        .on('click', showLaneInfo)
+        .addTo(map);
+}
+
+function showLaneInfo(e) {
+    closeLaneInfo(e);
+    var laneinfo = document.getElementById('laneinfo');
+    laneinfo.appendChild(getLaneInfoPanelContent(e.target.options.osm));
+    laneinfo.style.display = 'block';
+    map.originalEvent.preventDefault();
 }
 
 function getColor(condition) {
@@ -478,7 +500,8 @@ var tagsBlock = [
     "parking:condition:{side}:capacity"
 ];
 
-function getPopupContent(osm) {
+function getLaneInfoPanelContent(osm) {
+    //if (true) {
     if (editorMode) {
         setBacklight(osm);
 
@@ -514,11 +537,12 @@ function getPopupContent(osm) {
         form.setAttribute('id', osm.$id);
         form.onsubmit = (e) => {
             save(e);
-            map.closePopup();
+            closeLaneInfo();
         };
         //form.onreset = removeFromOsmChangeset;
 
         var checkBoth = document.createElement('input');
+        checkBoth.style.display = 'inline';
         checkBoth.setAttribute('type', 'checkbox');
         checkBoth.setAttribute('id', 'checkboth');
         checkBoth.onchange = (ch) => {
@@ -536,6 +560,7 @@ function getPopupContent(osm) {
 
         var label = document.createElement('label');
         label.setAttribute('for', 'checkboth');
+        label.style.display = 'inline';
         label.innerText = 'Both';
         form.appendChild(label);
 
@@ -570,14 +595,20 @@ function getPopupContent(osm) {
 
 
         var div = document.createElement('div');
+        div.id = 'infoContent';
         div.appendChild(head);
         div.appendChild(document.createElement('hr'));
         div.appendChild(form);
+
+        var result = document.createElement('div');
+        result.appendChild(div);
 
         return div;
     }
     else {
         var regex = new RegExp('^parking:');
+        var div = document.createElement('div');
+        div.id = 'infoContent';
         var result = '';
 
         result += '<div style="min-width:200px">';
@@ -594,7 +625,9 @@ function getPopupContent(osm) {
             if (regex.test(tag.$k))
                 result += tag.$k + ' = ' + tag.$v + '<br />';
 
-        return result;
+        div.innerHTML = result;
+
+        return div;
     }
 }
 
@@ -728,15 +761,17 @@ function getTagsBlock(side, osm) {
     };
     div.appendChild(sign);
 
+    var table = document.createElement('table');
+
     for (var tag of tagsBlock) {
         tag = tag.replace('{side}', side);
 
         var label = document.createElement('label');
         var tagSplit = tag.split(':');
         label.innerText = tagSplit[Math.floor(tagSplit.length / 2) * 2 - 1];
-        var inputdiv = document.createElement('div');
+        var inputdiv = document.createElement('tr');
         inputdiv.id = tag;
-        var dt = document.createElement('dt');
+        var dt = document.createElement('td');
         dt.appendChild(label);
 
         var value = osm.tag.filter(x => x.$k === tag)[0];
@@ -778,10 +813,10 @@ function getTagsBlock(side, osm) {
             tagval.setAttribute('value', value != undefined ? value.$v : '');
         }
         tagval.setAttribute('name', tag);
-        var dd = document.createElement('dd');
+        var dd = document.createElement('td');
         tagval.onchange = addOrUpdate;
         dd.appendChild(tagval);
-
+        
         if (regexTimeInt.test(tag))
             hideDefault = tagval.value === '';
         else if (regexDefault.test(tag) && hideDefault)
@@ -789,8 +824,9 @@ function getTagsBlock(side, osm) {
 
         inputdiv.appendChild(dt);
         inputdiv.appendChild(dd);
-        div.appendChild(inputdiv);
+        table.appendChild(inputdiv);
     }
+    div.appendChild(table);
     return div;
 }
 
@@ -801,7 +837,7 @@ function addOrUpdate() {
         if (this.value === '')
             document.getElementById('parking:condition:' + side + ':default').style.display = 'none';
         else
-            document.getElementById('parking:condition:' + side + ':default').style.display = 'block';
+            document.getElementById('parking:condition:' + side + ':default').style.display = '';
     }
 
     var obj = formToOsmWay(this.form);
@@ -899,7 +935,7 @@ function removeFromOsmChangeset(id) {
         document.getElementById('saveChangeset').style.display = 'none';
     document.getElementById('saveChangeset').innerText = 'Save (' + change.osmChange.modify.way.length + ')';
 
-    map.closePopup();
+    closeLaneInfo();
 }
 
 function saveChangesets(changesetId) {
@@ -961,7 +997,11 @@ function createChangset() {
     });
 }
 
-function deleteBacklight() {
+function closeLaneInfo(e) {
+    var laneinfo = document.getElementById('laneinfo');
+    laneinfo.style.display = 'none';
+    laneinfo.innerHTML = '';
+
     if (lanes['right'])
         lanes['right'].remove();
     if (lanes['left'])
@@ -969,6 +1009,5 @@ function deleteBacklight() {
 }
 
 map.on('moveend', mapMoveEnd);
-map.on('popupopen', e => e.popup.setContent(getPopupContent(e.popup.options.osm)));
-map.on('popupclose', e => deleteBacklight());
+map.on('click', closeLaneInfo);
 mapMoveEnd();

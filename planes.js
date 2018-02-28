@@ -501,38 +501,38 @@ var tagsBlock = [
 ];
 
 function getLaneInfoPanelContent(osm) {
+    setBacklight(osm);
+
+    var head = document.createElement('div');
+    head.setAttribute('style', 'min-width:250px');
+
+    var linkOsm = document.createElement('a');
+    linkOsm.setAttribute('target', '_blank');
+    linkOsm.setAttribute('href', 'https://openstreetmap.org/way/' + osm.$id);
+    linkOsm.innerText = 'View in OSM';
+    head.appendChild(linkOsm);
+
+    var editorBlock = document.createElement('span');
+    editorBlock.setAttribute('style', 'float:right');
+    editorBlock.innerText = 'Edit: ';
+
+    var linkJosm = document.createElement('a');
+    linkJosm.setAttribute('target', '_blank');
+    linkJosm.setAttribute('href', urlJosm + urlOverpass + getQueryOsmId(osm.$id));
+    linkJosm.innerText = 'Josm';
+    editorBlock.appendChild(linkJosm);
+    editorBlock.innerHTML += ', ';
+
+    var linkID = document.createElement('a');
+    linkID.setAttribute('target', '_blank');
+    linkID.setAttribute('href', urlID + '&way=' + osm.$id);
+    linkID.innerText = 'iD';
+    editorBlock.appendChild(linkID);
+
+    head.appendChild(editorBlock);
+
     //if (true) {
     if (editorMode) {
-        setBacklight(osm);
-
-        var head = document.createElement('div');
-        head.setAttribute('style', 'min-width:250px');
-
-        var linkOsm = document.createElement('a');
-        linkOsm.setAttribute('target', '_blank');
-        linkOsm.setAttribute('href', 'https://openstreetmap.org/way/' + osm.$id);
-        linkOsm.innerText = 'View in OSM';
-        head.appendChild(linkOsm);
-
-        var editorBlock = document.createElement('span');
-        editorBlock.setAttribute('style', 'float:right');
-        editorBlock.innerText = 'Edit: ';
-
-        var linkJosm = document.createElement('a');
-        linkJosm.setAttribute('target', '_blank');
-        linkJosm.setAttribute('href', urlJosm + urlOverpass + getQueryOsmId(osm.$id));
-        linkJosm.innerText = 'Josm';
-        editorBlock.appendChild(linkJosm);
-        editorBlock.innerHTML += ', ';
-
-        var linkID = document.createElement('a');
-        linkID.setAttribute('target', '_blank');
-        linkID.setAttribute('href', urlID + '&way=' + osm.$id);
-        linkID.innerText = 'iD';
-        editorBlock.appendChild(linkID);
-
-        head.appendChild(editorBlock);
-
         var form = document.createElement("form");
         form.setAttribute('id', osm.$id);
         form.onsubmit = (e) => {
@@ -606,26 +606,25 @@ function getLaneInfoPanelContent(osm) {
         return div;
     }
     else {
-        var regex = new RegExp('^parking:');
+        var getTagsBlockForViewer = function (tags, side) {
+            var regex = new RegExp('^parking:.*(?:'+side+'|both)');
+
+            var tagsBlock = document.createElement('div');
+            tagsBlock.id = side;
+
+            tagsBlock.innerHTML = tags.filter(tag => regex.test(tag.$k))
+                .map(tag => tag.$k + ' = ' + tag.$v)
+                .join('<br />');
+
+            return tagsBlock;
+        }
+
         var div = document.createElement('div');
         div.id = 'infoContent';
-        var result = '';
-
-        result += '<div style="min-width:200px">';
-        result += '<a target="_blank" href="https://openstreetmap.org/way/' + osm.$id + '">View in OSM</a>';
-        result += '<span style="float:right">Edit: ';
-        result += '<a target="_blank" href="' + urlJosm + urlOverpass + getQueryOsmId(osm.$id) + '">Josm</a>';
-        result += ', <a target="_blank" href="' + urlID + '&way=' + osm.$id + '">iD</a>';
-        result += '</span>';
-        result += '</div>';
-
-        result += '<hr>';
-
-        for (var tag of osm.tag)
-            if (regex.test(tag.$k))
-                result += tag.$k + ' = ' + tag.$v + '<br />';
-
-        div.innerHTML = result;
+        div.appendChild(head);
+        div.appendChild(document.createElement('hr'));
+        div.appendChild(getTagsBlockForViewer(osm.tag, 'right'));
+        div.appendChild(getTagsBlockForViewer(osm.tag, 'left'));
 
         return div;
     }

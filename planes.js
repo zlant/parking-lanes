@@ -151,16 +151,39 @@ L.Control.LaneInfo = L.Control.extend({
 
 new L.Control.LaneInfo({ position: 'topright' }).addTo(map);
 
+//---------------------------------------------------
+
+var cutIcon = L.divIcon({
+    className: 'cut-icon',
+    iconSize: new L.Point(20, 20),
+    html: '✂'
+});
+
 //----------------------------------------------------
 
 var ways = {};
+var nodes = {};
+
 var lanes = {};
+var markers = {};
+
+var waysInRelation = {};
+
 var offsetMajor = 6;
 var weightMajor = 3;
 var offsetMinor = 6;
 var weightMinor = 3;
 
-var change = { osmChange: { $version: '0.6', $generator: 'Parking lane ' + version, modify: { way: [] } } };
+var newWayId = -1;
+
+var change = {
+    osmChange: {
+        $version: '0.6',
+        $generator: 'Parking lane ' + version,
+        modify: { way: [] },
+        create: { way: [] }
+    }
+};
 
 var datetime = new Date();
 document.getElementById('datetime-input').value =
@@ -173,6 +196,9 @@ var editorMode = false;
 var saving = false;
 
 var viewMinZoom = 15;
+
+var highwayRegex = new RegExp('^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street');
+
 
 // ------------- functions -------------------
 
@@ -281,40 +307,48 @@ function withinLastBbox()
 }
 
 function parseContent(content) {
-    var nodes = {};
-    var regex = new RegExp('^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street');
-
     for (var obj of Array.isArray(content.osm.node) ? content.osm.node : [content.osm.node] ) {
         nodes[obj.$id] = [obj.$lat, obj.$lon];
     }
 
     content.osm.way = Array.isArray(content.osm.way) ? content.osm.way : [content.osm.way];
     for (var obj of content.osm.way.filter(x => x.tag != undefined)) {
-        if (!Array.isArray(obj.tag))
-            obj.tag = [obj.tag];
-        if (lanes[obj.$id.toString()] || lanes['-' + obj.$id] || lanes['empty' + obj.$id])
-            continue;
-
-        var isMajor = wayIsMajor(obj.tag);
-
-        if (typeof isMajor !== 'boolean')
-            continue;
-
-        ways[obj.$id] = obj;
-
-        var polyline = obj.nd.map(x => nodes[x.$ref]);
-        var emptyway = true;
-
-        for (var side of ['right', 'left']) {
-            var conditions = getConditions(side, obj.tag);
-            if (conditions.default != null || conditions.intervals.length > 0) {
-                addLane(polyline, conditions, side, obj, isMajor ? offsetMajor : offsetMinor, isMajor);
-                emptyway = false;
-            }
-        }
-        if (editorMode && emptyway && obj.tag.filter(x => x.$k == 'highway' && regex.test(x.$v)).length > 0)
-            addLane(polyline, null, 'right', obj, 0, isMajor);
+        parseWay(obj);
     }
+
+    content.osm.realtion = Array.isArray(content.osm.realtion) ? content.osm.realtion : [content.osm.realtion];
+    for (var obj of content.osm.relation) {
+        for (var member of obj.member)
+            if (member.$type === 'way' && ways[member.$ref])
+                waysInRelation[member.$ref] = true;
+    }
+}
+
+function parseWay(way) {
+    if (!Array.isArray(way.tag))
+        way.tag = [way.tag];
+    if (lanes['right' + way.$id] || lanes['left' + way.$id] || lanes['empty' + way.$id])
+        return;
+
+    var isMajor = wayIsMajor(way.tag);
+
+    if (typeof isMajor !== 'boolean')
+        return;
+
+    ways[way.$id] = way;
+
+    var polyline = way.nd.map(x => nodes[x.$ref]);
+    var emptyway = true;
+
+    for (var side of ['right', 'left']) {
+        var conditions = getConditions(side, way.tag);
+        if (conditions.default != null || conditions.intervals.length > 0) {
+            addLane(polyline, conditions, side, way, isMajor ? offsetMajor : offsetMinor, isMajor);
+            emptyway = false;
+        }
+    }
+    if (editorMode && emptyway && way.tag.filter(x => x.$k == 'highway' && highwayRegex.test(x.$v)).length > 0)
+        addLane(polyline, null, 'right', way, 0, isMajor);
 }
 
 function wayIsMajor(tags)
@@ -425,8 +459,8 @@ function addLane(line, conditions, side, osm, offset, isMajor) {
     var id = !conditions
         ? 'empty' + osm.$id
         : side == 'right'
-            ? osm.$id
-            : -osm.$id;
+            ? 'right' + osm.$id
+            : 'left' + osm.$id;
 
     lanes[id] = L.polyline(line,
         {
@@ -476,8 +510,8 @@ function getQueryParkingLanes() {
     } else {
         var bbox = [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',');
         return editorMode
-            ? '[out:xml];(way[highway~"^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street"](' + bbox + ');>;);out meta;'
-            : '[out:xml];(way[~"^parking:lane:.*"~"."](' + bbox + ');>;);out meta;';
+            ? '[out:xml];(way[highway~"^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street"](' + bbox + ');)->.a;(.a;.a >;.a <;);out meta;'
+            : '[out:xml];(way[highway][~"^parking:lane:.*"~"."](' + bbox + ');)->.a;(.a;.a >;.a <;);out meta;';
     }
 }
 
@@ -539,7 +573,6 @@ function getLaneInfoPanelContent(osm) {
             save(e);
             closeLaneInfo();
         };
-        //form.onreset = removeFromOsmChangeset;
 
         var checkBoth = document.createElement('input');
         checkBoth.style.display = 'inline';
@@ -564,6 +597,14 @@ function getLaneInfoPanelContent(osm) {
         label.innerText = 'Both';
         form.appendChild(label);
 
+        if (!waysInRelation[osm.$id]) {
+            var scissors = document.createElement('span');
+            scissors.className = 'float-right symb-icon';
+            scissors.innerText = '✂';
+            scissors.onclick = () => showNodes(osm);
+            form.appendChild(scissors);
+        }
+
         var regex = new RegExp('^parking:');
         var dl = document.createElement('dl');
         for (var side of ['both', 'right', 'left'].map(x => getTagsBlock(x, osm)))
@@ -583,14 +624,14 @@ function getLaneInfoPanelContent(osm) {
 
         if ((chooseSideTags(form, 'right') || chooseSideTags(form, 'left')) || !chooseSideTags(form, 'both')) {
             form[0].checked = false;
-            form.childNodes[2].childNodes[0].style.display = 'none';
-            form.childNodes[2].childNodes[1].style.display = 'block';
-            form.childNodes[2].childNodes[2].style.display = 'block';
+            dl.childNodes[0].style.display = 'none';
+            dl.childNodes[1].style.display = 'block';
+            dl.childNodes[2].style.display = 'block';
         } else {
             form[0].checked = true;
-            form.childNodes[2].childNodes[0].style.display = 'block';
-            form.childNodes[2].childNodes[1].style.display = 'none';
-            form.childNodes[2].childNodes[2].style.display = 'none';
+            dl.childNodes[0].style.display = 'block';
+            dl.childNodes[1].style.display = 'none';
+            dl.childNodes[2].style.display = 'none';
         }
 
 
@@ -599,9 +640,6 @@ function getLaneInfoPanelContent(osm) {
         div.appendChild(head);
         div.appendChild(document.createElement('hr'));
         div.appendChild(form);
-
-        var result = document.createElement('div');
-        result.appendChild(div);
 
         return div;
     }
@@ -631,10 +669,10 @@ function getLaneInfoPanelContent(osm) {
 }
 
 function setBacklight(osm) {
-    var polyline = lanes[osm.$id]
-        ? lanes[osm.$id].getLatLngs()
-        : lanes[-osm.$id]
-            ? lanes[-osm.$id].getLatLngs()
+    var polyline = lanes['right' + osm.$id]
+        ? lanes['right' + osm.$id].getLatLngs()
+        : lanes['left' + osm.$id]
+            ? lanes['left' + osm.$id].getLatLngs()
             : lanes['empty' + osm.$id].getLatLngs();
 
     var n = 3;
@@ -829,6 +867,72 @@ function getTagsBlock(side, osm) {
     return div;
 }
 
+function showNodes(osm) {
+    for (var nd of osm.nd.slice(1, osm.nd.length - 1)) {
+        markers[nd.$ref] = L.marker(nodes[nd.$ref], { icon: cutIcon, ndId: nd.$ref, wayId: osm.$id })
+            .on('click', cutWay)
+            .addTo(map);
+    }
+}
+
+function cutWay(arg) {
+    var oldWay = ways[arg.target.options.wayId];
+    var newWay = Object.assign({}, oldWay);
+
+    var ndIndex = oldWay.nd.findIndex((e, i, a) => { return e.$ref === arg.target.options.ndId });
+
+    oldWay.nd = oldWay.nd.slice(0, ndIndex + 1);
+    newWay.nd = newWay.nd.slice(ndIndex);
+    newWay.$id = newWayId--;
+    newWay.$version = '1';
+    delete newWay.$user;
+    delete newWay.$uid;
+    delete newWay.$timestamp;
+
+    if (lanes['right' + oldWay.$id])
+        lanes['right' + oldWay.$id].setLatLngs(oldWay.nd.map(x => nodes[x.$ref]));
+
+    if (lanes['left' + oldWay.$id])
+        lanes['left' + oldWay.$id].setLatLngs(oldWay.nd.map(x => nodes[x.$ref]));
+
+    if (lanes['empty' + oldWay.$id])
+        lanes['empty' + oldWay.$id].setLatLngs(oldWay.nd.map(x => nodes[x.$ref]));
+
+    if (lanes['left'])
+        lanes['left'].setLatLngs(oldWay.nd.map(x => nodes[x.$ref]));
+
+    if (lanes['right'])
+        lanes['right'].setLatLngs(oldWay.nd.map(x => nodes[x.$ref]));
+
+    for (var marker in markers) {
+        markers[marker].remove();
+        delete markers[marker];
+    }
+
+    ways[newWay.$id] = newWay;
+    parseWay(newWay);
+    
+    change.osmChange.create.way.push(newWay);
+
+    if (oldWay.$id > 0) {
+        var index = change.osmChange.modify.way.findIndex(x => x.$id == oldWay.$id);
+        if (index > -1)
+            change.osmChange.modify.way[index] = oldWay;
+        else
+            change.osmChange.modify.way.push(oldWay);
+    } else {
+        var index = change.osmChange.create.way.findIndex(x => x.$id == oldWay.$id);
+        if (index > -1)
+            change.osmChange.create.way[index] = oldWay;
+        else
+            change.osmChange.create.way.push(oldWay);
+    }
+
+    changesCount = change.osmChange.modify.way.length + change.osmChange.create.way.length;
+    document.getElementById('saveChangeset').innerText = 'Save (' + changesCount + ')';
+    document.getElementById('saveChangeset').style.display = 'block';
+}
+
 function addOrUpdate() {
     var regex = new RegExp('parking:condition:.+:time_interval');
     if (regex.test(this.name)) {
@@ -841,10 +945,10 @@ function addOrUpdate() {
 
     var obj = formToOsmWay(this.form);
     var polyline;
-    if (lanes[obj.$id])
-        polyline = lanes[obj.$id].getLatLngs();
-    else if (lanes[-obj.$id])
-        polyline = lanes[-obj.$id].getLatLngs();
+    if (lanes['right' + obj.$id])
+        polyline = lanes['right' + obj.$id].getLatLngs();
+    else if (lanes['left' + obj.$id])
+        polyline = lanes['left' + obj.$id].getLatLngs();
     else if (lanes['empty' + obj.$id])
         polyline = lanes['empty' + obj.$id].getLatLngs();
 
@@ -852,7 +956,7 @@ function addOrUpdate() {
     var emptyway = true;
     for (var side of ['right', 'left']) {
         var conditions = getConditions(side, obj.tag);
-        var id = side == 'right' ? obj.$id : -obj.$id;
+        var id = side == 'right' ? 'right' + obj.$id : 'left' + obj.$id;
         if (conditions.default != null) {
             if (lanes[id]) {
                 lanes[id].conditions = conditions;
@@ -908,13 +1012,23 @@ function save(form) {
     delete osm.$timestamp;
 
     var index = change.osmChange.modify.way.findIndex(x => x.$id == osm.$id);
+    
+    if (osm.$id > 0) {
+        var index = change.osmChange.modify.way.findIndex(x => x.$id == osm.$id);
+        if (index > -1)
+            change.osmChange.modify.way[index] = osm;
+        else
+            change.osmChange.modify.way.push(osm);
+    } else {
+        var index = change.osmChange.create.way.findIndex(x => x.$id == osm.$id);
+        if (index > -1)
+            change.osmChange.create.way[index] = osm;
+        else
+            change.osmChange.create.way.push(osm);
+    }
 
-    if (index > -1)
-        change.osmChange.modify.way[index] = osm;
-    else
-        change.osmChange.modify.way.push(osm);
-
-    document.getElementById('saveChangeset').innerText = 'Save (' + change.osmChange.modify.way.length + ')';
+    changesCount = change.osmChange.modify.way.length + change.osmChange.create.way.length;
+    document.getElementById('saveChangeset').innerText = 'Save (' + changesCount + ')';
     document.getElementById('saveChangeset').style.display = 'block';
 
     return false;
@@ -930,15 +1044,18 @@ function removeFromOsmChangeset(id) {
     if (index > -1)
         change.osmChange.modify.way.splice(index, 1);
 
-    if (change.osmChange.modify.way.length == 0)
+    changesCount = change.osmChange.modify.way.length + change.osmChange.create.way.length;
+    if (changesCount == 0)
         document.getElementById('saveChangeset').style.display = 'none';
-    document.getElementById('saveChangeset').innerText = 'Save (' + change.osmChange.modify.way.length + ')';
+    document.getElementById('saveChangeset').innerText = 'Save (' + changesCount + ')';
 
     closeLaneInfo();
 }
 
 function saveChangesets(changesetId) {
     for (var way of change.osmChange.modify.way)
+        way.$changeset = changesetId;
+    for (var way of change.osmChange.create.way)
         way.$changeset = changesetId;
 
     var path = '/api/0.6/changeset/' + changesetId + '/upload';
@@ -1000,6 +1117,11 @@ function closeLaneInfo(e) {
     var laneinfo = document.getElementById('laneinfo');
     laneinfo.style.display = 'none';
     laneinfo.innerHTML = '';
+
+    for (var marker in markers) {
+        markers[marker].remove();
+        delete markers[marker];
+    }
 
     if (lanes['right'])
         lanes['right'].remove();

@@ -848,6 +848,9 @@ function getTagsBlock(side, osm) {
             tagval.setAttribute('placeholder', tag);
             tagval.setAttribute('name', tag);
             tagval.setAttribute('value', value != undefined ? value.$v : '');
+
+            if (tag.indexOf('time_interval') >= 0)
+                tagval.oninput = oninputTimeIntervalTag;
         }
         tagval.setAttribute('name', tag);
         var dd = document.createElement('td');
@@ -933,16 +936,15 @@ function cutWay(arg) {
     document.getElementById('saveChangeset').style.display = 'block';
 }
 
-function addOrUpdate() {
-    var regex = new RegExp('parking:condition:.+:time_interval');
-    if (regex.test(this.name)) {
-        var side = this.name.split(':')[2];
-        if (this.value === '')
-            document.getElementById('parking:condition:' + side + ':default').style.display = 'none';
-        else
-            document.getElementById('parking:condition:' + side + ':default').style.display = '';
-    }
+function oninputTimeIntervalTag() {
+    var side = this.name.split(':')[2];
+    if (this.value === '')
+        document.getElementById('parking:condition:' + side + ':default').style.display = 'none';
+    else
+        document.getElementById('parking:condition:' + side + ':default').style.display = '';
+}
 
+function addOrUpdate() {
     var obj = formToOsmWay(this.form);
     var polyline;
     if (lanes['right' + obj.$id])

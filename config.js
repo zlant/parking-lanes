@@ -11,7 +11,8 @@ var legend = [
     { condition: 'free', color: 'limegreen', text: 'Free parking' },
     { condition: 'ticket', color: 'dodgerblue', text: 'Paid parking' },
     { condition: 'customers', color: 'greenyellow', text: 'For customers' },
-    { condition: 'residents', color: 'hotpink', text: 'For residents' }
+    { condition: 'residents', color: 'hotpink', text: 'For residents' },
+    { condition: 'disabled', color: 'turquoise', text: 'Disabled' }
 ];
 
 var useTestServer = false;

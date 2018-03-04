@@ -1084,6 +1084,11 @@ function closeChangset(changesetId) {
         path: path
     }, function (err, details) {
         document.getElementById('saveChangeset').style.display = 'none';
+        for (var way of change.osmChange.modify.way) {
+            way.$version = parseInt(way.$version) + 1;
+        }
+        change.osmChange.modify.way = [];
+        change.osmChange.create.way = [];
         saving = false;
     });
 }

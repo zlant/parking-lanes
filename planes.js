@@ -968,6 +968,7 @@ function addOrUpdate() {
             emptyway = false;
         } else if (lanes[id]) {
             lanes[id].remove();
+            delete lanes[id];
         }
     }
     if (emptyway) {
@@ -976,7 +977,8 @@ function addOrUpdate() {
             addLane(polyline, null, 'right', obj, 0, isMajor);
         }
     } else if (lanes['empty' + obj.$id]) {
-        lanes['empty' + obj.$id].setStyle({ color: 'white' });
+        lanes['empty' + obj.$id].remove();
+        delete lanes['empty' + obj.$id];
     }
 
     save({ target: this.form });

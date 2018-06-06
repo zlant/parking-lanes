@@ -307,20 +307,26 @@ function withinLastBbox()
 }
 
 function parseContent(content) {
-    for (var obj of Array.isArray(content.osm.node) ? content.osm.node : [content.osm.node] ) {
-        nodes[obj.$id] = [obj.$lat, obj.$lon];
+    if (content.osm.node) {
+        for (var obj of Array.isArray(content.osm.node) ? content.osm.node : [content.osm.node]) {
+            nodes[obj.$id] = [obj.$lat, obj.$lon];
+        }
     }
 
-    content.osm.way = Array.isArray(content.osm.way) ? content.osm.way : [content.osm.way];
-    for (var obj of content.osm.way.filter(x => x.tag != undefined)) {
-        parseWay(obj);
+    if (content.osm.way) {
+        content.osm.way = Array.isArray(content.osm.way) ? content.osm.way : [content.osm.way];
+        for (var obj of content.osm.way.filter(x => x.tag != undefined)) {
+            parseWay(obj);
+        }
     }
 
-    content.osm.realtion = Array.isArray(content.osm.realtion) ? content.osm.realtion : [content.osm.realtion];
-    for (var obj of content.osm.relation) {
-        for (var member of obj.member)
-            if (member.$type === 'way' && ways[member.$ref])
-                waysInRelation[member.$ref] = true;
+    if (content.osm.realtion) {
+        content.osm.realtion = Array.isArray(content.osm.realtion) ? content.osm.realtion : [content.osm.realtion];
+        for (var obj of content.osm.relation) {
+            for (var member of obj.member)
+                if (member.$type === 'way' && ways[member.$ref])
+                    waysInRelation[member.$ref] = true;
+        }
     }
 }
 
@@ -431,7 +437,7 @@ function getConditions(side, tags) {
             findResult = tags.find(x => x.$k == intervalTags[j]);
             if (findResult)
                 cond.interval = !/\d+-\d+\/\d+$/.test(findResult.$v)
-                    ? new opening_hours(findResult.$v, null, 0)
+                    ? parseTimeInterval(findResult.$v)
                     : parseInt(findResult.$v.match(/\d+/g)[0]) % 2 == 0
                         ? 'even'
                         : 'odd';
@@ -453,6 +459,16 @@ function getConditions(side, tags) {
         conditions.default = null;
     
     return conditions;
+}
+
+function parseTimeInterval(value) {
+    try {
+        return new opening_hours(value, null, 0);
+    }
+    catch (err) {
+        console.error('Invalid time interval: ' + value)
+        return undefined;
+    }
 }
 
 function addLane(line, conditions, side, osm, offset, isMajor) {

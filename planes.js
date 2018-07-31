@@ -5,7 +5,7 @@ if (document.location.href.indexOf('#') == -1)
     if (!setViewFromCookie())
         map.setView([51.591, 24.609], 5);
 
-L.tileLayer.grayscale('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+L.tileLayer.grayscale('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 18,
 }).addTo(map);

@@ -527,7 +527,7 @@ function getQueryParkingLanes() {
         var bbox = [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',');
         return editorMode
             ? '[out:xml];(way[highway~"^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street"](' + bbox + ');)->.a;(.a;.a >;.a <;);out meta;'
-            : '[out:xml];(way[highway][~"^parking:lane:.*"~"."](' + bbox + ');)->.a;(.a;.a >;.a <;);out meta;';
+            : '[out:xml];(way[highway][~"^parking:.*"~"."](' + bbox + ');)->.a;(.a;.a >;.a <;);out meta;';
     }
 }
 

@@ -320,8 +320,8 @@ function parseContent(content) {
         }
     }
 
-    if (content.osm.realtion) {
-        content.osm.realtion = Array.isArray(content.osm.realtion) ? content.osm.realtion : [content.osm.realtion];
+    if (content.osm.relation) {
+        content.osm.relation = Array.isArray(content.osm.relation) ? content.osm.relation : [content.osm.relation];
         for (var obj of content.osm.relation) {
             for (var member of obj.member)
                 if (member.$type === 'way' && ways[member.$ref])

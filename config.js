@@ -1,5 +1,4 @@
 var editorName = 'PLanes'
-var version = '0.1.1'
 
 var valuesLane = ['parallel', 'diagonal', 'perpendicular', 'no_parking', 'no_stopping', 'marked', 'fire_lane'];
 var valuesCond = ['free', 'ticket', 'disc', 'residents', 'customers', 'private'];

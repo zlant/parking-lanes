@@ -48,7 +48,16 @@
 <body>
     <div id="map"></div>
 
-    <script src="config.js"></script>
-    <script src="planes.js"></script>
+    <script>
+        var version = '0.1.2'
+
+        var configjs = document.createElement('script'); 
+        configjs.setAttribute('src','config.js?v='+version); 
+        document.head.appendChild(configjs);
+
+        var planesjs = document.createElement('script'); 
+        planesjs.setAttribute('src','planes.js?v='+version); 
+        document.head.appendChild(planesjs);
+    </script>
 </body>
 </html>

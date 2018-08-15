@@ -1015,7 +1015,10 @@ function chooseSideTags(form, side) {
 function formToOsmWay(form) {
     var regex = new RegExp('^parking:');
     var osm = ways[form.id];
-    osm.tag = osm.tag.filter(tag => !regex.test(tag.$k));
+
+    var supprtedTags = tagsBlock
+        .map(x => new RegExp('^' + x.replace('{side}', '(both|right|left)') + '$'));
+    osm.tag = osm.tag.filter(tag => supprtedTags.every(rgx => !rgx.test(tag.$k)));
 
     for (var input of form)
         if (regex.test(input.name) && input.value != '') {

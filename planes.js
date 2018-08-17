@@ -5,10 +5,24 @@ if (document.location.href.indexOf('#') == -1)
     if (!setViewFromCookie())
         map.setView([51.591, 24.609], 5);
 
-L.tileLayer.grayscale('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+var mapnik = L.tileLayer.grayscale('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 18,
 }).addTo(map);
+
+var esri = L.tileLayer('https://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: "<a href='https://wiki.openstreetmap.org/wiki/Esri'>Terms & Feedback</a>",
+      maxZoom: 22,
+      maxNativeZoom: 22,
+      ref: "esric"
+    })
+
+var baseMaps = {
+    "Mapnik": mapnik,
+    "Esri Clarity": esri,
+};
+
+var layerControl = L.control.layers(baseMaps, null, { position: 'bottomright' });
 
 L.control.locate({ drawCircle: false, drawMarker: true }).addTo(map);
 
@@ -211,6 +225,7 @@ document.getElementById('editorcb').onchange = (chb) => {
         }
         else {
             editorMode = true;
+            layerControl.addTo(map);
             document.getElementById('editorActive').style.color = 'green';
             lastBounds = undefined;
             mapMoveEnd();
@@ -221,6 +236,10 @@ document.getElementById('editorcb').onchange = (chb) => {
         auth.authenticate(checkAuth);
     else {
         editorMode = false;
+        layerControl.remove(map);
+        map.removeLayer(esri);
+        map.addLayer(mapnik);
+        mapnik.addTo(map);
         document.getElementById('editorActive').style.color = 'black';
         for (var lane in lanes)
             if (lane.startsWith('empty')) {

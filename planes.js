@@ -1,4 +1,4 @@
-﻿var map = L.map('map', { fadeAnimation: false });
+var map = L.map('map', { fadeAnimation: false });
 var hash = new L.Hash(map);
 
 if (document.location.href.indexOf('#') == -1)
@@ -342,7 +342,7 @@ function parseContent(content) {
     if (content.osm.relation) {
         content.osm.relation = Array.isArray(content.osm.relation) ? content.osm.relation : [content.osm.relation];
         for (var obj of content.osm.relation) {
-            for (var member of obj.member)
+            for (var member of Array.isArray(obj.member) ? obj.member : [obj.member])
                 if (member.$type === 'way' && ways[member.$ref])
                     waysInRelation[member.$ref] = true;
         }

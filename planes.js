@@ -1,4 +1,4 @@
-var map = L.map('map', { fadeAnimation: false });
+﻿var map = L.map('map', { fadeAnimation: false });
 var hash = new L.Hash(map);
 
 if (document.location.href.indexOf('#') == -1)
@@ -12,8 +12,8 @@ var mapnik = L.tileLayer.grayscale('https://{s}.tile.openstreetmap.org/{z}/{x}/{
 
 var esri = L.tileLayer('https://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       attribution: "<a href='https://wiki.openstreetmap.org/wiki/Esri'>Terms & Feedback</a>",
-      maxZoom: 22,
-      maxNativeZoom: 22,
+      maxZoom: 19,
+      maxNativeZoom: 19,
       ref: "esric"
     })
 
@@ -125,8 +125,8 @@ new L.Control.Datetime({ position: 'topright' }).addTo(map);
 
 L.Control.Info = L.Control.extend({
     onAdd: map => {
-        var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding control-bigfont');
-        div.innerHTML = 'Zoom in on the map.';
+        var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding control-bigfont control-button');
+        div.innerHTML = 'Zoom in on the map';
         div.id = 'info';
         div.onclick = () => map.setZoom(viewMinZoom);
         return div;
@@ -134,6 +134,20 @@ L.Control.Info = L.Control.extend({
 });
 
 new L.Control.Info({ position: 'topright' }).addTo(map);
+
+//------------- Fast control --------------------
+
+L.Control.Fast = L.Control.extend({
+    onAdd: map => {
+        var div = L.DomUtil.create('div', 'leaflet-control-layers control-padding control-bigfont control-button');
+        div.innerHTML = 'Download bbox';
+        div.id = 'fast';
+        div.onclick = downloadHere;
+        return div;
+    }
+});
+
+new L.Control.Fast({ position: 'topright' }).addTo(map);
 
 //------------- Save control --------------------
 
@@ -308,11 +322,23 @@ function mapMoveEnd() {
     if (withinLastBbox())
         return;
 
+    downloadHere();
+}
+
+function downloadHere() {
     lastBounds = map.getBounds();
+    downloading(true);
     if (useTestServer)
         getContent(urlOsmTest + getQueryParkingLanes(), parseContent);
     else
         getContent(urlOverpass + encodeURIComponent(getQueryParkingLanes()), parseContent);
+}
+
+function downloading(downloading){
+    if(downloading)
+        document.getElementById('fast').innerHTML = 'Downloading... ';
+    else
+        document.getElementById('fast').innerHTML = 'Download bbox';
 }
 
 function withinLastBbox()
@@ -347,6 +373,8 @@ function parseContent(content) {
                     waysInRelation[member.$ref] = true;
         }
     }
+
+    downloading(false)
 }
 
 function parseWay(way) {

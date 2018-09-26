@@ -594,6 +594,7 @@ var tagsBlock = [
     "parking:condition:{side}",
     "parking:condition:{side}:time_interval",
     "parking:condition:{side}:default",
+    "parking:condition:{side}:maxstay",
     "parking:condition:{side}:capacity"
 ];
 
@@ -777,6 +778,10 @@ function getTagsBlock(side, osm) {
     var regexTimeInt = new RegExp('parking:condition:.+:time_interval');
     var regexDefault = new RegExp('parking:condition:.+:default');
 
+    var hideMaxstay = false;
+    var regexCondition = new RegExp('parking:condition:[^:]+$');
+    var regexMaxstay = new RegExp('parking:condition:.+:maxstay');
+
     var sign = document.createElement('img');
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/9/98/3.27_Russian_road_sign.svg';
     sign.height = 20;
@@ -787,6 +792,7 @@ function getTagsBlock(side, osm) {
         document.getElementById(osm.$id)['parking:condition:' + side].value = '';
         document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '';
         document.getElementById(osm.$id)['parking:condition:' + side + ':default'].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':maxstay'].value = '';
         document.getElementById(osm.$id)['parking:lane:' + side].onchange();
     };
     div.appendChild(sign);
@@ -801,6 +807,7 @@ function getTagsBlock(side, osm) {
         document.getElementById(osm.$id)['parking:condition:' + side].value = '';
         document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '';
         document.getElementById(osm.$id)['parking:condition:' + side + ':default'].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':maxstay'].value = '';
         document.getElementById(osm.$id)['parking:lane:' + side].onchange();
     };
     div.appendChild(sign);
@@ -815,6 +822,7 @@ function getTagsBlock(side, osm) {
         document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '1-31/2';
         document.getElementById(osm.$id)['parking:condition:' + side].value = '';
         document.getElementById(osm.$id)['parking:condition:' + side + ':default'].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':maxstay'].value = '';
         document.getElementById(osm.$id)['parking:lane:' + side].onchange();
     };
     div.appendChild(sign);
@@ -829,6 +837,7 @@ function getTagsBlock(side, osm) {
         document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '2-30/2';
         document.getElementById(osm.$id)['parking:condition:' + side].value = '';
         document.getElementById(osm.$id)['parking:condition:' + side + ':default'].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':maxstay'].value = '';
         document.getElementById(osm.$id)['parking:lane:' + side].onchange();
     };
     div.appendChild(sign);
@@ -843,6 +852,7 @@ function getTagsBlock(side, osm) {
         document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '';
         document.getElementById(osm.$id)['parking:condition:' + side].value = 'free';
         document.getElementById(osm.$id)['parking:condition:' + side + ':default'].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':maxstay'].value = '';
         document.getElementById(osm.$id)['parking:lane:' + side].onchange();
     };
     div.appendChild(sign);
@@ -857,6 +867,7 @@ function getTagsBlock(side, osm) {
         document.getElementById(osm.$id)['parking:condition:' + side + ':time_interval'].value = '';
         document.getElementById(osm.$id)['parking:condition:' + side].value = 'ticket';
         document.getElementById(osm.$id)['parking:condition:' + side + ':default'].value = '';
+        document.getElementById(osm.$id)['parking:condition:' + side + ':maxstay'].value = '';
         document.getElementById(osm.$id)['parking:lane:' + side].onchange();
     };
     div.appendChild(sign);
@@ -904,6 +915,8 @@ function getTagsBlock(side, osm) {
                 tagval.appendChild(option);
             }
             tagval.setAttribute('name', tag);
+            
+            tagval.oninput = onInputConditionTag;
         }
         else {
             tagval = document.createElement('input');
@@ -924,6 +937,12 @@ function getTagsBlock(side, osm) {
             hideDefault = tagval.value === '';
         else if (regexDefault.test(tag) && hideDefault)
             inputdiv.style.display = 'none';
+
+        if (regexCondition.test(tag))
+            hideMaxstay = tagval.value !== 'disc'
+        else if (regexMaxstay.test(tag) && hideMaxstay)
+            inputdiv.style.display = 'none';
+
 
         inputdiv.appendChild(dt);
         inputdiv.appendChild(dd);
@@ -1005,6 +1024,14 @@ function oninputTimeIntervalTag() {
         document.getElementById('parking:condition:' + side + ':default').style.display = 'none';
     else
         document.getElementById('parking:condition:' + side + ':default').style.display = '';
+}
+
+function onInputConditionTag() {
+    var side = this.name.split(':')[2];
+    if (this.value === 'disc')
+        document.getElementById('parking:condition:' + side + ':maxstay').style.display = '';
+    else
+        document.getElementById('parking:condition:' + side + ':maxstay').style.display = 'none';
 }
 
 function addOrUpdate() {

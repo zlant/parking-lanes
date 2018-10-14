@@ -591,6 +591,7 @@ function getQueryOsmId(id) {
 
 var tagsBlock = [
     "parking:lane:{side}",
+    "parking:lane:{side}:type",
     "parking:condition:{side}",
     "parking:condition:{side}:time_interval",
     "parking:condition:{side}:default",
@@ -782,6 +783,10 @@ function getTagsBlock(side, osm) {
     var regexCondition = new RegExp('parking:condition:[^:]+$');
     var regexMaxstay = new RegExp('parking:condition:.+:maxstay');
 
+    var hideType = false;
+    var regexLane = new RegExp('parking:lane:(both|right|left)+$');
+    var regexType = new RegExp('parking:lane:(both|right|left)+:(parallel|diagonal|perpendicular)+$');
+
     var sign = document.createElement('img');
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/9/98/3.27_Russian_road_sign.svg';
     sign.height = 20;
@@ -901,6 +906,22 @@ function getTagsBlock(side, osm) {
                 tagval.appendChild(option);
             }
             tagval.setAttribute('name', tag);
+
+            tagval.oninput = onInputLaneTag;
+        }
+        else if (tag == 'parking:lane:' + side + ':type') {
+            tagval = document.createElement('select');
+            var additVals = value && valuesType.indexOf(value.$v) == -1 ? ['', value.$v] : [''];
+
+            for (var x of additVals.concat(valuesType)) {
+                var option = document.createElement('option');
+                option.value = x;
+                option.innerText = x;
+                if (value && value.$v === x)
+                    option.setAttribute('selected', 'selected');
+                tagval.appendChild(option);
+            }
+            tagval.setAttribute('name', tag);
         }
         else if (tag == 'parking:condition:' + side) {
             tagval = document.createElement('select');
@@ -941,6 +962,11 @@ function getTagsBlock(side, osm) {
         if (regexCondition.test(tag))
             hideMaxstay = tagval.value !== 'disc'
         else if (regexMaxstay.test(tag) && hideMaxstay)
+            inputdiv.style.display = 'none';
+
+        if (regexLane.test(tag))
+            hideType = ['parallel', 'diagonal', 'perpendicular'].indexOf(tagval.value) < 0
+        else if (regexType.test(tag) && hideType)
             inputdiv.style.display = 'none';
 
 
@@ -1034,6 +1060,20 @@ function onInputConditionTag() {
         document.getElementById('parking:condition:' + side + ':maxstay').style.display = 'none';
 }
 
+function onInputLaneTag() {
+    var side = this.name.split(':')[2];
+    // Type tag should only exist when parking:lane:side has one on the following values
+    if (['parallel', 'diagonal', 'perpendicular'].indexOf(this.value) > -1) {
+        // exact name of the tag depends on parking:lane:side value
+        var typeTagTr = document.querySelector('[id^="parking:lane:' + side + ':"]');
+        typeTagTr.style.display = '';
+        var typeTagSelect = document.querySelector('[name^="parking:lane:' + side + ':"]');
+        typeTagSelect.name = 'parking:lane:' + side + ':' + this.value;
+    }
+    else
+        document.querySelector('[id^="parking:lane:' + side + ':"]').style.display = 'none';
+}
+
 function addOrUpdate() {
     var obj = formToOsmWay(this.form);
     var polyline;
@@ -1091,7 +1131,7 @@ function formToOsmWay(form) {
     var osm = ways[form.id];
 
     var supprtedTags = tagsBlock
-        .map(x => new RegExp('^' + x.replace('{side}', '(both|right|left)') + '$'));
+        .map(x => new RegExp('^' + x.replace('{side}', '(both|right|left)').replace('type', '(parallel|diagonal|perpendicular)') + '$'));
     osm.tag = osm.tag.filter(tag => supprtedTags.every(rgx => !rgx.test(tag.$k)));
 
     for (var input of form)

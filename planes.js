@@ -42,7 +42,7 @@ L.Control.Link = L.Control.extend({
 
         var editorActivation = document.createElement('span');
         editorActivation.id = 'editorActive';
-        
+
         var editorCheckBox = document.createElement('input');
         editorCheckBox.setAttribute('type', 'checkbox');
         editorCheckBox.setAttribute('id', 'editorcb');
@@ -58,7 +58,7 @@ L.Control.Link = L.Control.extend({
         editorActivation.appendChild(label);
 
         div.appendChild(editorActivation);
-        
+
         div.innerHTML += ' | <a target="_blank" href="https://github.com/zetx16/parking-lanes">GitHub</a>';
 
         div.onmouseenter = e => document.getElementById('editors').style.display = 'inline';
@@ -268,7 +268,7 @@ function mapMoveEnd() {
     document.getElementById('id-bbox').href = urlID + '#map=' +
         document.location.href.substring(document.location.href.indexOf('#') + 1);
     setLocationCookie();
-    
+
     var zoom = map.getZoom();
 
     if (zoom <= 12) {
@@ -504,7 +504,7 @@ function getConditions(side, tags) {
 
     if (legend.findIndex(x => x.condition === conditions.default) == -1)
         conditions.default = null;
-    
+
     return conditions;
 }
 
@@ -591,7 +591,7 @@ function getQueryOsmId(id) {
 
 var tagsBlock = [
     "parking:lane:{side}",
-    "parking:lane:{side}:type",
+    "parking:lane:{side}:{type}",
     "parking:condition:{side}",
     "parking:condition:{side}:time_interval",
     "parking:condition:{side}:default",
@@ -785,7 +785,7 @@ function getTagsBlock(side, osm) {
 
     var hideType = false;
     var regexLane = new RegExp('parking:lane:(both|right|left)+$');
-    var regexType = new RegExp('parking:lane:(both|right|left)+:(parallel|diagonal|perpendicular)+$');
+    var regexType = new RegExp('parking:lane:(both|right|left)+:type');
 
     var sign = document.createElement('img');
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/9/98/3.27_Russian_road_sign.svg';
@@ -878,9 +878,10 @@ function getTagsBlock(side, osm) {
     div.appendChild(sign);
 
     var table = document.createElement('table');
+    var parkingType = 'type';
 
     for (var tag of tagsBlock) {
-        tag = tag.replace('{side}', side);
+        tag = tag.replace('{side}', side).replace('{type}', parkingType);
 
         var label = document.createElement('label');
         var tagSplit = tag.split(':');
@@ -901,15 +902,20 @@ function getTagsBlock(side, osm) {
                 var option = document.createElement('option');
                 option.value = x;
                 option.innerText = x;
-                if (value && value.$v === x)
+                if (value && value.$v === x) {
                     option.setAttribute('selected', 'selected');
+                    parkingType = value.$v;
+                }
                 tagval.appendChild(option);
             }
             tagval.setAttribute('name', tag);
 
             tagval.oninput = onInputLaneTag;
         }
-        else if (tag == 'parking:lane:' + side + ':type') {
+        else if (['parking:lane:' + side + ':type',
+                    'parking:lane:' + side + ':parallel',
+                    'parking:lane:' + side + ':diagonal',
+                    'parking:lane:' + side + ':perpendicular'].indexOf(tag) !== -1) {
             tagval = document.createElement('select');
             var additVals = value && valuesType.indexOf(value.$v) == -1 ? ['', value.$v] : [''];
 
@@ -936,7 +942,7 @@ function getTagsBlock(side, osm) {
                 tagval.appendChild(option);
             }
             tagval.setAttribute('name', tag);
-            
+
             tagval.oninput = onInputConditionTag;
         }
         else {
@@ -953,7 +959,7 @@ function getTagsBlock(side, osm) {
         var dd = document.createElement('td');
         tagval.onchange = addOrUpdate;
         dd.appendChild(tagval);
-        
+
         if (regexTimeInt.test(tag))
             hideDefault = tagval.value === '';
         else if (regexDefault.test(tag) && hideDefault)
@@ -965,7 +971,7 @@ function getTagsBlock(side, osm) {
             inputdiv.style.display = 'none';
 
         if (regexLane.test(tag))
-            hideType = ['parallel', 'diagonal', 'perpendicular'].indexOf(tagval.value) < 0
+            hideType = ['parallel', 'diagonal', 'perpendicular'].indexOf(tagval.value) === -1
         else if (regexType.test(tag) && hideType)
             inputdiv.style.display = 'none';
 
@@ -1022,7 +1028,7 @@ function cutWay(arg) {
 
     ways[newWay.$id] = newWay;
     parseWay(newWay);
-    
+
     change.osmChange.create.way.push(newWay);
 
     if (oldWay.$id > 0) {
@@ -1120,9 +1126,9 @@ function chooseSideTags(form, side) {
     var regex = new RegExp('^parking:.*' + side);
 
     for (var input of form)
-        if (regex.test(input.name) && input.value != '') 
+        if (regex.test(input.name) && input.value != '')
             return true;
-        
+
     return false;
 }
 
@@ -1149,7 +1155,7 @@ function save(form) {
     delete osm.$timestamp;
 
     var index = change.osmChange.modify.way.findIndex(x => x.$id == osm.$id);
-    
+
     if (osm.$id > 0) {
         var index = change.osmChange.modify.way.findIndex(x => x.$id == osm.$id);
         if (index > -1)

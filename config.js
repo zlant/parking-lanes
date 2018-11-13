@@ -1,6 +1,7 @@
 var editorName = 'PLanes'
 
 var valuesLane = ['parallel', 'diagonal', 'perpendicular', 'no_parking', 'no_stopping', 'marked', 'fire_lane'];
+var valuesType = ['on_street', 'half_on_kerb', 'on_kerb', 'lay_by', 'painted_area_only'];
 var valuesCond = ['free', 'ticket', 'disc', 'residents', 'customers', 'private'];
 
 var legend = [

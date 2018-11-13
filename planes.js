@@ -1137,7 +1137,7 @@ function formToOsmWay(form) {
     var osm = ways[form.id];
 
     var supprtedTags = tagsBlock
-        .map(x => new RegExp('^' + x.replace('{side}', '(both|right|left)').replace('type', '(parallel|diagonal|perpendicular)') + '$'));
+        .map(x => new RegExp('^' + x.replace('{side}', '(both|right|left)').replace('{type}', '(parallel|diagonal|perpendicular)') + '$'));
     osm.tag = osm.tag.filter(tag => supprtedTags.every(rgx => !rgx.test(tag.$k)));
 
     for (var input of form)

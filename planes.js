@@ -676,16 +676,16 @@ function getLaneInfoPanelContent(osm) {
             dl.appendChild(side);
         form.appendChild(dl);
 
-        var submit = document.createElement('input');
-        submit.setAttribute('type', 'submit');
-        submit.setAttribute('value', 'Apply');
-        form.appendChild(submit);
+        // var submit = document.createElement('input');
+        // submit.setAttribute('type', 'submit');
+        // submit.setAttribute('value', 'Apply');
+        // form.appendChild(submit);
 
-        var cancel = document.createElement('input');
-        cancel.setAttribute('type', 'reset');
-        cancel.setAttribute('value', 'Cancel');
-        cancel.onclick =  () => removeFromOsmChangeset(osm.$id);
-        form.appendChild(cancel);
+        // var cancel = document.createElement('input');
+        // cancel.setAttribute('type', 'reset');
+        // cancel.setAttribute('value', 'Cancel');
+        // cancel.onclick =  () => removeFromOsmChangeset(osm.$id);
+        // form.appendChild(cancel);
 
         if ((chooseSideTags(form, 'right') || chooseSideTags(form, 'left')) || !chooseSideTags(form, 'both')) {
             form[0].checked = false;

@@ -1,4 +1,4 @@
-﻿var map = L.map('map', { fadeAnimation: false });
+var map = L.map('map', { fadeAnimation: false });
 var hash = new L.Hash(map);
 
 if (document.location.href.indexOf('#') == -1)
@@ -543,7 +543,7 @@ function showLaneInfo(e) {
     var laneinfo = document.getElementById('laneinfo');
     laneinfo.appendChild(getLaneInfoPanelContent(e.target.options.osm));
     laneinfo.style.display = 'block';
-    map.originalEvent.preventDefault();
+    L.DomEvent.stopPropagation(e);
 }
 
 function getColor(condition) {
@@ -1279,4 +1279,3 @@ function closeLaneInfo(e) {
 
 map.on('moveend', mapMoveEnd);
 map.on('click', closeLaneInfo);
-mapMoveEnd();

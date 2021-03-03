@@ -789,6 +789,8 @@ function getTagsBlock(side, osm) {
 
     var sign = document.createElement('img');
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/9/98/3.27_Russian_road_sign.svg';
+    sign.alt = "No Stopping Sign"
+    sign.title = "No Stopping"
     sign.height = 20;
     sign.width = 20;
     sign.className = 'sign';
@@ -804,6 +806,8 @@ function getTagsBlock(side, osm) {
 
     var sign = document.createElement('img');
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/8/81/3.28_Russian_road_sign.svg';
+    sign.alt = "No Parking Sign"
+    sign.title = "No Parking"
     sign.height = 20;
     sign.width = 20;
     sign.className = 'sign';
@@ -819,6 +823,8 @@ function getTagsBlock(side, osm) {
 
     var sign = document.createElement('img');
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/f/f4/3.29_Russian_road_sign.svg';
+    sign.alt = "No Parking on Odd Days Sign"
+    sign.title = "No Parking on Odd Days"
     sign.height = 20;
     sign.width = 20;
     sign.className = 'sign';
@@ -834,6 +840,8 @@ function getTagsBlock(side, osm) {
 
     var sign = document.createElement('img');
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/7/76/3.30_Russian_road_sign.svg';
+    sign.alt = "No Parking on Even Days Sign"
+    sign.title = "No Parking on Even Days"
     sign.height = 20;
     sign.width = 20;
     sign.className = 'sign';
@@ -849,6 +857,8 @@ function getTagsBlock(side, osm) {
 
     var sign = document.createElement('img');
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/e/eb/6.4_Russian_road_sign.svg';
+    sign.alt = "Free Parking Sign"
+    sign.title = "Free Parking"
     sign.height = 20;
     sign.width = 20;
     sign.className = 'sign';
@@ -864,6 +874,8 @@ function getTagsBlock(side, osm) {
 
     var sign = document.createElement('img');
     sign.src = 'https://upload.wikimedia.org/wikipedia/commons/f/f3/8.8_Russian_road_sign.svg';
+    sign.alt = "Paid Parking Sign"
+    sign.title = "Paid Parking"
     sign.height = 20;
     sign.width = 40;
     sign.className = 'sign';

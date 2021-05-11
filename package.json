@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "start": "webpack serve"
+    "start": "webpack serve",
+    "deploy": "gh-pages -d dist"
   },
   "keywords": [],
   "author": "Zlant",
@@ -25,6 +26,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
+    "gh-pages": "^3.1.0",
     "html-webpack-plugin": "^5.3.1",
     "node-sass": "^5.0.0",
     "postcss-loader": "^5.2.0",

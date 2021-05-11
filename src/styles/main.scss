@@ -1,0 +1,138 @@
+$font-size: 1rem;
+
+html {
+    font-size: $font-size;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+
+.legend-element {
+    display: inline-block;
+    width: 30px;
+    height: 3px;
+    vertical-align: middle;
+    overflow: hidden;
+}
+
+.control-padding {
+    padding: 4px 7px;
+}
+
+.control-bigfont {
+    font-size: 110%;
+}
+
+.mapnik_gray {
+    filter: grayscale(1);
+}
+
+.leaflet-control.control-button {
+    cursor: pointer;
+}
+
+.leaflet-control.control-button:hover {
+    background-color: #f4f4f4;
+}
+
+::placeholder {
+    color: gainsboro;
+}
+
+select,
+input[type=text] {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.leaflet-marker-icon.cut-icon {
+    background: #fffc7e;
+    color: black;
+    border-radius: 50%;
+    line-height: 5px;
+    border: 2px solid #f00;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 140%;
+}
+
+.cut-icon:hover {
+    border: 2px solid darkgreen;
+}
+
+// lane-info
+
+.tags-block_right {
+    background-color: #fee2fe;
+}
+
+.tags-block_left {
+    background-color: lightcyan;
+}
+
+.tags-block__tag {
+    margin: 0;
+}
+
+// editor-panel
+
+.leaflet-control-layers .editor-form__side-switcher {
+    display: inline;
+    cursor: pointer;
+}
+
+.editor-form__side-switcher-checkbox {
+    display: inline;
+    vertical-align: top;
+    cursor: pointer;
+}
+
+.editor-form__cut-button {
+    float: right;
+    padding: 0 2px;
+    border: 0;
+    border-radius: 2px;
+    font-size: 120%;
+    background: transparent;
+    cursor: pointer;
+}
+
+.editor-form__cut-button:hover {
+    background: #f4f4f4;
+}
+
+.sign-preset {
+    margin: 2px;
+    cursor: pointer;
+}
+
+// github control
+
+.leaflet-control-layers .editor-mode,
+.editor-mode {
+    display: inline;
+    cursor: pointer;
+}
+
+.editor-mode__checkbox {
+    display: inline;
+    vertical-align: top;
+    margin: 3px 3px 3px 0;
+}
+
+// save control
+
+.leaflet-control.save-control {
+    background-color: yellow;
+}
+
+.leaflet-control.save-control:hover {
+    background-color: #f4f400;
+}

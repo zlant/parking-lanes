@@ -18,6 +18,10 @@ export async function downloadBbox(bounds, editorMode, useDevServer) {
     let newData = null
 
     const content = await downloadContent(getQueryUrl(bounds, editorMode, useDevServer))
+
+    if (!content)
+        return null
+
     newData = parseContent(content)
 
     if (newData) {
@@ -37,6 +41,10 @@ function withinLastBbox(bounds) {
            bounds.getEast() < lastBounds.getEast() && bounds.getNorth() < lastBounds.getNorth()
 }
 
+export function resetLastBounds() {
+    lastBounds = null
+}
+
 function getQueryUrl(bounds, editorMode, useDevServer) {
     if (useDevServer) {
         const bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()].join(',')
@@ -51,12 +59,17 @@ function getQueryUrl(bounds, editorMode, useDevServer) {
 }
 
 async function downloadContent(url) {
-    const resp = await axios.get(url, {
-        headers: {
-            Accept: 'application/xml',
-        },
-    })
-    return JXON.stringToJs(resp.data)
+    try {
+        const resp = await axios.get(url, {
+            headers: {
+                Accept: 'application/xml',
+            },
+        })
+        return JXON.stringToJs(resp.data)
+    } catch (err) {
+        console.error(err)
+        return null
+    }
 }
 
 function parseContent(content) {

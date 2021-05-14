@@ -143,6 +143,8 @@ function closeChangset(changesetId, callback) {
 
                 change.osmChange.modify.way = []
                 change.osmChange.create.way = []
+
+                callback()
             }
         })
 }

@@ -30,43 +30,49 @@ import {
 
 import { getLocationFromCookie, setLocationToCookie } from './location-ccokie'
 import { idUrl, josmUrl, overpassUrl } from './links'
-import { downloadBbox, cache } from './data-client'
+import { downloadBbox, cache, resetLastBounds } from './data-client'
 import { authenticate, save, uploadChanges } from './osm-client'
 
+/** @type {L.Map} */
 let map = null
+
 let editorMode = false
 const useDevServer = false
 let datetime = new Date()
 const viewMinZoom = 15
 
 const laneInfoControl = new LaneInfoControl({ position: 'topright' })
-let layersControl = new L.Control.Layers()
 
-export function initMap() {
-    const root = document.querySelector('#map')
-    map = L.map(root, { fadeAnimation: false })
-    if (document.location.href.indexOf('#') === -1)
-        map.setView(...(getLocationFromCookie() || [[51.591, 24.609], 5]))
-
-    const mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+const tileLayers = {
+    mapnik: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 18,
         className: 'mapnik_gray',
-    }).addTo(map)
-
-    const esri = L.tileLayer('https://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    }),
+    esri: L.tileLayer('https://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         attribution: "<a href='https://wiki.openstreetmap.org/wiki/Esri'>Terms & Feedback</a>",
         maxZoom: 19,
         maxNativeZoom: 19,
         ref: 'esric',
-    })
+    }),
+}
 
-    const baseMaps = {
-        Mapnik: mapnik,
-        'Esri Clarity': esri,
-    }
+const layersControl = L.control.layers(
+    {
+        Mapnik: tileLayers.mapnik,
+        'Esri Clarity': tileLayers.esri,
+    },
+    null,
+    { position: 'bottomright' })
 
-    layersControl = L.control.layers(baseMaps, null, { position: 'bottomright' })
+export function initMap() {
+    const root = document.querySelector('#map')
+    map = L.map(root, { fadeAnimation: false })
+
+    if (document.location.href.indexOf('#') === -1)
+        map.setView(...(getLocationFromCookie() || [[51.591, 24.609], 5]))
+
+    tileLayers.mapnik.addTo(map)
 
     L.control.locate({ drawCircle: false, drawMarker: true }).addTo(map)
 
@@ -93,7 +99,7 @@ export function initMap() {
 
 export const InfoControl = L.Control.extend({
     onAdd: map => hyper`
-        <div id="info"
+        <div id="min-zoom-btn"
              class="leaflet-control-layers control-padding control-bigfont control-button"
              onclick=${() => map.setZoom(viewMinZoom)}>
             Zoom in on the map
@@ -102,16 +108,16 @@ export const InfoControl = L.Control.extend({
 
 export const DownloadControl = L.Control.extend({
     onAdd: map => hyper`
-        <div id="fast"
-                class="leaflet-control-layers control-padding control-bigfont control-button"
-                onclick=${() => downloadParkinkLanes(map)}>
+        <div id="download-btn"
+             class="leaflet-control-layers control-padding control-bigfont control-button"
+             onclick=${() => downloadParkinkLanes(map)}>
             Download bbox
         </div>`,
 })
 
 export const SaveControl = L.Control.extend({
     onAdd: map => hyper`
-        <button id="saveChangeset"
+        <button id="save-btn"
                 class="leaflet-control-layers control-padding control-bigfont control-button save-control"
                 style="display: none"
                 onclick=${handleSaveClick}>
@@ -128,7 +134,12 @@ const lanes = {}
 const markers = {}
 
 async function downloadParkinkLanes(map) {
+    document.getElementById('download-btn').innerText = 'Downloading...'
     const newData = await downloadBbox(map.getBounds(), editorMode, useDevServer)
+    document.getElementById('download-btn').innerText = 'Download bbox'
+
+    if (!newData)
+        return
 
     for (const way of Object.values(newData.ways).filter(x => x.tag != null)) {
         if (lanes['right' + way.$id] || lanes['left' + way.$id] || lanes['empty' + way.$id])
@@ -193,7 +204,7 @@ function handleMapMoveEnd() {
 
     updateLaneStylesByZoom(lanes, zoom)
 
-    document.getElementById('info').style.display =
+    document.getElementById('min-zoom-btn').style.display =
         zoom < viewMinZoom ? 'block' : 'none'
 
     if (zoom < viewMinZoom)
@@ -216,11 +227,16 @@ function handleEditorModeCheckboxChange(e) {
         authenticate(useDevServer, checkAuth)
     } else {
         editorMode = false
+
         layersControl.remove(map)
-        // map.removeLayer(esri)
-        // map.addLayer(mapnik)
-        // mapnik.addTo(map)
+        if (map.hasLayer(tileLayers.esri)) {
+            map.removeLayer(tileLayers.esri)
+            map.addLayer(tileLayers.mapnik)
+            tileLayers.mapnik.addTo(map)
+        }
+
         document.getElementById('ghc-editor-mode-label').style.color = 'black'
+
         for (const lane in lanes) {
             if (lane.startsWith('empty')) {
                 lanes[lane].remove()
@@ -237,7 +253,7 @@ function handleEditorModeCheckboxChange(e) {
             editorMode = true
             layersControl.addTo(map)
             document.getElementById('ghc-editor-mode-label').style.color = 'green'
-            // lastBounds = undefined
+            resetLastBounds()
             handleMapMoveEnd()
         }
     }
@@ -248,8 +264,8 @@ function handleOsmChange(newOsm) {
     newLanes.forEach(lane => lane.addTo(map))
 
     const changesCount = save(newOsm)
-    document.getElementById('saveChangeset').innerText = 'Save (' + changesCount + ')'
-    document.getElementById('saveChangeset').style.display = 'block'
+    document.getElementById('save-btn').innerText = 'Save (' + changesCount + ')'
+    document.getElementById('save-btn').style.display = 'block'
 }
 
 function handleSaveClick() {
@@ -262,7 +278,7 @@ function handleUploadingCallback(err) {
         return
     }
 
-    document.getElementById('saveChangeset').style.display = 'none'
+    document.getElementById('save-btn').style.display = 'none'
 }
 
 const cutIcon = L.divIcon({
@@ -322,6 +338,6 @@ function cutWay(arg) {
 
     save(newWay)
     const changesCount = save(oldWay)
-    document.getElementById('saveChangeset').innerText = 'Save (' + changesCount + ')'
-    document.getElementById('saveChangeset').style.display = 'block'
+    document.getElementById('save-btn').innerText = 'Save (' + changesCount + ')'
+    document.getElementById('save-btn').style.display = 'block'
 }

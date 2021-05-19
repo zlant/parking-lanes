@@ -1,6 +1,6 @@
 import L from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
-import { idUrl, josmUrl, overpassUrl } from '../links'
+import { idUrl, josmUrl, overpassUrl } from '~/src/utils/links'
 import { getLaneEditForm, setOsmChangeListener } from './editor/editor-form'
 
 export default L.Control.extend({

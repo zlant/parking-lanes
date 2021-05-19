@@ -28,16 +28,21 @@ import {
     getBacklights,
 } from './parking-lane'
 
-import { getLocationFromCookie, setLocationToCookie } from './location-ccokie'
-import { idUrl, josmUrl, overpassUrl } from './links'
-import { downloadBbox, cache, resetLastBounds } from './data-client'
-import { authenticate, save, uploadChanges } from './osm-client'
+import { getLocationFromCookie, setLocationToCookie } from '~/src/utils/location-ccokie'
+import { idUrl, josmUrl, overpassUrl } from '~/src/utils/links'
+import { downloadBbox, osmData, resetLastBounds } from '~/src/utils/data-client'
+import { getUrl } from './data-url'
+import { addChanedEntity, changesStore } from '~/src/utils/changes-store'
+import { authenticate, uploadChanges } from '~/src/utils/osm-client'
+
+const editorName = 'PLanes'
+const version = '0.4.0'
 
 /** @type {L.Map} */
 let map = null
 
 let editorMode = false
-const useDevServer = false
+const useDevServer = true
 let datetime = new Date()
 const viewMinZoom = 15
 
@@ -135,7 +140,8 @@ const markers = {}
 
 async function downloadParkinkLanes(map) {
     document.getElementById('download-btn').innerText = 'Downloading...'
-    const newData = await downloadBbox(map.getBounds(), editorMode, useDevServer)
+    const url = getUrl(map.getBounds(), editorMode, useDevServer)
+    const newData = await downloadBbox(map.getBounds(), url)
     document.getElementById('download-btn').innerText = 'Download bbox'
 
     if (!newData)
@@ -171,7 +177,7 @@ function handleLaneClick(e) {
     if (editorMode) {
         laneInfoControl.showEditForm(
             e.target.options.osm,
-            cache.waysInRelation,
+            osmData.waysInRelation,
             handleCutLaneClick)
     } else {
         laneInfoControl.showLaneInfo(e.target.options.osm)
@@ -222,9 +228,19 @@ function getHighwaysOverpassQuery() {
 
 // Editor
 
-function handleEditorModeCheckboxChange(e) {
+async function handleEditorModeCheckboxChange(e) {
     if (e.currentTarget.checked) {
-        authenticate(useDevServer, checkAuth)
+        try {
+            await authenticate(useDevServer)
+            editorMode = true
+            layersControl.addTo(map)
+            document.getElementById('ghc-editor-mode-label').style.color = 'green'
+            resetLastBounds()
+            handleMapMoveEnd()
+        } catch (err) {
+            document.getElementById('ghc-editor-mode-label').style.color = 'red'
+            alert(err)
+        }
     } else {
         editorMode = false
 
@@ -244,41 +260,24 @@ function handleEditorModeCheckboxChange(e) {
             }
         }
     }
-
-    function checkAuth(err) {
-        if (err) {
-            document.getElementById('ghc-editor-mode-label').style.color = 'red'
-            alert(err)
-        } else {
-            editorMode = true
-            layersControl.addTo(map)
-            document.getElementById('ghc-editor-mode-label').style.color = 'green'
-            resetLastBounds()
-            handleMapMoveEnd()
-        }
-    }
 }
 
 function handleOsmChange(newOsm) {
     const newLanes = parseChangedParkingLane(newOsm, lanes, datetime, map.getZoom())
     newLanes.forEach(lane => lane.addTo(map))
 
-    const changesCount = save(newOsm)
+    const changesCount = addChanedEntity(newOsm)
     document.getElementById('save-btn').innerText = 'Save (' + changesCount + ')'
     document.getElementById('save-btn').style.display = 'block'
 }
 
-function handleSaveClick() {
-    uploadChanges(handleUploadingCallback)
-}
-
-function handleUploadingCallback(err) {
-    if (err) {
+async function handleSaveClick() {
+    try {
+        await uploadChanges(editorName + ' ' + version, changesStore)
+        document.getElementById('save-btn').style.display = 'none'
+    } catch (err) {
         alert(err)
-        return
     }
-
-    document.getElementById('save-btn').style.display = 'none'
 }
 
 const cutIcon = L.divIcon({
@@ -293,7 +292,7 @@ function handleCutLaneClick(osm) {
 
     for (const nd of osm.nd.slice(1, osm.nd.length - 1)) {
         markers[nd.$ref] = L.marker(
-            cache.nodes[nd.$ref],
+            osmData.nodes[nd.$ref],
             {
                 icon: cutIcon,
                 ndId: nd.$ref,
@@ -307,7 +306,7 @@ function handleCutLaneClick(osm) {
 let newWayId = -1
 
 function cutWay(arg) {
-    const oldWay = cache.ways[arg.target.options.wayId]
+    const oldWay = osmData.ways[arg.target.options.wayId]
     const newWay = { ...oldWay }
 
     const ndIndex = oldWay.nd.findIndex(e => e.$ref === arg.target.options.ndId)
@@ -320,24 +319,24 @@ function cutWay(arg) {
     delete newWay.$uid
     delete newWay.$timestamp
 
-    lanes['right' + oldWay.$id]?.setLatLngs(oldWay.nd.map(x => cache.nodes[x.$ref]))
-    lanes['left' + oldWay.$id]?.setLatLngs(oldWay.nd.map(x => cache.nodes[x.$ref]))
-    lanes['empty' + oldWay.$id]?.setLatLngs(oldWay.nd.map(x => cache.nodes[x.$ref]))
+    lanes['right' + oldWay.$id]?.setLatLngs(oldWay.nd.map(x => osmData.nodes[x.$ref]))
+    lanes['left' + oldWay.$id]?.setLatLngs(oldWay.nd.map(x => osmData.nodes[x.$ref]))
+    lanes['empty' + oldWay.$id]?.setLatLngs(oldWay.nd.map(x => osmData.nodes[x.$ref]))
 
-    lanes.left?.setLatLngs(oldWay.nd.map(x => cache.nodes[x.$ref]))
-    lanes.right?.setLatLngs(oldWay.nd.map(x => cache.nodes[x.$ref]))
+    lanes.left?.setLatLngs(oldWay.nd.map(x => osmData.nodes[x.$ref]))
+    lanes.right?.setLatLngs(oldWay.nd.map(x => osmData.nodes[x.$ref]))
 
     for (const marker in markers) {
         markers[marker].remove()
         delete markers[marker]
     }
 
-    cache.ways[newWay.$id] = newWay
-    const newLanes = parseParkingLane(newWay, cache.nodes, map.getZoom(), editorMode)
+    osmData.ways[newWay.$id] = newWay
+    const newLanes = parseParkingLane(newWay, osmData.nodes, map.getZoom(), editorMode)
     addNewLanes(newLanes, map)
 
-    save(newWay)
-    const changesCount = save(oldWay)
+    addChanedEntity(newWay)
+    const changesCount = addChanedEntity(oldWay)
     document.getElementById('save-btn').innerText = 'Save (' + changesCount + ')'
     document.getElementById('save-btn').style.display = 'block'
 }

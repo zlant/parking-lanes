@@ -7,7 +7,7 @@ export const changesStore = {
     },
 }
 
-export function addChanedEntity(osm) {
+export function addChangedEntity(osm) {
     delete osm.$user
     delete osm.$uid
     delete osm.$timestamp

@@ -20,7 +20,7 @@ export function getUrl(bounds, editorMode, useDevServer) {
     }
 }
 
-function getOverpassViewerQuery(bounds) {
+function getOverpassEditorQuery(bounds) {
     return `
         [out:xml];
         (
@@ -34,7 +34,7 @@ function getOverpassViewerQuery(bounds) {
         out meta;`
 }
 
-function getOverpassEditorQuery(bounds) {
+function getOverpassViewerQuery(bounds) {
     return `
         [out:xml];
         (

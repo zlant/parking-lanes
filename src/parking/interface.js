@@ -32,7 +32,7 @@ import { getLocationFromCookie, setLocationToCookie } from '~/src/utils/location
 import { idUrl, josmUrl, overpassUrl } from '~/src/utils/links'
 import { downloadBbox, osmData, resetLastBounds } from '~/src/utils/data-client'
 import { getUrl } from './data-url'
-import { addChanedEntity, changesStore } from '~/src/utils/changes-store'
+import { addChangedEntity, changesStore } from '~/src/utils/changes-store'
 import { authenticate, uploadChanges } from '~/src/utils/osm-client'
 
 const editorName = 'PLanes'
@@ -42,7 +42,7 @@ const version = '0.4.0'
 let map = null
 
 let editorMode = false
-const useDevServer = true
+const useDevServer = false
 let datetime = new Date()
 const viewMinZoom = 15
 
@@ -266,7 +266,7 @@ function handleOsmChange(newOsm) {
     const newLanes = parseChangedParkingLane(newOsm, lanes, datetime, map.getZoom())
     newLanes.forEach(lane => lane.addTo(map))
 
-    const changesCount = addChanedEntity(newOsm)
+    const changesCount = addChangedEntity(newOsm)
     document.getElementById('save-btn').innerText = 'Save (' + changesCount + ')'
     document.getElementById('save-btn').style.display = 'block'
 }
@@ -335,8 +335,8 @@ function cutWay(arg) {
     const newLanes = parseParkingLane(newWay, osmData.nodes, map.getZoom(), editorMode)
     addNewLanes(newLanes, map)
 
-    addChanedEntity(newWay)
-    const changesCount = addChanedEntity(oldWay)
+    addChangedEntity(newWay)
+    const changesCount = addChangedEntity(oldWay)
     document.getElementById('save-btn').innerText = 'Save (' + changesCount + ')'
     document.getElementById('save-btn').style.display = 'block'
 }

@@ -113,9 +113,9 @@ function getColor(condition) {
 }
 
 function wayIsMajor(tags) {
-    const findResult = tags.find(x => x.$k === 'highway')
-    if (findResult) {
-        if (findResult.$v.search(/^motorway|trunk|primary|secondary|tertiary|unclassified|residential/) >= 0)
+    const highwayTag = tags.find(x => x.$k === 'highway')
+    if (highwayTag) {
+        if (highwayTag.$v.search(/^motorway|trunk|primary|secondary|tertiary|unclassified|residential/) >= 0)
             return true
         else
             return false

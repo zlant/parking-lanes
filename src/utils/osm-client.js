@@ -35,9 +35,9 @@ export function authenticate(useDevServer) {
  */
 export async function uploadChanges(editor, changesStore) {
     try {
-        const changesetId = await createChangset(editor)
+        const changesetId = await createChangeset(editor)
         await saveChangesets(changesStore, changesetId, editor)
-        await closeChangset(changesetId)
+        await closeChangeset(changesetId)
 
         for (const way of changesStore.modify.way)
             way.$version = parseInt(way.$version) + 1
@@ -50,7 +50,7 @@ export async function uploadChanges(editor, changesStore) {
     }
 }
 
-function createChangset(editor) {
+function createChangeset(editor) {
     const change = {
         osm: {
             changeset: {
@@ -119,7 +119,7 @@ function saveChangesets(changesStore, changesetId, editor) {
     )
 }
 
-function closeChangset(changesetId) {
+function closeChangeset(changesetId) {
     return new Promise((resolve, reject) =>
         auth.xhr(
             {

@@ -1,5 +1,6 @@
 import L from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
+import { handleJosmLinkClick } from '~/src/utils/josm'
 
 export default L.Control.extend({
     onAdd: map => hyper`
@@ -10,7 +11,7 @@ export default L.Control.extend({
                 <a href="https://wiki.openstreetmap.org/wiki/Key:parking:lane" target="_blank">Tagging</a>
                 |
                 <a id="ghc-id" target="_blank">iD</a>,
-                <a id="ghc-josm" target="_blank">Josm</a>,
+                <a id="ghc-josm" target="_blank" onclick=${handleJosmLinkClick}>Josm</a>,
             </span>
             <label id="ghc-editor-mode-label" class="editor-mode">
                 <input id="ghc-editor-mode"

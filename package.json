@@ -6,7 +6,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV='production' webpack",
     "start": "webpack serve",
-    "analyze": "cross-env NODE_ENV='production' webpack --analyze",
+    "analyze": "cross-env NODE_ENV='production' cross-env ANALYZE=true webpack",
     "deploy": "gh-pages -d dist"
   },
   "keywords": [],

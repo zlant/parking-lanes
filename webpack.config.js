@@ -42,7 +42,7 @@ module.exports = {
         }),
         new CleanWebpackPlugin(),
         new webpack.HotModuleReplacementPlugin(),
-        new BundleAnalyzerPlugin(),
+        ...(process.env.ANALYZE ? [new BundleAnalyzerPlugin()] : []),
     ],
     module: {
         rules: [

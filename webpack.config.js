@@ -1,11 +1,14 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const webpack = require('webpack')
 
 module.exports = {
-    mode: 'development',
+    mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
     devServer: {
         historyApiFallback: true,
         contentBase: path.resolve(__dirname, './dist'),
@@ -19,20 +22,18 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, './dist'),
-        filename: '[name].bundle.js',
+        filename: '[name].[contenthash].js',
+        assetModuleFilename: '[name].[hash][ext][query]',
+        hashDigestLength: 8,
     },
-    // resolve: {
-    //     root: [
-    //         path.resolve(__dirname, 'src'),
-    //         path.resolve(__dirname, 'node_modules'),
-    //     ],
-    //     extensions: ['', '.js'],
-    // },
     plugins: [
         new HtmlWebpackPlugin({
             title: 'Parking lanes viewer',
             template: path.resolve(__dirname, './src/template.html'),
             filename: 'index.html',
+        }),
+        new MiniCssExtractPlugin({
+            filename: '[name].[contenthash].css',
         }),
         new CopyPlugin({
             patterns: [
@@ -41,6 +42,7 @@ module.exports = {
         }),
         new CleanWebpackPlugin(),
         new webpack.HotModuleReplacementPlugin(),
+        new BundleAnalyzerPlugin(),
     ],
     module: {
         rules: [
@@ -55,12 +57,18 @@ module.exports = {
             },
             {
                 test: /\.(woff(2)?|eot|ttf|otf|svg|)$/,
-                type: 'asset/inline',
+                type: 'asset/resource',
             },
             {
                 test: /\.(scss|css)$/,
-                use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
+                use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader'],
             },
+        ],
+    },
+    optimization: {
+        minimizer: [
+            '...',
+            new CssMinimizerPlugin(),
         ],
     },
 }

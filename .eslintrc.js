@@ -10,6 +10,7 @@ module.exports = {
         ecmaVersion: 12,
         sourceType: 'module',
     },
+    ignorePatterns: ['dist'],
     rules: {
         indent: ['error', 4, { SwitchCase: 1 }],
         'brace-style': ['error', '1tbs', { allowSingleLine: false }],

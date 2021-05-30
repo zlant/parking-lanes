@@ -22,7 +22,7 @@ export function getUrl(bounds, editorMode, useDevServer) {
 
 function getOverpassEditorQuery(bounds) {
     return `
-        [out:xml];
+        [out:json];
         (
             way[highway~"^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street"][service!=parking_aisle](${convertBoundsToOverpassBbox(bounds)});
         )->.a;
@@ -36,7 +36,7 @@ function getOverpassEditorQuery(bounds) {
 
 function getOverpassViewerQuery(bounds) {
     return `
-        [out:xml];
+        [out:json];
         (
             way[highway][~"^parking:.*"~"."](${convertBoundsToOverpassBbox(bounds)});
         )->.a;

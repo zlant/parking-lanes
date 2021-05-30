@@ -1,4 +1,3 @@
-import * as JXON from 'jxon'
 import axios from 'axios'
 
 export const osmData = {
@@ -15,12 +14,12 @@ export async function downloadBbox(bounds, url) {
 
     lastBounds = bounds
 
-    const content = await downloadContent(url)
+    const osmResp = await downloadContent(url)
 
-    if (!content)
+    if (!osmResp)
         return null
 
-    const newData = parseXml(content)
+    const newData = parseOsmResp(osmResp)
 
     if (newData) {
         Object.assign(osmData.nodes, newData.nodes)
@@ -47,7 +46,7 @@ async function downloadContent(url) {
     try {
         const resp = await axios.get(url, {
             headers: {
-                Accept: 'application/xml',
+                Accept: 'application/json',
             },
         })
         return resp.data
@@ -57,33 +56,32 @@ async function downloadContent(url) {
     }
 }
 
-function parseXml(xmlStr) {
-    const xmlObj = JXON.stringToJs(xmlStr)
-
+function parseOsmResp(osmResp) {
     const newData = {
         ways: {},
         nodes: {},
         waysInRelation: {},
     }
 
-    if (xmlObj.osm.node) {
-        for (const node of Array.isArray(xmlObj.osm.node) ? xmlObj.osm.node : [xmlObj.osm.node])
-            newData.nodes[node.$id] = [node.$lat, node.$lon]
-    }
+    for (const el of osmResp.elements) {
+        switch (el.type) {
+            case 'node':
+                newData.nodes[el.id] = [el.lat, el.lon]
+                break
 
-    if (xmlObj.osm.way) {
-        xmlObj.osm.way = Array.isArray(xmlObj.osm.way) ? xmlObj.osm.way : [xmlObj.osm.way]
-        for (const way of xmlObj.osm.way.filter(x => x.tag != null))
-            newData.ways[way.$id] = way
-    }
+            case 'way':
+                newData.ways[el.id] = el
+                break
 
-    if (xmlObj.osm.relation) {
-        xmlObj.osm.relation = Array.isArray(xmlObj.osm.relation) ? xmlObj.osm.relation : [xmlObj.osm.relation]
-        for (const rel of xmlObj.osm.relation) {
-            for (const member of Array.isArray(rel.member) ? rel.member : [rel.member]) {
-                if (member.$type === 'way' && newData.ways[member.$ref])
-                    newData.waysInRelation[member.$ref] = true
-            }
+            case 'relation':
+                for (const member of el.members) {
+                    if (member.type === 'way' && newData.ways[member.ref])
+                        newData.waysInRelation[member.ref] = true
+                }
+                break
+
+            default:
+                throw new Error('Not supported osm type ' + el.type)
         }
     }
 

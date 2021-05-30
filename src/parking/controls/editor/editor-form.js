@@ -3,7 +3,7 @@ import { presets } from './presets'
 
 export function getLaneEditForm(osm, waysInRelation, cutLaneListener) {
     const form = hyper`
-        <form id="${osm.$id}"
+        <form id="${osm.id}"
               class="editor-form">
             <label class="editor-form__side-switcher">
                 <input id="side-switcher"
@@ -15,7 +15,7 @@ export function getLaneEditForm(osm, waysInRelation, cutLaneListener) {
             <button title="Cut lane"
                     type="button"
                     class="editor-form__cut-button"
-                    style="${waysInRelation[osm.$id] ? displayNone : null}"
+                    style="${waysInRelation[osm.id] ? displayNone : null}"
                     onclick=${() => cutLaneListener(osm)}>
                 ✂
             </button>
@@ -88,7 +88,7 @@ const parkingLaneTagTemplates = [
 
 function getTagInupts(osm, side) {
     const inputs = []
-    const type = osm.tag.find(x => x.$k === `parking:lane:${side}`)?.$v || 'type'
+    const type = osm.tags[`parking:lane:${side}`] || 'type'
     for (const tagTemplate of parkingLaneTagTemplates)
         inputs.push(getTagInupt(osm, side, type, tagTemplate))
     return inputs
@@ -102,7 +102,7 @@ function getTagInupt(osm, side, parkingType, tagTemplate) {
     const tagSplit = tag.split(':')
     const label = tagSplit[Math.floor(tagSplit.length / 2) * 2 - 1]
 
-    const value = osm.tag.find(x => x.$k === tag)?.$v
+    const value = osm.tags[tag]
 
     /** @type {HTMLElement} */
     let input
@@ -124,7 +124,7 @@ function getTagInupt(osm, side, parkingType, tagTemplate) {
             const laneTag = 'parking:lane:{side}'
                 .replace('{side}', side)
             hide = !['parallel', 'diagonal', 'perpendicular']
-                .includes(osm.tag.find(x => x.$k === laneTag)?.$v)
+                .includes(osm.tags[laneTag])
             break
         }
         case 'parking:condition:{side}':
@@ -136,14 +136,14 @@ function getTagInupt(osm, side, parkingType, tagTemplate) {
             input = getTextInput(tag, value)
             const timeIntervalTag = 'parking:condition:{side}:time_interval'
                 .replace('{side}', side)
-            hide = !osm.tag.find(x => x.$k === timeIntervalTag)?.$v
+            hide = !osm.tags[timeIntervalTag]
             break
         }
         case 'parking:condition:{side}:maxstay': {
             input = getTextInput(tag, value)
             const conditionTag = 'parking:condition:{side}'
                 .replace('{side}', side)
-            hide = osm.tag.find(x => x.$k === conditionTag)?.$v !== 'disc'
+            hide = osm.tags[conditionTag] !== 'disc'
             break
         }
         default:
@@ -198,9 +198,9 @@ function getPresetSigns(osm, side) {
 
 function handlePresetClick(tags, osm, side) {
     for (const tag of tags)
-        document.getElementById(osm.$id)[tag.k.replace('{side}', side)].value = tag.v
+        document.getElementById(osm.id)[tag.k.replace('{side}', side)].value = tag.v
 
-    document.getElementById(osm.$id)['parking:lane:' + side].dispatchEvent(new Event('change'))
+    document.getElementById(osm.id)['parking:lane:' + side].dispatchEvent(new Event('change'))
 }
 
 function handleLaneTagInput() {
@@ -292,11 +292,14 @@ function formToOsmWay(osm, form) {
             return new RegExp('^' + tagRegexPart + '$')
         })
 
-    osm.tag = osm.tag.filter(tag => supprtedTags.every(rgx => !rgx.test(tag.$k)))
+    for (const tagKey of Object.keys(osm.tags)) {
+        if (supprtedTags.some(regex => regex.test(tagKey)))
+            delete osm.tags[tagKey]
+    }
 
     for (const input of form) {
         if (regex.test(input.name) && input.value)
-            osm.tag.push({ $k: input.name, $v: input.value })
+            osm.tags[input.name] = input.value
     }
 
     return osm

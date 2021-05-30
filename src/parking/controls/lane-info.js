@@ -42,13 +42,13 @@ function getPanel(osm, body) {
     return hyper`
         <div>
             <div style="min-width:250px">
-                <a href="https://openstreetmap.org/way/${osm.$id}" target="_blank">View in OSM</a>
+                <a href="https://openstreetmap.org/way/${osm.id}" target="_blank">View in OSM</a>
                 <span style="float:right">
                     Edit: 
-                    <a href="${josmUrl + overpassUrl + getWayWithRelationsOverpassQuery(osm.$id).replace(/\s+/g, ' ')}" 
+                    <a href="${josmUrl + overpassUrl + getWayWithRelationsOverpassQuery(osm.id).replace(/\s+/g, ' ')}" 
                        target="_blank"
                        onclick=${handleJosmLinkClick}>Josm</a>,
-                    <a href="${idUrl + '&way=' + osm.$id}" 
+                    <a href="${idUrl + '&way=' + osm.id}" 
                        target="_blank">iD</a>
                 </span>
             </div>
@@ -72,16 +72,16 @@ function getWayWithRelationsOverpassQuery(wayId) {
 function getLaneInfo(osm) {
     return hyper`
         <div>
-            ${getTagsBlock(osm.tag, 'right')}
-            ${getTagsBlock(osm.tag, 'left')}
+            ${getTagsBlock(osm.tags, 'right')}
+            ${getTagsBlock(osm.tags, 'left')}
         </div>`
 
     function getTagsBlock(tags, side) {
         const regex = new RegExp('^parking:.*(?:' + side + '|both)')
 
-        const filteredTags = tags
-            .filter(tag => regex.test(tag.$k))
-            .map(tag => tag.$k + ' = ' + tag.$v)
+        const filteredTags = Object.keys(tags)
+            .filter(tag => regex.test(tag))
+            .map(tag => tag + ' = ' + tags[tag])
 
         return hyper`
             <div class="tags-block ${'tags-block_' + side}">

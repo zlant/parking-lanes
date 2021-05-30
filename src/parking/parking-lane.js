@@ -6,21 +6,18 @@ import { laneStyleByZoom as laneStyle } from './lane-styles'
 const highwayRegex = /'^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street'/
 
 export function parseParkingLane(way, nodes, zoom, editorMode) {
-    if (!Array.isArray(way.tag))
-        way.tag = [way.tag]
-
-    const isMajor = wayIsMajor(way.tag)
+    const isMajor = wayIsMajor(way.tags)
 
     if (typeof isMajor !== 'boolean')
         return
 
-    const polyline = way.nd.map(x => nodes[x.$ref])
+    const polyline = way.nodes.map(x => nodes[x])
     let emptyway = true
 
     const lanes = {}
 
     for (const side of ['right', 'left']) {
-        const conditions = getConditions(side, way.tag)
+        const conditions = getConditions(side, way.tags)
         if (conditions.default != null || conditions.intervals.length > 0) {
             const laneId = generateLaneId(way, side, conditions)
             const leafletPolyline = createPolyline(polyline, conditions, side, way, isMajor ? laneStyle[zoom].offsetMajor : laneStyle[zoom].offsetMinor, isMajor, zoom)
@@ -30,7 +27,8 @@ export function parseParkingLane(way, nodes, zoom, editorMode) {
     }
     if (editorMode &&
         emptyway &&
-        way.tag.filter(x => x.$k === 'highway' && highwayRegex.test(x.$v)).length > 0) {
+        way.tags.highway &&
+        highwayRegex.test(way.tags.highway)) {
         const laneId = generateLaneId(way)
         const leafletPolyline = createPolyline(polyline, null, 'right', way, 0, isMajor, zoom)
         lanes[laneId] = leafletPolyline
@@ -40,21 +38,21 @@ export function parseParkingLane(way, nodes, zoom, editorMode) {
 }
 
 export function parseChangedParkingLane(newOsm, lanes, datetime, zoom) {
-    const lane = lanes['right' + newOsm.$id] || lanes['left' + newOsm.$id] || lanes['empty' + newOsm.$id]
+    const lane = lanes['right' + newOsm.id] || lanes['left' + newOsm.id] || lanes['empty' + newOsm.id]
     const polyline = lane.getLatLngs()
     let emptyway = true
 
     const newLanes = []
 
     for (const side of ['right', 'left']) {
-        const conditions = getConditions(side, newOsm.tag)
-        const id = side + newOsm.$id
+        const conditions = getConditions(side, newOsm.tags)
+        const id = side + newOsm.id
         if (conditions.default != null) {
             if (lanes[id]) {
                 lanes[id].conditions = conditions
                 lanes[id].setStyle({ color: getColorByDate(conditions, datetime) })
             } else {
-                const isMajor = wayIsMajor(newOsm.tag)
+                const isMajor = wayIsMajor(newOsm.tags)
                 const laneId = generateLaneId(newOsm, side, conditions)
                 const leafletPolyline = createPolyline(polyline, conditions, side, newOsm, isMajor ? laneStyle[zoom].offsetMajor : laneStyle[zoom].offsetMinor, isMajor, zoom)
                 lanes[laneId] = leafletPolyline
@@ -68,16 +66,16 @@ export function parseChangedParkingLane(newOsm, lanes, datetime, zoom) {
     }
 
     if (emptyway) {
-        if (!lanes['empty' + newOsm.$id]) {
-            const isMajor = wayIsMajor(newOsm.tag)
+        if (!lanes['empty' + newOsm.id]) {
+            const isMajor = wayIsMajor(newOsm.tags)
             const laneId = generateLaneId(newOsm)
             const leafletPolyline = createPolyline(polyline, null, 'right', newOsm, 0, isMajor, zoom)
             lanes[laneId] = leafletPolyline
             newLanes.push(leafletPolyline)
         }
-    } else if (lanes['empty' + newOsm.$id]) {
-        lanes['empty' + newOsm.$id].remove()
-        delete lanes['empty' + newOsm.$id]
+    } else if (lanes['empty' + newOsm.id]) {
+        lanes['empty' + newOsm.id].remove()
+        delete lanes['empty' + newOsm.id]
     }
 
     return newLanes
@@ -85,9 +83,9 @@ export function parseChangedParkingLane(newOsm, lanes, datetime, zoom) {
 
 function generateLaneId(osm, side, conditions) {
     if (!conditions)
-        return 'empty' + osm.$id
+        return 'empty' + osm.id
 
-    return side + osm.$id
+    return side + osm.id
 }
 
 function createPolyline(line, conditions, side, osm, offset, isMajor, zoom) {
@@ -113,9 +111,8 @@ function getColor(condition) {
 }
 
 function wayIsMajor(tags) {
-    const highwayTag = tags.find(x => x.$k === 'highway')
-    if (highwayTag) {
-        if (highwayTag.$v.search(/^motorway|trunk|primary|secondary|tertiary|unclassified|residential/) >= 0)
+    if (tags.highway) {
+        if (tags.highway.search(/^motorway|trunk|primary|secondary|tertiary|unclassified|residential/) >= 0)
             return true
         else
             return false
@@ -131,9 +128,9 @@ function getConditions(side, tags) {
 
     let findResult
     for (const tag of defaultTags) {
-        findResult = tags.find(x => x.$k === tag)
+        findResult = tags[tag]
         if (findResult)
-            conditions.default = findResult.$v
+            conditions.default = findResult
 
         if (conditions.default)
             break
@@ -149,17 +146,17 @@ function getConditions(side, tags) {
         const cond = {}
 
         for (let j = 0; j < sides.length; j++) {
-            findResult = tags.find(x => x.$k === laneTags[j])
-            if (findResult && legend.findIndex(x => x.condition === findResult.$v) >= 0)
-                cond.condition = findResult.$v
+            findResult = tags[laneTags[j]]
+            if (findResult && legend.findIndex(x => x.condition === findResult) >= 0)
+                cond.condition = findResult
 
-            findResult = tags.find(x => x.$k === conditionTags[j])
+            findResult = tags[conditionTags[j]]
             if (findResult)
-                cond.condition = findResult.$v
+                cond.condition = findResult
 
-            findResult = tags.find(x => x.$k === intervalTags[j])
+            findResult = tags[intervalTags[j]]
             if (findResult)
-                cond.interval = parseOpeningHourse(findResult.$v)
+                cond.interval = parseOpeningHourse(findResult)
         }
 
         if (i === 1 && cond.interval == null) {

@@ -86,24 +86,20 @@ function createChangeset(editorName, editorVersion) {
 }
 
 function saveChangesets(changesStore, changesetId, editorName) {
-    for (const way of changesStore.modify.way)
-        way.$changeset = changesetId
-    for (const way of changesStore.create.way)
-        way.$changeset = changesetId
-
     const change = {
         osmChange: {
             $version: '0.6',
             $generator: editorName,
             modify: {
-                way: changesStore.modify.way,
+                way: changesStore.modify.way
+                    .map(x => wayToJxon(x, changesetId)),
             },
             create: {
-                way: changesStore.create.way,
+                way: changesStore.create.way
+                    .map(x => wayToJxon(x, changesetId)),
             },
         },
     }
-    const xmlContent = JXON.jsToString(change)
 
     return new Promise((resolve, reject) =>
         auth.xhr(
@@ -111,7 +107,7 @@ function saveChangesets(changesStore, changesetId, editorName) {
                 method: 'POST',
                 path: '/api/0.6/changeset/' + changesetId + '/upload',
                 options: { header: { 'Content-Type': 'text/xml' } },
-                content: xmlContent,
+                content: JXON.jsToString(change),
             },
             (err, details) => {
                 if (err)
@@ -139,4 +135,20 @@ function closeChangeset(changesetId) {
             },
         ),
     )
+}
+
+function wayToJxon(osm, changesetId) {
+    const jxonWay = {
+        $id: osm.id,
+        $version: osm.version || 0,
+        tag: Object.keys(osm.tags)
+            .map(k => ({ $k: k, $v: osm.tags[k] })),
+        nd: osm.nodes
+            .map(id => ({ $ref: id })),
+    }
+
+    if (changesetId)
+        jxonWay.$changeset = changesetId
+
+    return jxonWay
 }

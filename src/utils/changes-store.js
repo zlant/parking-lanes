@@ -8,18 +8,18 @@ export const changesStore = {
 }
 
 export function addChangedEntity(osm) {
-    delete osm.$user
-    delete osm.$uid
-    delete osm.$timestamp
+    delete osm.user
+    delete osm.uid
+    delete osm.timestamp
 
-    if (osm.$id > 0) {
-        const index = changesStore.modify.way.findIndex(x => x.$id === osm.$id)
+    if (osm.id > 0) {
+        const index = changesStore.modify.way.findIndex(x => x.id === osm.id)
         if (index > -1)
             changesStore.modify.way[index] = osm
         else
             changesStore.modify.way.push(osm)
     } else {
-        const index = changesStore.create.way.findIndex(x => x.$id === osm.$id)
+        const index = changesStore.create.way.findIndex(x => x.id === osm.id)
         if (index > -1)
             changesStore.create.way[index] = osm
         else

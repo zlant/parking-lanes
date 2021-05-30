@@ -168,8 +168,8 @@ function getTagInupt(osm, side, parkingType, tagTemplate) {
 
 function getSelectInput(tag, value, values) {
     const options = values.includes(value) ?
-        ['', value, ...values] :
-        ['', ...values]
+        ['', ...values] :
+        ['', value, ...values]
 
     return hyper`
         <select name=${tag}>

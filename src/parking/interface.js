@@ -36,7 +36,7 @@ import { addChangedEntity, changesStore } from '~/src/utils/changes-store'
 import { authenticate, uploadChanges } from '~/src/utils/osm-client'
 
 const editorName = 'PLanes'
-const version = '0.4.0'
+const version = '0.4.1'
 
 /** @type {L.Map} */
 let map = null

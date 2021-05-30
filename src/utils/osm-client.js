@@ -31,12 +31,13 @@ export function authenticate(useDevServer) {
 }
 
 /**
- * @param {string} editor
+ * @param {string} editorName
+ * @param {number} editorVersion
  */
-export async function uploadChanges(editor, changesStore) {
+export async function uploadChanges(editorName, editorVersion, changesStore) {
     try {
-        const changesetId = await createChangeset(editor)
-        await saveChangesets(changesStore, changesetId, editor)
+        const changesetId = await createChangeset(editorName, editorVersion)
+        await saveChangesets(changesStore, changesetId, editorName)
         await closeChangeset(changesetId)
 
         for (const way of changesStore.modify.way)
@@ -46,17 +47,20 @@ export async function uploadChanges(editor, changesStore) {
         changesStore.create.way = []
     } catch (err) {
         console.error(err)
-        throw new Error(err)
+        throw err
     }
 }
 
-function createChangeset(editor) {
+function createChangeset(editorName, editorVersion) {
     const change = {
         osm: {
             changeset: {
+                $version: '0.6',
+                $generator: editorName,
                 tag: [
-                    { $k: 'created_by', $v: editor },
-                    { $k: 'comment', $v: 'Parking lanes' }],
+                    { $k: 'created_by', $v: `${editorName} ${editorVersion}` },
+                    { $k: 'comment', $v: 'Parking lanes' },
+                ],
             },
         },
     }
@@ -81,7 +85,7 @@ function createChangeset(editor) {
     )
 }
 
-function saveChangesets(changesStore, changesetId, editor) {
+function saveChangesets(changesStore, changesetId, editorName) {
     for (const way of changesStore.modify.way)
         way.$changeset = changesetId
     for (const way of changesStore.create.way)
@@ -90,7 +94,7 @@ function saveChangesets(changesStore, changesetId, editor) {
     const change = {
         osmChange: {
             $version: '0.6',
-            $generator: editor,
+            $generator: editorName,
             modify: {
                 way: changesStore.modify.way,
             },

@@ -45,6 +45,10 @@ html {
     color: gainsboro;
 }
 
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    margin: 0;
+}
+
 select,
 input[type=text] {
     width: 100%;

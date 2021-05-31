@@ -51,6 +51,7 @@
     "leaflet": "^1.7.1",
     "leaflet-hash": "^0.2.1",
     "leaflet-polylineoffset": "^1.1.1",
+    "leaflet-touch-helper": "^2.0.0",
     "leaflet.locatecontrol": "^0.73.0",
     "normalize.css": "^8.0.1",
     "opening_hours": "^3.6.0",

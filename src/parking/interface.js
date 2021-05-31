@@ -10,6 +10,9 @@ import polylineoffset from 'leaflet-polylineoffset'
 // eslint-disable-next-line no-unused-vars
 import leaflethash from 'leaflet-hash'
 
+// eslint-disable-next-line no-unused-vars
+import leaflettouchhelper from 'leaflet-touch-helper'
+
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css'
 import 'font-awesome/css/font-awesome.min.css'
 
@@ -162,6 +165,7 @@ function addNewLanes(newLanes, map) {
     for (const newLane of Object.values(newLanes)) {
         newLane.on('click', handleLaneClick)
         newLane.addTo(map)
+        L.path.touchHelper(newLane).addTo(map)
     }
 }
 

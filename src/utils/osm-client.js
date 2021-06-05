@@ -2,6 +2,7 @@ import * as JXON from 'jxon'
 import osmAuth from 'osm-auth'
 import { osmProdUrl, osmDevUrl } from './links'
 
+/** @type {OSMAuth.OSMAuthInstance} */
 let auth = null
 
 function craeteOsmAuth(useDevServer) {
@@ -21,6 +22,23 @@ function craeteOsmAuth(useDevServer) {
 }
 
 /**
+ * @param {OSMAuth.OSMAuthXHROptions} options
+ */
+function osmXhr(options) {
+    return new Promise((resolve, reject) =>
+        auth.xhr(
+            options,
+            (err, details) => {
+                if (err)
+                    reject(err)
+                else
+                    resolve(details)
+            },
+        ),
+    )
+}
+
+/**
  * @param {boolean} useDevServer
  */
 export function authenticate(useDevServer) {
@@ -28,6 +46,18 @@ export function authenticate(useDevServer) {
     return new Promise((resolve, reject) =>
         auth.authenticate((err, oauth) => err ? reject(err) : resolve(oauth)),
     )
+}
+
+export function logout() {
+    return auth.logout()
+}
+
+export function userInfo() {
+    return osmXhr({
+        method: 'GET',
+        path: '/api/0.6/user/details',
+        options: { header: { Accept: 'application/json' } },
+    })
 }
 
 /**
@@ -65,24 +95,12 @@ function createChangeset(editorName, editorVersion) {
         },
     }
 
-    const xmlContent = JXON.jsToString(change)
-
-    return new Promise((resolve, reject) =>
-        auth.xhr(
-            {
-                method: 'PUT',
-                path: '/api/0.6/changeset/create',
-                options: { header: { 'Content-Type': 'text/xml' } },
-                content: xmlContent,
-            },
-            (err, details) => {
-                if (err)
-                    reject(err)
-                else
-                    resolve(details)
-            },
-        ),
-    )
+    return osmXhr({
+        method: 'PUT',
+        path: '/api/0.6/changeset/create',
+        options: { header: { 'Content-Type': 'text/xml' } },
+        content: JXON.jsToString(change),
+    })
 }
 
 function saveChangesets(changesStore, changesetId, editorName) {
@@ -101,40 +119,20 @@ function saveChangesets(changesStore, changesetId, editorName) {
         },
     }
 
-    return new Promise((resolve, reject) =>
-        auth.xhr(
-            {
-                method: 'POST',
-                path: '/api/0.6/changeset/' + changesetId + '/upload',
-                options: { header: { 'Content-Type': 'text/xml' } },
-                content: JXON.jsToString(change),
-            },
-            (err, details) => {
-                if (err)
-                    reject(err)
-                else
-                    resolve(details)
-            },
-        ),
-    )
+    return osmXhr({
+        method: 'POST',
+        path: '/api/0.6/changeset/' + changesetId + '/upload',
+        options: { header: { 'Content-Type': 'text/xml' } },
+        content: JXON.jsToString(change),
+    })
 }
 
 function closeChangeset(changesetId) {
-    return new Promise((resolve, reject) =>
-        auth.xhr(
-            {
-                method: 'PUT',
-                path: '/api/0.6/changeset/' + changesetId + '/close',
-                options: { header: { 'Content-Type': 'text/xml' } },
-            },
-            (err, details) => {
-                if (err)
-                    reject(err)
-                else
-                    resolve(details)
-            },
-        ),
-    )
+    return osmXhr({
+        method: 'PUT',
+        path: '/api/0.6/changeset/' + changesetId + '/close',
+        options: { header: { 'Content-Type': 'text/xml' } },
+    })
 }
 
 function wayToJxon(osm, changesetId) {

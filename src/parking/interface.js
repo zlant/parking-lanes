@@ -36,7 +36,7 @@ import { idUrl, josmUrl, overpassUrl } from '~/src/utils/links'
 import { downloadBbox, osmData, resetLastBounds } from '~/src/utils/data-client'
 import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '~/src/utils/changes-store'
-import { authenticate, uploadChanges } from '~/src/utils/osm-client'
+import { authenticate, logout, userInfo, uploadChanges } from '~/src/utils/osm-client'
 
 const editorName = 'PLanes'
 const version = '0.4.1'
@@ -236,6 +236,12 @@ async function handleEditorModeCheckboxChange(e) {
     if (e.currentTarget.checked) {
         try {
             await authenticate(useDevServer)
+            try {
+                await userInfo()
+            } catch {
+                logout()
+                await authenticate(useDevServer)
+            }
             editorMode = true
             layersControl.addTo(map)
             document.getElementById('ghc-editor-mode-label').style.color = 'green'

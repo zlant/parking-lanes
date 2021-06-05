@@ -12,9 +12,9 @@ module.exports = {
     devServer: {
         historyApiFallback: true,
         contentBase: path.resolve(__dirname, './dist'),
-        open: true,
         compress: true,
         hot: true,
+        host: '0.0.0.0',
         port: 33444,
     },
     entry: {

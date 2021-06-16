@@ -39,7 +39,7 @@ import { addChangedEntity, changesStore } from '~/src/utils/changes-store'
 import { authenticate, logout, userInfo, uploadChanges } from '~/src/utils/osm-client'
 
 const editorName = 'PLanes'
-const version = '0.4.1'
+const version = '0.4.2'
 
 /** @type {L.Map} */
 let map = null
@@ -320,7 +320,7 @@ let newWayId = -1
 
 function cutWay(arg) {
     const oldWay = osmData.ways[arg.target.options.wayId]
-    const newWay = { ...oldWay }
+    const newWay = JSON.parse(JSON.stringify(oldWay))
 
     const ndIndex = oldWay.nodes.findIndex(e => e === arg.target.options.ndId)
 

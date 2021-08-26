@@ -69,7 +69,15 @@ function getSideGroup(osm, side) {
     return hyper`
         <div id=${side}
              class="tags-block_${side}">
-            ${getPresetSigns(osm, side)}
+            <div>
+                <p>Russia</p>
+                ${getPresetSigns(osm, side, 'russia')}
+            </div>
+            <div>
+                <p>Australia</p>
+                ${getPresetSigns(osm, side, 'australia')}
+            </div>
+
             <table>
                 ${getTagInupts(osm, side)}
             </table>
@@ -185,15 +193,18 @@ function getTextInput(tag, value) {
                value="${value != null ? value : ''}">`
 }
 
-function getPresetSigns(osm, side) {
-    return presets.map(x => hyper`
-        <img src=${x.img.src}
-             class="sign-preset"
-             height=${x.img.height}
-             width=${x.img.width}
-             alt=${x.img.alt}
-             title=${x.img.title}
-             onclick=${() => handlePresetClick(x.tags, osm, side)}>`)
+function getPresetSigns(osm, side, country) {
+    return presets
+    // Filter signs by that country
+        .filter(preset => preset.country === country)
+        .map(x => hyper`
+            <img src=${x.img.src}
+                class="sign-preset"
+                height=${x.img.height}
+                width=${x.img.width}
+                alt=${x.img.alt}
+                title=${x.img.title}
+                onclick=${() => handlePresetClick(x.tags, osm, side)}>`)
 }
 
 function handlePresetClick(tags, osm, side) {

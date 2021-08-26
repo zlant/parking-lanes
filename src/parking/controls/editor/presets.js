@@ -1,5 +1,92 @@
+
+import ausNoStoppingImg from '../../../signs/no-stopping.jpg'
+import ausNoParkingSign from '../../../signs/no-parking.jpg'
+import aus1pSign from '../../../signs/1p.jpg'
+import aus2pPermitSign from '../../../signs/2p-permit.png'
+
+const ausSignHeight = 100 / 3
+const ausSignWidth = 20
+
 export const presets = [
     {
+        country: 'australia',
+        key: 'noStoppingAus',
+        tags: [
+            { k: 'parking:lane:{side}', v: 'no_stopping' },
+            { k: 'parking:condition:{side}', v: '' },
+            { k: 'parking:condition:{side}:time_interval', v: '' },
+            { k: 'parking:condition:{side}:default', v: '' },
+            { k: 'parking:condition:{side}:maxstay', v: '' },
+        ],
+        img: {
+            src: ausNoStoppingImg,
+            height: ausSignHeight,
+            width: ausSignWidth,
+            alt: 'No Stopping Sign',
+            title: 'No Stopping',
+        },
+    },
+    {
+        country: 'australia',
+        key: 'noParkingAus',
+        tags: [
+            { k: 'parking:lane:{side}', v: 'no_parking' },
+            { k: 'parking:condition:{side}', v: '' },
+            { k: 'parking:condition:{side}:time_interval', v: '' },
+            { k: 'parking:condition:{side}:default', v: '' },
+            { k: 'parking:condition:{side}:maxstay', v: '' },
+        ],
+        img: {
+            src: ausNoParkingSign,
+            height: ausSignHeight,
+            width: ausSignWidth,
+            alt: 'No Parking Sign',
+            title: 'No Parking',
+        },
+    },
+    {
+        country: 'australia',
+        key: '1p',
+        tags: [
+            { k: 'parking:condition:{side}', v: 'disc' },
+            { k: 'parking:condition:{side}:time_interval', v: 'Mo-Fr 09:30-17:30; Sa 09:00-12:00' },
+            { k: 'parking:condition:{side}:default', v: 'free' },
+            { k: 'parking:condition:{side}:maxstay', v: '30 minutes' },
+        ],
+        img: {
+            src: aus1pSign,
+            height: ausSignHeight,
+            width: ausSignWidth,
+            alt: '1P Parking',
+            title: '1P free parking',
+        },
+        click: {
+            showTypeButtons: true,
+        },
+    },
+    {
+        country: 'australia',
+        key: '2p-residents',
+        tags: [
+            { k: 'parking:condition:{side}', v: 'disc' },
+            { k: 'parking:condition:{side}:time_interval', v: 'Mo-Fr 08:00-18:00' },
+            { k: 'parking:condition:{side}:disc:maxstay', v: '2 hours' },
+            { k: 'parking:condition:{side}:default', v: 'free' },
+            { k: 'parking:condition:{side}:residents', v: '*' },
+        ],
+        img: {
+            src: aus2pPermitSign,
+            height: ausSignHeight,
+            width: ausSignWidth,
+            alt: '2P Parking, Permit excepted',
+            title: '2P Parking, Permit excepted',
+        },
+        click: {
+            showTypeButtons: true,
+        },
+    },
+    {
+        country: 'russia',
         key: 'noStopping',
         tags: [
             { k: 'parking:lane:{side}', v: 'no_stopping' },
@@ -17,6 +104,7 @@ export const presets = [
         },
     },
     {
+        country: 'russia',
         key: 'noParking',
         tags: [
             { k: 'parking:lane:{side}', v: 'no_parking' },
@@ -34,6 +122,7 @@ export const presets = [
         },
     },
     {
+        country: 'russia',
         key: 'noParkingOdd',
         tags: [
             { k: 'parking:lane:{side}', v: 'no_parking' },
@@ -51,6 +140,7 @@ export const presets = [
         },
     },
     {
+        country: 'russia',
         key: 'noParkingEven',
         tags: [
             { k: 'parking:lane:{side}', v: 'no_parking' },
@@ -68,6 +158,7 @@ export const presets = [
         },
     },
     {
+        country: 'russia',
         key: 'parking',
         tags: [
             { k: 'parking:lane:{side}', v: '' },
@@ -88,6 +179,7 @@ export const presets = [
         },
     },
     {
+        country: 'russia',
         key: 'ticket',
         tags: [
             { k: 'parking:lane:{side}', v: '' },

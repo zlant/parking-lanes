@@ -12,3 +12,13 @@ Viewer:
 Editor:
 
 <img src="https://i.imgur.com/e0vsqUQ.png" alt="Editor UI">
+
+# Local Development
+
+- Install dependencies: `npm install`
+- Start Webpack dev server: `npm run start`
+
+Geolocation won't work over http. [ngrok](https://ngrok.com/docs) can start an HTTPS tunnel to your
+localhost with the following command:
+
+`ngrok http --host-header=rewrite 33444`

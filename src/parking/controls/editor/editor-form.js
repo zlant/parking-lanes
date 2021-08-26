@@ -70,11 +70,11 @@ function getSideGroup(osm, side) {
         <div id=${side}
              class="tags-block_${side}">
             <div>
-                <p class="sign-country-name">Russia</p>
+                <span><b>Russia</b></span>
                 ${getPresetSigns(osm, side, 'russia')}
             </div>
             <div>
-                <p class="sign-country-name">Australia</p>
+                <span><b>Australia</b></span>
                 ${getPresetSigns(osm, side, 'australia')}
             </div>
 

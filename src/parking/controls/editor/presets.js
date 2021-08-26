@@ -18,6 +18,8 @@ export const presets = [
             { k: 'parking:condition:{side}:time_interval', v: '' },
             { k: 'parking:condition:{side}:default', v: '' },
             { k: 'parking:condition:{side}:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
             src: ausNoStoppingImg,
@@ -36,6 +38,8 @@ export const presets = [
             { k: 'parking:condition:{side}:time_interval', v: '' },
             { k: 'parking:condition:{side}:default', v: '' },
             { k: 'parking:condition:{side}:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
             src: ausNoParkingSign,
@@ -49,10 +53,13 @@ export const presets = [
         country: 'australia',
         key: '1p',
         tags: [
+            { k: 'parking:lane:{side}', v: '' },
             { k: 'parking:condition:{side}', v: 'disc' },
             { k: 'parking:condition:{side}:time_interval', v: 'Mo-Fr 09:30-17:30; Sa 09:00-12:00' },
             { k: 'parking:condition:{side}:default', v: 'free' },
             { k: 'parking:condition:{side}:maxstay', v: '30 minutes' },
+            { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
             src: aus1pSign,
@@ -69,10 +76,12 @@ export const presets = [
         country: 'australia',
         key: '2p-residents',
         tags: [
+            { k: 'parking:lane:{side}', v: '' },
             { k: 'parking:condition:{side}', v: 'disc' },
             { k: 'parking:condition:{side}:time_interval', v: 'Mo-Fr 08:00-18:00' },
-            { k: 'parking:condition:{side}:disc:maxstay', v: '2 hours' },
             { k: 'parking:condition:{side}:default', v: 'free' },
+            { k: 'parking:condition:{side}:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:maxstay', v: '2 hours' },
             { k: 'parking:condition:{side}:residents', v: '*' },
         ],
         img: {
@@ -95,6 +104,8 @@ export const presets = [
             { k: 'parking:condition:{side}:time_interval', v: '' },
             { k: 'parking:condition:{side}:default', v: '' },
             { k: 'parking:condition:{side}:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
             src: 'https://upload.wikimedia.org/wikipedia/commons/9/98/3.27_Russian_road_sign.svg',
@@ -113,6 +124,8 @@ export const presets = [
             { k: 'parking:condition:{side}:time_interval', v: '' },
             { k: 'parking:condition:{side}:default', v: '' },
             { k: 'parking:condition:{side}:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
             src: 'https://upload.wikimedia.org/wikipedia/commons/8/81/3.28_Russian_road_sign.svg',
@@ -131,6 +144,8 @@ export const presets = [
             { k: 'parking:condition:{side}:time_interval', v: '1-31/2' },
             { k: 'parking:condition:{side}:default', v: 'free' },
             { k: 'parking:condition:{side}:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
             src: 'https://upload.wikimedia.org/wikipedia/commons/f/f4/3.29_Russian_road_sign.svg',
@@ -149,6 +164,8 @@ export const presets = [
             { k: 'parking:condition:{side}:time_interval', v: '2-30/2' },
             { k: 'parking:condition:{side}:default', v: 'free' },
             { k: 'parking:condition:{side}:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
             src: 'https://upload.wikimedia.org/wikipedia/commons/7/76/3.30_Russian_road_sign.svg',
@@ -167,6 +184,8 @@ export const presets = [
             { k: 'parking:condition:{side}:time_interval', v: '' },
             { k: 'parking:condition:{side}:default', v: '' },
             { k: 'parking:condition:{side}:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
             src: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/6.4_Russian_road_sign.svg',
@@ -188,6 +207,8 @@ export const presets = [
             { k: 'parking:condition:{side}:time_interval', v: '' },
             { k: 'parking:condition:{side}:default', v: '' },
             { k: 'parking:condition:{side}:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
             src: 'https://upload.wikimedia.org/wikipedia/commons/f/f3/8.8_Russian_road_sign.svg',

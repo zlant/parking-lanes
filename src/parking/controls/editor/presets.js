@@ -4,8 +4,9 @@ import ausNoParkingSign from '../../../signs/no-parking.jpg'
 import aus1pSign from '../../../signs/1p.jpg'
 import aus2pPermitSign from '../../../signs/2p-permit.png'
 
-const ausSignHeight = 100 / 3
-const ausSignWidth = 20
+const ausSignWidth = 30
+const ausSignAspectRatio = 60 / 100
+const ausSignHeight = ausSignWidth / ausSignAspectRatio
 
 export const presets = [
     {

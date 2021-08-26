@@ -70,11 +70,11 @@ function getSideGroup(osm, side) {
         <div id=${side}
              class="tags-block_${side}">
             <div>
-                <p>Russia</p>
+                <p class="sign-country-name">Russia</p>
                 ${getPresetSigns(osm, side, 'russia')}
             </div>
             <div>
-                <p>Australia</p>
+                <p class="sign-country-name">Australia</p>
                 ${getPresetSigns(osm, side, 'australia')}
             </div>
 
@@ -92,6 +92,9 @@ const parkingLaneTagTemplates = [
     'parking:condition:{side}:default',
     'parking:condition:{side}:maxstay',
     'parking:condition:{side}:capacity',
+    'parking:condition:{side}:residents',
+    'parking:condition:{side}:disc:time_interval',
+    'parking:condition:{side}:disc:maxstay',
 ]
 
 function getTagInupts(osm, side) {
@@ -107,8 +110,9 @@ function getTagInupt(osm, side, parkingType, tagTemplate) {
         .replace('{side}', side)
         .replace('{type}', parkingType)
 
-    const tagSplit = tag.split(':')
-    const label = tagSplit[Math.floor(tagSplit.length / 2) * 2 - 1]
+    // Show the entire tag. If we cut by `:` then tags with multiple
+    // `:` aren't shown correctly.
+    const label = tag
 
     const value = osm.tags[tag]
 
@@ -186,9 +190,11 @@ function getSelectInput(tag, value, values) {
 }
 
 function getTextInput(tag, value) {
+    const placeholder = tag.includes(':residents') ? '* for any OR permit #' : tag
+
     return hyper`
         <input type="text" 
-               placeholder="${tag}"
+               placeholder="${placeholder}"
                name="${tag}"
                value="${value != null ? value : ''}">`
 }

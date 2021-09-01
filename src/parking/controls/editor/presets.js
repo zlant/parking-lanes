@@ -2,6 +2,7 @@
 import ausNoStoppingImg from '../../../signs/no-stopping.jpg'
 import ausNoParkingSign from '../../../signs/no-parking.jpg'
 import aus1pSign from '../../../signs/1p.jpg'
+import aus1pDuringDaySign from '../../../signs/1p-during-day.jpg'
 import aus2pPermitSign from '../../../signs/2p-permit.png'
 
 const ausSignWidth = 30
@@ -17,8 +18,8 @@ export const presets = [
             { k: 'parking:condition:{side}', v: '' },
             { k: 'parking:condition:{side}:time_interval', v: '' },
             { k: 'parking:condition:{side}:default', v: '' },
-            { k: 'parking:condition:{side}:maxstay', v: '' },
             { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:time_interval', v: '' },
             { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
@@ -37,8 +38,8 @@ export const presets = [
             { k: 'parking:condition:{side}', v: '' },
             { k: 'parking:condition:{side}:time_interval', v: '' },
             { k: 'parking:condition:{side}:default', v: '' },
-            { k: 'parking:condition:{side}:maxstay', v: '' },
             { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:time_interval', v: '' },
             { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
@@ -51,14 +52,38 @@ export const presets = [
     },
     {
         country: 'australia',
+        key: '1p-during-day',
+        tags: [
+            { k: 'parking:lane:{side}', v: '' },
+            { k: 'parking:condition:{side}', v: 'disc' },
+            { k: 'parking:condition:{side}:time_interval', v: '' },
+            { k: 'parking:condition:{side}:default', v: 'free' },
+            { k: 'parking:condition:{side}:disc:maxstay', v: '1 hour' },
+            { k: 'parking:condition:{side}:disc:time_interval', v: 'Mo-Fr 09:30-17:30; Sa 09:00-12:00' },
+            { k: 'parking:condition:{side}:residents', v: '' },
+        ],
+        img: {
+
+            src: aus1pDuringDaySign,
+            height: ausSignHeight,
+            width: ausSignWidth,
+            alt: '1P free parking during day, unlimited otherwise',
+            title: '1P free parking during day, unlimited otherwise',
+        },
+        click: {
+            showTypeButtons: true,
+        },
+    },
+    {
+        country: 'australia',
         key: '1p',
         tags: [
             { k: 'parking:lane:{side}', v: '' },
             { k: 'parking:condition:{side}', v: 'disc' },
-            { k: 'parking:condition:{side}:time_interval', v: 'Mo-Fr 09:30-17:30; Sa 09:00-12:00' },
-            { k: 'parking:condition:{side}:default', v: 'free' },
-            { k: 'parking:condition:{side}:maxstay', v: '30 minutes' },
-            { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:time_interval', v: '' },
+            { k: 'parking:condition:{side}:default', v: '' },
+            { k: 'parking:condition:{side}:disc:maxstay', v: '1 hour' },
+            { k: 'parking:condition:{side}:disc:time_interval', v: '' },
             { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
@@ -78,18 +103,18 @@ export const presets = [
         tags: [
             { k: 'parking:lane:{side}', v: '' },
             { k: 'parking:condition:{side}', v: 'disc' },
-            { k: 'parking:condition:{side}:time_interval', v: 'Mo-Fr 08:00-18:00' },
+            { k: 'parking:condition:{side}:time_interval', v: '' },
             { k: 'parking:condition:{side}:default', v: 'free' },
-            { k: 'parking:condition:{side}:maxstay', v: '' },
             { k: 'parking:condition:{side}:disc:maxstay', v: '2 hours' },
+            { k: 'parking:condition:{side}:disc:time_interval', v: 'Mo-Fr 08:00-18:00' },
             { k: 'parking:condition:{side}:residents', v: '*' },
         ],
         img: {
             src: aus2pPermitSign,
             height: ausSignHeight,
             width: ausSignWidth,
-            alt: '2P Parking, Permit excepted',
-            title: '2P Parking, Permit excepted',
+            alt: '2P free parking during weekday daytime, permit excepted',
+            title: '2P free parking during weekday daytime, permit excepted',
         },
         click: {
             showTypeButtons: true,
@@ -103,8 +128,8 @@ export const presets = [
             { k: 'parking:condition:{side}', v: '' },
             { k: 'parking:condition:{side}:time_interval', v: '' },
             { k: 'parking:condition:{side}:default', v: '' },
-            { k: 'parking:condition:{side}:maxstay', v: '' },
             { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:time_interval', v: '' },
             { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
@@ -123,8 +148,8 @@ export const presets = [
             { k: 'parking:condition:{side}', v: '' },
             { k: 'parking:condition:{side}:time_interval', v: '' },
             { k: 'parking:condition:{side}:default', v: '' },
-            { k: 'parking:condition:{side}:maxstay', v: '' },
             { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:time_interval', v: '' },
             { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
@@ -143,8 +168,8 @@ export const presets = [
             { k: 'parking:condition:{side}', v: '' },
             { k: 'parking:condition:{side}:time_interval', v: '1-31/2' },
             { k: 'parking:condition:{side}:default', v: 'free' },
-            { k: 'parking:condition:{side}:maxstay', v: '' },
             { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:time_interval', v: '' },
             { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
@@ -163,8 +188,8 @@ export const presets = [
             { k: 'parking:condition:{side}', v: '' },
             { k: 'parking:condition:{side}:time_interval', v: '2-30/2' },
             { k: 'parking:condition:{side}:default', v: 'free' },
-            { k: 'parking:condition:{side}:maxstay', v: '' },
             { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:time_interval', v: '' },
             { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
@@ -183,8 +208,8 @@ export const presets = [
             { k: 'parking:condition:{side}', v: 'free' },
             { k: 'parking:condition:{side}:time_interval', v: '' },
             { k: 'parking:condition:{side}:default', v: '' },
-            { k: 'parking:condition:{side}:maxstay', v: '' },
             { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:time_interval', v: '' },
             { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {
@@ -206,8 +231,8 @@ export const presets = [
             { k: 'parking:condition:{side}', v: 'ticket' },
             { k: 'parking:condition:{side}:time_interval', v: '' },
             { k: 'parking:condition:{side}:default', v: '' },
-            { k: 'parking:condition:{side}:maxstay', v: '' },
             { k: 'parking:condition:{side}:disc:maxstay', v: '' },
+            { k: 'parking:condition:{side}:disc:time_interval', v: '' },
             { k: 'parking:condition:{side}:residents', v: '' },
         ],
         img: {

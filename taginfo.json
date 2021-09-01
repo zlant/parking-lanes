@@ -29,6 +29,10 @@
         { "key": "parking:condition:right:time_interval", "object_types": ["way"] },
         { "key": "parking:condition:both:time_interval", "object_types": ["way"] },
 
+        { "key": "parking:condition:left:disc:time_interval", "object_types": ["way"] },
+        { "key": "parking:condition:right:disc:time_interval", "object_types": ["way"] },
+        { "key": "parking:condition:both:disc:time_interval", "object_types": ["way"] },
+
         { "key": "parking:condition:left:default", "object_types": ["way"] },
         { "key": "parking:condition:right:default", "object_types": ["way"] },
         { "key": "parking:condition:both:default", "object_types": ["way"] },

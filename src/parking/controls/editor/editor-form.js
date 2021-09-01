@@ -88,8 +88,8 @@ const parkingLaneTagTemplates = [
     'parking:lane:{side}',
     'parking:lane:{side}:{type}',
     'parking:condition:{side}',
-    'parking:condition:{side}:time_interval',
     'parking:condition:{side}:default',
+    'parking:condition:{side}:time_interval',
     'parking:condition:{side}:maxstay',
     'parking:condition:{side}:capacity',
     'parking:condition:{side}:residents',
@@ -101,11 +101,11 @@ function getTagInupts(osm, side) {
     const inputs = []
     const type = osm.tags[`parking:lane:${side}`] || 'type'
     for (const tagTemplate of parkingLaneTagTemplates)
-        inputs.push(getTagInupt(osm, side, type, tagTemplate))
+        inputs.push(getTagInput(osm, side, type, tagTemplate))
     return inputs
 }
 
-function getTagInupt(osm, side, parkingType, tagTemplate) {
+function getTagInput(osm, side, parkingType, tagTemplate) {
     const tag = tagTemplate
         .replace('{side}', side)
         .replace('{type}', parkingType)
@@ -146,9 +146,8 @@ function getTagInupt(osm, side, parkingType, tagTemplate) {
 
         case 'parking:condition:{side}:default': {
             input = getTextInput(tag, value)
-            const timeIntervalTag = 'parking:condition:{side}:time_interval'
-                .replace('{side}', side)
-            hide = !osm.tags[timeIntervalTag]
+            // Don't hide this even if time_interval is showing -
+            // the default is still important
             break
         }
         case 'parking:condition:{side}:maxstay': {

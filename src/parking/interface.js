@@ -97,6 +97,7 @@ export function initMap() {
     laneInfoControl.addTo(map)
         .setOsmChangeListener(handleOsmChange)
 
+    map.on('movestart', handleMapMoveStart)
     map.on('moveend', handleMapMoveEnd)
     map.on('click', closeLaneInfo)
 
@@ -205,13 +206,12 @@ function closeLaneInfo(e) {
 
 // Reduce strain on the overpass turbo API!
 const debouncedDownloadParkingLanes = debounce(downloadParkinkLanes, 1500, {
-    // Trigger at very start
-    leading: true,
-    // Note: If leading and trailing options are true, func is invoked on the trailing edge of the
-    // timeout only if the debounced function is invoked more than once during the wait timeout.
     trailing: true,
 })
 
+function handleMapMoveStart() {
+    debouncedDownloadParkingLanes.cancel()
+}
 // Map move handler
 function handleMapMoveEnd() {
     document.getElementById('ghc-josm').href = josmUrl + overpassUrl + getHighwaysOverpassQuery()

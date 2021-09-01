@@ -202,12 +202,32 @@ function closeLaneInfo(e) {
     lanes.left?.remove()
 }
 
-// Map move handler
+function debounce(func, wait, immediate) {
+    let timeout
+    return function() {
+        const context = this
+        const args = arguments
 
+        const callNow = immediate && !timeout
+
+        clearTimeout(timeout)
+        timeout = setTimeout(function() {
+            timeout = null
+            if (!immediate)
+                func.apply(context, args)
+        }, wait)
+        if (callNow) func.apply(context, args)
+    }
+}
+
+// Reduce strain on the overpass turbo API!
+const debouncedDownloadParkingLanes = debounce(downloadParkinkLanes, 5000, true)
+
+// Map move handler
 function handleMapMoveEnd() {
     document.getElementById('ghc-josm').href = josmUrl + overpassUrl + getHighwaysOverpassQuery()
     document.getElementById('ghc-id').href = idUrl + '#map=' +
-    document.location.href.substring(document.location.href.indexOf('#') + 1)
+        document.location.href.substring(document.location.href.indexOf('#') + 1)
 
     const zoom = map.getZoom()
     setLocationToCookie(map.getCenter(), zoom)
@@ -220,7 +240,7 @@ function handleMapMoveEnd() {
     if (zoom < viewMinZoom)
         return
 
-    downloadParkinkLanes(map)
+    debouncedDownloadParkingLanes(map)
 }
 
 function getHighwaysOverpassQuery() {

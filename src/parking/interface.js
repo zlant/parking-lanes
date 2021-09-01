@@ -1,5 +1,6 @@
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import debounce from 'lodash/debounce'
 
 // eslint-disable-next-line no-unused-vars
 import locatecontrol from 'leaflet.locatecontrol'
@@ -202,26 +203,14 @@ function closeLaneInfo(e) {
     lanes.left?.remove()
 }
 
-function debounce(func, wait, immediate) {
-    let timeout
-    return function() {
-        const context = this
-        const args = arguments
-
-        const callNow = immediate && !timeout
-
-        clearTimeout(timeout)
-        timeout = setTimeout(function() {
-            timeout = null
-            if (!immediate)
-                func.apply(context, args)
-        }, wait)
-        if (callNow) func.apply(context, args)
-    }
-}
-
 // Reduce strain on the overpass turbo API!
-const debouncedDownloadParkingLanes = debounce(downloadParkinkLanes, 5000, true)
+const debouncedDownloadParkingLanes = debounce(downloadParkinkLanes, 1500, {
+    // Trigger at very start
+    leading: true,
+    // Note: If leading and trailing options are true, func is invoked on the trailing edge of the
+    // timeout only if the debounced function is invoked more than once during the wait timeout.
+    trailing: true,
+})
 
 // Map move handler
 function handleMapMoveEnd() {

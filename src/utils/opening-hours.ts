@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import OpeningHours from 'opening_hours'
 
 export function parseOpeningHourse(value) {

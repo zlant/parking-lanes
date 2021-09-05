@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import L from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
 import { legend } from '../legend'

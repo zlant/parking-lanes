@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import axios from 'axios'
 
 export function handleJosmLinkClick(e) {

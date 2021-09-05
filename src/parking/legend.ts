@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 export const legend = [
     /* eslint-disable no-multi-spaces */
     { condition: 'disc',         color: 'yellowgreen',  text: 'Disc' },

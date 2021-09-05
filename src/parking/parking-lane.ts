@@ -1,5 +1,7 @@
+// @ts-nocheck
+
 import L from 'leaflet'
-import { parseOpeningHourse, getOpeningHourseState } from '~/src/utils/opening-hours'
+import { parseOpeningHourse, getOpeningHourseState } from '../utils/opening-hours'
 import { legend } from './legend'
 import { laneStyleByZoom as laneStyle } from './lane-styles'
 

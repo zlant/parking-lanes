@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { hyper } from 'hyperhtml/esm'
 import { presets } from './presets'
 

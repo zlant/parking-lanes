@@ -1,7 +1,8 @@
+// @ts-nocheck
 
 // eslint-disable-next-line no-unused-vars
 import L from 'leaflet'
-import { overpassUrl, osmDevUrl } from '~/src/utils/links'
+import { overpassUrl, osmDevUrl } from '../utils/links'
 
 /**
  * @param {L.LatLngBounds} bounds

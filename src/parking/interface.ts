@@ -1,3 +1,4 @@
+// @ts-nocheck
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import debounce from 'lodash/debounce'
@@ -32,12 +33,12 @@ import {
     getBacklights,
 } from './parking-lane'
 
-import { getLocationFromCookie, setLocationToCookie } from '~/src/utils/location-ccokie'
-import { idUrl, josmUrl, overpassUrl } from '~/src/utils/links'
-import { downloadBbox, osmData, resetLastBounds } from '~/src/utils/data-client'
+import { getLocationFromCookie, setLocationToCookie } from '../utils/location-ccokie'
+import { idUrl, josmUrl, overpassUrl } from '../utils/links'
+import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
 import { getUrl } from './data-url'
-import { addChangedEntity, changesStore } from '~/src/utils/changes-store'
-import { authenticate, logout, userInfo, uploadChanges } from '~/src/utils/osm-client'
+import { addChangedEntity, changesStore } from '../utils/changes-store'
+import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-client'
 
 const editorName = 'PLanes'
 const version = '0.4.2'

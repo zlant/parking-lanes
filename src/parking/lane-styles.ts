@@ -1,3 +1,4 @@
+// @ts-nocheck
 function generateStyleMapByZoom() {
     const map = {}
 

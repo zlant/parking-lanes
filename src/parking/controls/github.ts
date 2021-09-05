@@ -1,6 +1,7 @@
+// @ts-nocheck
 import L from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
-import { handleJosmLinkClick } from '~/src/utils/josm'
+import { handleJosmLinkClick } from '../../utils/josm'
 
 export default L.Control.extend({
     onAdd: map => hyper`

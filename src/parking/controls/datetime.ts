@@ -1,3 +1,4 @@
+// @ts-nocheck
 import L from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
 import dayjs from 'dayjs'

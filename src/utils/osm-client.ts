@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as JXON from 'jxon'
 import osmAuth from 'osm-auth'
 import { osmProdUrl, osmDevUrl } from './links'

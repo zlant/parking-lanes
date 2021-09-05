@@ -1,7 +1,8 @@
+// @ts-nocheck
 import L from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
-import { handleJosmLinkClick } from '~/src/utils/josm'
-import { idUrl, josmUrl, overpassUrl } from '~/src/utils/links'
+import { handleJosmLinkClick } from '../../utils/josm'
+import { idUrl, josmUrl, overpassUrl } from '../../utils/links'
 import { getLaneEditForm, setOsmChangeListener } from './editor/editor-form'
 
 export default L.Control.extend({

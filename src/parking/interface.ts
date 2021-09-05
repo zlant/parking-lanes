@@ -190,7 +190,7 @@ function handleLaneClick(e: Event) {
 
     // I don't know where this gets set, but it appears to be a way
     // @ts-ignore
-    const osm: OSMWay = e.target.options;
+    const osm: OSMWay = e.target.options.osm;
 
     const osmId = osm.id
     const lane = lanes['right' + osmId] || lanes['left' + osmId] || lanes['empty' + osmId]

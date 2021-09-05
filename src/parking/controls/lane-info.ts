@@ -3,6 +3,7 @@ import { hyper } from 'hyperhtml/esm'
 import { handleJosmLinkClick } from '../..//utils/josm'
 import { idUrl, josmUrl, overpassUrl } from '../../utils/links'
 import { getLaneEditForm, setOsmChangeListener } from './editor/editor-form'
+import { OSMWay } from '../../utils/interfaces'
 
 export default L.Control.extend({
     onAdd: (map: L.Map) => hyper`
@@ -14,7 +15,7 @@ export default L.Control.extend({
              onpointerdown=${L.DomEvent.stopPropagation}
              onclick=${L.DomEvent.stopPropagation} />`,
 
-    showLaneInfo(osm: any) {
+    showLaneInfo(osm: OSMWay) {
         const laneinfo = document.getElementById('lane-control')
         if(laneinfo === null) {
             return;
@@ -23,7 +24,7 @@ export default L.Control.extend({
         laneinfo.style.display = 'block'
     },
 
-    showEditForm(osm: any, waysInRelation: any, cutLaneListener: any) {
+    showEditForm(osm: OSMWay, waysInRelation: any, cutLaneListener: any) {
         const laneinfo = document.getElementById('lane-control')
         if(laneinfo === null) {
             return;
@@ -47,7 +48,7 @@ export default L.Control.extend({
     },
 })
 
-function getPanel(osm: any, body: any) {
+function getPanel(osm: OSMWay, body: any) {
     return hyper`
         <div>
             <div style="min-width:250px">
@@ -66,7 +67,7 @@ function getPanel(osm: any, body: any) {
         </div>`
 }
 
-function getWayWithRelationsOverpassQuery(wayId: string) {
+function getWayWithRelationsOverpassQuery(wayId: number) {
     return `
         [out:xml];
         (
@@ -78,7 +79,7 @@ function getWayWithRelationsOverpassQuery(wayId: string) {
         out meta;`
 }
 
-function getLaneInfo(osm: any) {
+function getLaneInfo(osm: OSMWay) {
     return hyper`
         <div>
             ${getTagsBlock(osm.tags, 'right')}

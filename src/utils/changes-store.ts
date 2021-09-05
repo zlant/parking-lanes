@@ -8,6 +8,7 @@ export const changesStore = {
 }
 
 export function addChangedEntity(osm: any) {
+    // TODO: May need to duplicate osm object or change type
     delete osm.user
     delete osm.uid
     delete osm.timestamp

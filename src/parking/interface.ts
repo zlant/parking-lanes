@@ -40,7 +40,7 @@ import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
 import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '../utils/changes-store'
 import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-client'
-import { OurWindow, OverpassTurboResponse, ParkingLanes } from '../utils/interfaces'
+import { OurWindow, OverpassTurboResponse, ParkingLanes, OSMWay } from '../utils/interfaces'
 
 const editorName = 'PLanes'
 const version = '0.4.2'
@@ -188,25 +188,23 @@ function handleLaneClick(e: Event) {
     const {map} = (window as OurWindow);
     closeLaneInfo()
 
+    // I don't know where this gets set, but it appears to be a way
     // @ts-ignore
-    const osmId = e.target.options.osm.id
-    // @ts-ignore
+    const osm: OSMWay = e.target.options;
+
+    const osmId = osm.id
     const lane = lanes['right' + osmId] || lanes['left' + osmId] || lanes['empty' + osmId]
     const backligntPolylines = getBacklights(lane.getLatLngs(), map.getZoom())
-    // @ts-ignore
     lanes.right = backligntPolylines.right.addTo(map)
-    // @ts-ignore
     lanes.left = backligntPolylines.left.addTo(map)
 
     if (editorMode) {
         laneInfoControl.showEditForm(
-            // @ts-ignore
-            e.target.options.osm,
+            osm,
             osmData.waysInRelation,
             handleCutLaneClick)
     } else {
-        // @ts-ignore
-        laneInfoControl.showLaneInfo(e.target.options.osm)
+        laneInfoControl.showLaneInfo(osm)
     }
 
     L.DomEvent.stopPropagation(e)
@@ -300,7 +298,7 @@ async function handleEditorModeCheckboxChange(e: Event) {
     }
 }
 
-function handleOsmChange(newOsm: any) {
+function handleOsmChange(newOsm: OSMWay) {
     const {map} = (window as OurWindow);
     const newLanes = parseChangedParkingLane(newOsm, lanes, datetime, map.getZoom())
     newLanes.forEach(lane => lane.addTo(map))
@@ -329,7 +327,7 @@ const cutIcon = L.divIcon({
     html: '✂',
 })
 
-function handleCutLaneClick(osm: any) {
+function handleCutLaneClick(osm: OSMWay) {
     if (Object.keys(markers).length > 0)
         return
 

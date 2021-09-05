@@ -11,7 +11,8 @@
     "rootDir": "./src/",
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "skipLibCheck": true
   },
   "include": ["src/parking/*.ts", "src/utils/*.ts"]
 }

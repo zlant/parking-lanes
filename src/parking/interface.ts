@@ -40,12 +40,12 @@ import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
 import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '../utils/changes-store'
 import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-client'
-import { ParkingLanes } from '../utils/interfaces'
+import { OurWindow, ParkingLanes } from '../utils/interfaces'
 
 const editorName = 'PLanes'
 const version = '0.4.2'
 
-let map: L.Map;
+// let map: L.Map;
 
 let editorMode = false
 const useDevServer = false
@@ -79,7 +79,7 @@ const layersControl = L.control.layers(
 
 export function initMap() {
     const root = document.querySelector('#map') as HTMLElement;
-    map = L.map(root, { fadeAnimation: false })
+    const map = L.map(root, { fadeAnimation: false })
 
     if (document.location.href.indexOf('#') === -1) {
         const cookieLocation = getLocationFromCookie();
@@ -109,12 +109,10 @@ export function initMap() {
         .setOsmChangeListener(handleOsmChange)
 
     map.on('moveend', handleMapMoveEnd)
-    // @ts-ignore
     map.on('click', closeLaneInfo)
 
     // @ts-ignore
     const hash = new L.Hash(map)
-
     return map
 }
 
@@ -190,7 +188,8 @@ function addNewLanes(newLanes: ParkingLanes, map: L.Map) {
 }
 
 function handleLaneClick(e: Event) {
-    closeLaneInfo(e)
+    const {map} = (window as OurWindow);
+    closeLaneInfo()
 
     // @ts-ignore
     const osmId = e.target.options.osm.id
@@ -216,7 +215,7 @@ function handleLaneClick(e: Event) {
     L.DomEvent.stopPropagation(e)
 }
 
-function closeLaneInfo(e: Event) {
+function closeLaneInfo(){
     laneInfoControl.closeLaneInfo()
 
     for (const marker in markers) {
@@ -235,6 +234,7 @@ function closeLaneInfo(e: Event) {
 // Map move handler
 
 function handleMapMoveEnd() {
+    const {map} = (window as OurWindow);
     (document.getElementById('ghc-josm') as HTMLLinkElement).href = josmUrl + overpassUrl + getHighwaysOverpassQuery();
     (document.getElementById('ghc-id') as HTMLLinkElement).href = idUrl + '#map=' +
     document.location.href.substring(document.location.href.indexOf('#') + 1)
@@ -254,6 +254,7 @@ function handleMapMoveEnd() {
 }
 
 function getHighwaysOverpassQuery() {
+    const {map} = (window as OurWindow);
     const bounds = map.getBounds()
     const bbox = [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',')
     const tag = 'highway~"^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street"'
@@ -263,6 +264,7 @@ function getHighwaysOverpassQuery() {
 // Editor
 
 async function handleEditorModeCheckboxChange(e: Event) {
+    const {map} = (window as OurWindow);
     // @ts-ignore
     if (e.currentTarget.checked) {
         try {
@@ -306,6 +308,7 @@ async function handleEditorModeCheckboxChange(e: Event) {
 }
 
 function handleOsmChange(newOsm: any) {
+    const {map} = (window as OurWindow);
     // @ts-ignore
     const newLanes = parseChangedParkingLane(newOsm, lanes, datetime, map.getZoom())
     newLanes.forEach(lane => lane.addTo(map))
@@ -338,6 +341,7 @@ function handleCutLaneClick(osm: any) {
     if (Object.keys(markers).length > 0)
         return
 
+    const {map} = (window as OurWindow);
     for (const nd of osm.nodes.slice(1, osm.nodes.length - 1)) {
         // @ts-ignore
         markers[nd] = L.marker(
@@ -393,6 +397,7 @@ function cutWay(arg: any) {
 
     // @ts-ignore
     osmData.ways[newWay.id] = newWay
+    const {map} = (window as OurWindow);
     const newLanes = parseParkingLane(newWay, osmData.nodes, map.getZoom(), editorMode)
     // @ts-ignore
     addNewLanes(newLanes, map)

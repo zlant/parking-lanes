@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { OverpassTurboResponse } from './interfaces';
 
 export const osmData = {
     ways: {},
@@ -8,7 +9,7 @@ export const osmData = {
 
 let lastBounds: L.LatLngBounds | null;
 
-export async function downloadBbox(bounds: L.LatLngBounds, url: string) {
+export async function downloadBbox(bounds: L.LatLngBounds, url: string): Promise<OverpassTurboResponse | null> {
     if (withinLastBounds(bounds))
         return null
 

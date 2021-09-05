@@ -9,6 +9,7 @@ locatecontrol
 
 // eslint-disable-next-line no-unused-vars
 import polylineoffset from 'leaflet-polylineoffset'
+polylineoffset
 
 // eslint-disable-next-line no-unused-vars
 import leaflethash from 'leaflet-hash'
@@ -16,6 +17,7 @@ leaflethash
 
 // eslint-disable-next-line no-unused-vars
 import leaflettouchhelper from 'leaflet-touch-helper'
+leaflettouchhelper
 
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css'
 import 'font-awesome/css/font-awesome.min.css'

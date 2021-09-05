@@ -1,21 +1,21 @@
 import axios from 'axios'
-import { OverpassTurboResponse } from './interfaces';
+import { OverpassTurboRawResponse, OverpassTurboResponse } from './interfaces';
 
-export const osmData = {
+export const osmData: OverpassTurboResponse = {
     ways: {},
     nodes: {},
     waysInRelation: {},
 }
 
-let lastBounds: L.LatLngBounds | null;
+let lastBounds: L.LatLngBounds | undefined;
 
 export async function downloadBbox(bounds: L.LatLngBounds, url: string): Promise<OverpassTurboResponse | null> {
-    if (withinLastBounds(bounds))
+    if (lastBounds !== undefined && withinLastBounds(bounds, lastBounds))
         return null
 
     lastBounds = bounds
 
-    const osmResp = await downloadContent(url)
+    const osmResp: OverpassTurboRawResponse | null = await downloadContent(url)
 
     if (!osmResp)
         return null
@@ -31,19 +31,17 @@ export async function downloadBbox(bounds: L.LatLngBounds, url: string): Promise
     return newData
 }
 
-function withinLastBounds(bounds: L.LatLngBounds) {
-    if (lastBounds == null)
-        return false
-
-    return bounds.getWest() > lastBounds.getWest() && bounds.getSouth() > lastBounds.getSouth() &&
-           bounds.getEast() < lastBounds.getEast() && bounds.getNorth() < lastBounds.getNorth()
+/** Check if the new bounds (lat/lng + zoom) is contained within the old bounds */
+function withinLastBounds(newBounds: L.LatLngBounds, oldBounds: L.LatLngBounds) {
+    return newBounds.getWest() > oldBounds.getWest() && newBounds.getSouth() > oldBounds.getSouth() &&
+           newBounds.getEast() < oldBounds.getEast() && newBounds.getNorth() < oldBounds.getNorth()
 }
 
 export function resetLastBounds() {
-    lastBounds = null
+    lastBounds = undefined;
 }
 
-async function downloadContent(url: string) {
+async function downloadContent(url: string): Promise<null | any> {
     try {
         const resp = await axios.get(url, {
             headers: {
@@ -57,8 +55,8 @@ async function downloadContent(url: string) {
     }
 }
 
-function parseOsmResp(osmResp: any) {
-    const newData = {
+function parseOsmResp(osmResp: OverpassTurboRawResponse): OverpassTurboResponse {
+    const newData: OverpassTurboResponse = {
         ways: {},
         nodes: {},
         waysInRelation: {},
@@ -67,28 +65,25 @@ function parseOsmResp(osmResp: any) {
     for (const el of osmResp.elements) {
         switch (el.type) {
             case 'node':
-                // @ts-ignore
                 newData.nodes[el.id] = [el.lat, el.lon]
                 break
 
             case 'way':
-                // @ts-ignore
                 newData.ways[el.id] = el
                 break
 
             case 'relation':
                 for (const member of el.members) {
-                        // @ts-ignore
                     if (member.type === 'way' && newData.ways[member.ref])
-                        // @ts-ignore
                         newData.waysInRelation[member.ref] = true
                 }
                 break
 
             default:
+                // This shouldn't happen, but in case.
+                // @ts-ignore
                 throw new Error('Not supported osm type ' + el.type)
         }
     }
-
     return newData
 }

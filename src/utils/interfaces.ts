@@ -42,24 +42,43 @@ export interface ConditionColorDefinition {
 }
 
 export interface OverpassTurboResponse {
-    ways: Ways;
-    nodes: Nodes;
+    ways: OSMWays;
+    nodes: { [key: number]: L.LatLngTuple};
     waysInRelation: { [key: number]: boolean};
 }
 
+export type OSMElement = OSMNode | OSMWay | OSMRelation;
+export interface OverpassTurboRawResponse {
+  elements: OSMElement[];
+}
+
 ////// OSM Types
-export interface Way {
+interface OSMObject {
+  id: number;
+  uid: number;
+  user: string;
+  /** ISO8601 string */
+  timestamp: string;
+  version: number;
+  changeset: number;
+}
+interface OSMRelation extends OSMObject {
+    type: "relation";
+    members: any[];
+    tags: { [key: string]: string };
+}
+
+export interface OSMNode extends OSMObject {
+  type: "node";
+  lat: number;
+  lon: number;
+}
+
+export interface OSMWay extends OSMObject {
     type: "way";
-    id: number;
-    /** ISO8601 string */
-    timestamp: string;
-    version: number;
-    changeset: number;
-    user: string;
-    uid: number;
     nodes: number[];
     tags: { [key: string]: string };
 }
 
-export type Ways  = { [key: number]: Way }
-export type Nodes  = { [key: number]: Way }
+export type OSMWays  = { [key: number]: OSMWay }
+export type OSMNodes  = { [key: number]: OSMNode }

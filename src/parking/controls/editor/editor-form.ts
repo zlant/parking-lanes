@@ -161,7 +161,6 @@ function getTagInupt(osm: any, side: string, parkingType: any, tagTemplate: any)
         }
         // @ts-ignore
         const newOsm = formToOsmWay(osm, e.currentTarget.form)
-        // @ts-ignore
         osmChangeListener?.(newOsm)
     }
 

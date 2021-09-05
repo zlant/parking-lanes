@@ -222,7 +222,7 @@ export function updateLaneColorsByDate(lanes: any, datetime: Date) {
 }
 
 function getColorByDate(conditions: ConditionsInterface, datetime: Date) {
-    if (!conditions)
+    if (Object.keys(conditions).length === 0 || conditions.intervals === undefined)
         return 'black'
 
     for (const interval of conditions.intervals) {

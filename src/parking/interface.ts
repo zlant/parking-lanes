@@ -5,12 +5,14 @@ import debounce from 'lodash/debounce'
 
 // eslint-disable-next-line no-unused-vars
 import locatecontrol from 'leaflet.locatecontrol'
+locatecontrol
 
 // eslint-disable-next-line no-unused-vars
 import polylineoffset from 'leaflet-polylineoffset'
 
 // eslint-disable-next-line no-unused-vars
 import leaflethash from 'leaflet-hash'
+leaflethash
 
 // eslint-disable-next-line no-unused-vars
 import leaflettouchhelper from 'leaflet-touch-helper'

@@ -228,8 +228,6 @@ function handlePresetClick(
         const currentInput = document.querySelector(inputSelector) as
             HTMLInputElement | HTMLSelectElement;
 
-        console.log({element: formElement, key: osmTagKey, currentInput});
-
         // Set the textbox/select content
         currentInput.value = tag.v
     }

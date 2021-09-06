@@ -59,7 +59,7 @@
     "leaflet-touch-helper": "^2.0.0",
     "leaflet.locatecontrol": "^0.73.0",
     "normalize.css": "^8.0.1",
-    "opening_hours": "^3.6.0",
+    "opening_hours": "^3.7.0",
     "osm-auth": "^1.1.0",
     "sass": "^1.38.0"
   }

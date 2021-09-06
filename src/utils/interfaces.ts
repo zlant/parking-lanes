@@ -52,6 +52,23 @@ export interface OverpassTurboRawResponse {
   elements: OSMElement[];
 }
 
+/** EG: { k: 'parking:lane:{side}', v: 'no_stopping' } */
+export interface OSMKeyValue {
+  k: string,
+  v: string;
+}
+export interface Preset {
+  /** Name of this preset */
+  key: string,
+  tags: OSMKeyValue[],
+  img: {
+      src: string,
+      height: number,
+      width: number,
+      alt: string,
+      title: string,
+  },
+}
 ////// OSM Types
 interface OSMObject {
   id: number;

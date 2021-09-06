@@ -1,4 +1,6 @@
-export const presets = [
+import { Preset } from "../../../utils/interfaces";
+
+export const presets: Preset[] = [
     {
         key: 'noStopping',
         tags: [
@@ -83,9 +85,6 @@ export const presets = [
             alt: 'Free Parking Sign',
             title: 'Free Parking',
         },
-        click: {
-            showTypeButtons: true,
-        },
     },
     {
         key: 'ticket',
@@ -102,9 +101,6 @@ export const presets = [
             width: 40,
             alt: 'Paid Parking Sign',
             title: 'Paid Parking',
-        },
-        click: {
-            showTypeButtons: true,
         },
     },
 ]

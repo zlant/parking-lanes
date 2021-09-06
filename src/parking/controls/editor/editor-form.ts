@@ -1,5 +1,5 @@
 import { hyper } from 'hyperhtml/esm'
-import { OSMWay } from '../../../utils/interfaces'
+import { OSMKeyValue, OSMWay } from '../../../utils/interfaces'
 import { presets } from './presets'
 
 export function getLaneEditForm(osm: OSMWay, waysInRelation: any, cutLaneListener: any) {
@@ -70,7 +70,7 @@ function handleSideSwitcherChange(e: Event) {
     }
 }
 
-function getSideGroup(osm: OSMWay, side: string) {
+function getSideGroup(osm: OSMWay, side: 'both'|'left'|'right') {
     return hyper`
         <div id=${side}
              class="tags-block_${side}">
@@ -91,7 +91,7 @@ const parkingLaneTagTemplates = [
     'parking:condition:{side}:capacity',
 ]
 
-function getTagInputs(osm: OSMWay, side: string) {
+function getTagInputs(osm: OSMWay, side: 'both'|'left'|'right') {
     const inputs = []
     const type = osm.tags[`parking:lane:${side}`] || 'type'
     for (const tagTemplate of parkingLaneTagTemplates)
@@ -196,7 +196,7 @@ function getTextInput(tag: string, value: any): HTMLInputElement {
                value="${value != null ? value : ''}">`
 }
 
-function getPresetSigns(osm: OSMWay, side: any) {
+function getPresetSigns(osm: OSMWay, side: 'both'|'left'|'right') {
     return presets.map(x => hyper`
         <img src=${x.img.src}
              class="sign-preset"
@@ -207,14 +207,36 @@ function getPresetSigns(osm: OSMWay, side: any) {
              onclick=${() => handlePresetClick(x.tags, osm, side)}>`)
 }
 
-function handlePresetClick(tags: any, osm: OSMWay, side: any) {
+/**
+ * Set the content of all the select and input elements in the form when clicking on a preset.
+ * @param tags An array of objects containing an OSM key and corresponding value for the preset
+ * @param osm The OSM way we have selected
+ * @param side What side of the OSM way we are applying this preset to
+ */
+function handlePresetClick(
+        tags: OSMKeyValue[], osm: OSMWay, side: 'both' | 'left' | 'right'
+    ): void {
     for (const tag of tags) {
-        // @ts-ignore
-        document.getElementById(osm.id)[tag.k.replace('{side}', side)].value = tag.v
+        // The id of the form is the OSM way ID
+        const formElement = document.getElementById(osm.id.toString()) as HTMLFormElement;
+
+        // Replace the placeholder `{side}` in the key with the actual side
+        const osmTagKey = tag.k.replace('{side}', side);
+
+        // Some controls are selects, some are textboxes
+        const inputSelector = `form[id='${osm.id}'] [name='${osmTagKey}']`;
+        const currentInput = document.querySelector(inputSelector) as
+            HTMLInputElement | HTMLSelectElement;
+
+        console.log({element: formElement, key: osmTagKey, currentInput});
+
+        // Set the textbox/select content
+        currentInput.value = tag.v
     }
 
-    // @ts-ignore
-    document.getElementById(osm.id)['parking:lane:' + side].dispatchEvent(new Event('change'))
+    const inputSelector = `form[id='${osm.id}'] [name='${`parking:lane:` + side}']`;
+    const element = document.querySelector(inputSelector) as HTMLInputElement | HTMLSelectElement;
+    element.dispatchEvent(new Event('change'))
 }
 
 function handleLaneTagInput() {

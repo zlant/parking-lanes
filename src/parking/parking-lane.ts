@@ -215,11 +215,12 @@ export function updateLaneColorsByDate(lanes: ParkingLanes, datetime: Date): voi
 
 function getColorByDate(conditions: ConditionsInterface, datetime: Date): ConditionColor | undefined {
     // Is object empty?
-    if (Object.keys(conditions).length === 0 || conditions.intervals === undefined) {
+    if (Object.keys(conditions).length === 0) {
         return 'black'
     }
 
-    for (const interval of conditions.intervals) {
+    // If conditions.intervals not defined, return the default color
+    for (const interval of conditions.intervals ?? []) {
         if (interval.interval && getOpeningHourseState(interval.interval, datetime))
             return getColor(interval.condition)
     }

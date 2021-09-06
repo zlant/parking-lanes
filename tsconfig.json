@@ -1,0 +1,18 @@
+{
+  "lib": ["es2017"],
+  "compilerOptions": {
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "lib": ["dom", "es2017"],
+    "target": "es2017",
+    "noImplicitAny": true,
+    "pretty": true,
+    "sourceRoot": "./src/",
+    "rootDir": "./src/",
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/parking/*.ts", "src/utils/*.ts"]
+}

@@ -1,11 +1,11 @@
 import L from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
-import { handleJosmLinkClick } from '~/src/utils/josm'
-import { idUrl, josmUrl, overpassUrl } from '~/src/utils/links'
+import { handleJosmLinkClick } from '../..//utils/josm'
+import { idUrl, josmUrl, overpassUrl } from '../../utils/links'
 import { getLaneEditForm, setOsmChangeListener } from './editor/editor-form'
 
 export default L.Control.extend({
-    onAdd: map => hyper`
+    onAdd: (map: L.Map) => hyper`
         <div id="lane-control"
              class="leaflet-control-layers control-padding"
              style="display: none"
@@ -14,31 +14,40 @@ export default L.Control.extend({
              onpointerdown=${L.DomEvent.stopPropagation}
              onclick=${L.DomEvent.stopPropagation} />`,
 
-    showLaneInfo(osm) {
+    showLaneInfo(osm: any) {
         const laneinfo = document.getElementById('lane-control')
+        if(laneinfo === null) {
+            return;
+        }
         laneinfo.appendChild(getPanel(osm, getLaneInfo(osm)))
         laneinfo.style.display = 'block'
     },
 
-    showEditForm(osm, waysInRelation, cutLaneListener) {
+    showEditForm(osm: any, waysInRelation: any, cutLaneListener: any) {
         const laneinfo = document.getElementById('lane-control')
+        if(laneinfo === null) {
+            return;
+        }
         laneinfo.appendChild(getPanel(osm, getLaneEditForm(osm, waysInRelation, cutLaneListener)))
         laneinfo.style.display = 'block'
     },
 
-    setOsmChangeListener(listener) {
+    setOsmChangeListener(listener: any) {
         setOsmChangeListener(listener)
         return this
     },
 
     closeLaneInfo() {
         const laneinfo = document.getElementById('lane-control')
+        if(laneinfo === null) {
+            return;
+        }
         laneinfo.style.display = 'none'
         laneinfo.innerHTML = ''
     },
 })
 
-function getPanel(osm, body) {
+function getPanel(osm: any, body: any) {
     return hyper`
         <div>
             <div style="min-width:250px">
@@ -57,7 +66,7 @@ function getPanel(osm, body) {
         </div>`
 }
 
-function getWayWithRelationsOverpassQuery(wayId) {
+function getWayWithRelationsOverpassQuery(wayId: string) {
     return `
         [out:xml];
         (
@@ -69,18 +78,19 @@ function getWayWithRelationsOverpassQuery(wayId) {
         out meta;`
 }
 
-function getLaneInfo(osm) {
+function getLaneInfo(osm: any) {
     return hyper`
         <div>
             ${getTagsBlock(osm.tags, 'right')}
             ${getTagsBlock(osm.tags, 'left')}
         </div>`
 
-    function getTagsBlock(tags, side) {
+    function getTagsBlock(tags: Object, side: string) {
         const regex = new RegExp('^parking:.*(?:' + side + '|both)')
 
         const filteredTags = Object.keys(tags)
             .filter(tag => regex.test(tag))
+            // @ts-ignore
             .map(tag => tag + ' = ' + tags[tag])
 
         return hyper`

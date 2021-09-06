@@ -3,7 +3,7 @@ import { hyper } from 'hyperhtml/esm'
 import dayjs from 'dayjs'
 
 export default L.Control.extend({
-    onAdd: map => hyper`
+    onAdd: (map: L.Map) => hyper`
         <input id="datetime-input"
                class="leaflet-control-layers control-padding control-bigfont"
                style="width: 150px"
@@ -12,13 +12,15 @@ export default L.Control.extend({
                ondblclick=${L.DomEvent.stopPropagation}
                onpointerdown=${L.DomEvent.stopPropagation}>`,
 
-    setDatetime(datetime) {
-        document.getElementById('datetime-input').value = dayjs(datetime).format('YYYY-MM-DDTHH:mm')
+    setDatetime(datetime: Date) {
+        (document.getElementById('datetime-input') as HTMLInputElement)
+            .value = dayjs(datetime).format('YYYY-MM-DDTHH:mm')
         return this
     },
 
-    setDatetimeChangeListener(listener) {
-        document.getElementById('datetime-input').oninput = e => {
+    setDatetimeChangeListener(listener: any) {
+        (document.getElementById('datetime-input') as HTMLInputElement).oninput = e => {
+            // @ts-ignore
             const newDatetime = dayjs(e.target.value)
             if (newDatetime.isValid())
                 listener(newDatetime.toDate())

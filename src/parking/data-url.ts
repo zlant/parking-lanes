@@ -1,14 +1,14 @@
 
 // eslint-disable-next-line no-unused-vars
 import L from 'leaflet'
-import { overpassUrl, osmDevUrl } from '~/src/utils/links'
+import { overpassUrl, osmDevUrl } from '../utils/links'
 
 /**
  * @param {L.LatLngBounds} bounds
  * @param {boolean} editorMode
  * @param {boolean} useDevServer
  */
-export function getUrl(bounds, editorMode, useDevServer) {
+export function getUrl(bounds: L.LatLngBounds, editorMode: boolean, useDevServer: boolean) {
     if (useDevServer) {
         const bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()].join(',')
         return osmDevUrl + '/api/0.6/map?bbox=' + bbox
@@ -20,7 +20,7 @@ export function getUrl(bounds, editorMode, useDevServer) {
     }
 }
 
-function getOverpassEditorQuery(bounds) {
+function getOverpassEditorQuery(bounds: L.LatLngBounds) {
     return `
         [out:json];
         (
@@ -34,7 +34,7 @@ function getOverpassEditorQuery(bounds) {
         out meta;`
 }
 
-function getOverpassViewerQuery(bounds) {
+function getOverpassViewerQuery(bounds: L.LatLngBounds) {
     return `
         [out:json];
         (
@@ -49,6 +49,6 @@ function getOverpassViewerQuery(bounds) {
 }
 
 /** @param {L.LatLngBounds} bounds */
-function convertBoundsToOverpassBbox(bounds) {
+function convertBoundsToOverpassBbox(bounds: L.LatLngBounds) {
     return [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',')
 }

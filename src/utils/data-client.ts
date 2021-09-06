@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { OverpassTurboResponse } from './interfaces';
 
 export const osmData = {
     ways: {},
@@ -6,9 +7,9 @@ export const osmData = {
     waysInRelation: {},
 }
 
-let lastBounds
+let lastBounds: L.LatLngBounds | null;
 
-export async function downloadBbox(bounds, url) {
+export async function downloadBbox(bounds: L.LatLngBounds, url: string): Promise<OverpassTurboResponse | null> {
     if (withinLastBounds(bounds))
         return null
 
@@ -30,7 +31,7 @@ export async function downloadBbox(bounds, url) {
     return newData
 }
 
-function withinLastBounds(bounds) {
+function withinLastBounds(bounds: L.LatLngBounds) {
     if (lastBounds == null)
         return false
 
@@ -42,7 +43,7 @@ export function resetLastBounds() {
     lastBounds = null
 }
 
-async function downloadContent(url) {
+async function downloadContent(url: string) {
     try {
         const resp = await axios.get(url, {
             headers: {
@@ -56,7 +57,7 @@ async function downloadContent(url) {
     }
 }
 
-function parseOsmResp(osmResp) {
+function parseOsmResp(osmResp: any) {
     const newData = {
         ways: {},
         nodes: {},
@@ -66,16 +67,20 @@ function parseOsmResp(osmResp) {
     for (const el of osmResp.elements) {
         switch (el.type) {
             case 'node':
+                // @ts-ignore
                 newData.nodes[el.id] = [el.lat, el.lon]
                 break
 
             case 'way':
+                // @ts-ignore
                 newData.ways[el.id] = el
                 break
 
             case 'relation':
                 for (const member of el.members) {
+                        // @ts-ignore
                     if (member.type === 'way' && newData.ways[member.ref])
+                        // @ts-ignore
                         newData.waysInRelation[member.ref] = true
                 }
                 break

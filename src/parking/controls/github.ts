@@ -1,9 +1,9 @@
 import L from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
-import { handleJosmLinkClick } from '~/src/utils/josm'
+import { handleJosmLinkClick } from '../../utils/josm'
 
 export default L.Control.extend({
-    onAdd: map => hyper`
+    onAdd: (map: L.Map) => hyper`
         <div class="leaflet-control-layers control-padding control-bigfont"
              onmouseenter=${showExternalEditorLinks}
              onmouseleave=${hideExternalEditorLinks}>
@@ -23,15 +23,18 @@ export default L.Control.extend({
             <a href="https://github.com/zetx16/parking-lanes" target="_blank">GitHub</a>
         </div>`,
 
-    setEditorModeCheckboxListener(listener) {
+    setEditorModeCheckboxListener(listener: any) {
+        // @ts-ignore
         document.getElementById('ghc-editor-mode').onchange = listener
     },
 })
 
 function showExternalEditorLinks() {
+    // @ts-ignore
     document.getElementById('ghc-editors').style.display = 'inline'
 }
 
 function hideExternalEditorLinks() {
+    // @ts-ignore
     document.getElementById('ghc-editors').style.display = 'none'
 }

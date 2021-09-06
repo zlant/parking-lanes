@@ -1,4 +1,6 @@
-export const legend = [
+import {ConditionColorDefinition} from '../utils/interfaces'
+
+export const legend: ConditionColorDefinition[] = [
     /* eslint-disable no-multi-spaces */
     { condition: 'disc',         color: 'yellowgreen',  text: 'Disc' },
     { condition: 'no_parking',   color: 'orange',       text: 'No parking' },

@@ -1,5 +1,9 @@
-function generateStyleMapByZoom() {
-    const map = {}
+import { StyleMapInterface } from "../utils/interfaces"
+
+
+
+function generateStyleMapByZoom(): { [key: number]: StyleMapInterface; } {
+    const map: { [key: number]: StyleMapInterface; }  = {}
 
     for (const zoom of [...Array(20).keys()]) {
         map[zoom] = {}

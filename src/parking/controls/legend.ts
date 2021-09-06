@@ -3,7 +3,7 @@ import { hyper } from 'hyperhtml/esm'
 import { legend } from '../legend'
 
 export default L.Control.extend({
-    onAdd: map => hyper`
+    onAdd: (map: L.Map) => hyper`
         <div id="legend"
              class="leaflet-control-layers control-padding control-bigfont"
              onmouseenter=${handleLegendMouseEnter}
@@ -15,7 +15,7 @@ export default L.Control.extend({
 
 let legendPinned = false
 
-function changeLegendPinning(e) {
+function changeLegendPinning(e: Event) {
     if (legendPinned)
         setLegendHead(e)
     else
@@ -24,22 +24,30 @@ function changeLegendPinning(e) {
     legendPinned = !legendPinned
 }
 
-function handleLegendMouseEnter(e) {
+function handleLegendMouseEnter(e: Event) {
     if (!legendPinned)
         setLegendBody(e)
 }
 
-function handleLegendMouseLeave(e) {
+function handleLegendMouseLeave(e: Event) {
     if (!legendPinned)
         setLegendHead(e)
 }
 
-function setLegendBody(e) {
+function setLegendBody(e: Event) {
+    if(e.currentTarget === null) {
+        return;
+    }
+    // @ts-ignore
     e.currentTarget.innerHTML = legend
         .map(x => "<div class='legend-element' style='background-color:" + x.color + ";'></div> " + x.text)
         .join('<br />')
 }
 
-function setLegendHead(e) {
+function setLegendHead(e: Event) {
+    if(e.currentTarget === null) {
+        return;
+    }
+    // @ts-ignore
     e.currentTarget.innerHTML = 'Legend'
 }

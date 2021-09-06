@@ -18,13 +18,16 @@ module.exports = {
         port: 33444,
     },
     entry: {
-        main: path.resolve(__dirname, './src/index.js'),
+        main: path.resolve(__dirname, './src/index.ts'),
     },
     output: {
         path: path.resolve(__dirname, './dist'),
         filename: '[name].[contenthash].js',
         assetModuleFilename: '[name].[hash][ext][query]',
         hashDigestLength: 8,
+    },
+    resolve: {
+        extensions: ['.ts', '.js'],
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -46,6 +49,11 @@ module.exports = {
     ],
     module: {
         rules: [
+            {
+                test: /\.ts?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
             {
                 test: /\.js$/,
                 exclude: /node_modules/,

@@ -1,7 +1,7 @@
 import { hyper } from 'hyperhtml/esm'
 import { presets } from './presets'
 
-export function getLaneEditForm(osm, waysInRelation, cutLaneListener) {
+export function getLaneEditForm(osm: any, waysInRelation: any, cutLaneListener: any) {
     const form = hyper`
         <form id="${osm.id}"
               class="editor-form">
@@ -42,7 +42,7 @@ export function getLaneEditForm(osm, waysInRelation, cutLaneListener) {
     return form
 }
 
-function existsSideTags(form, side) {
+function existsSideTags(form: any, side: string) {
     const regex = new RegExp('^parking:.*' + side)
 
     for (const input of form) {
@@ -53,7 +53,11 @@ function existsSideTags(form, side) {
     return false
 }
 
-function handleSideSwitcherChange(e) {
+function handleSideSwitcherChange(e: Event) {
+    if(e.currentTarget === null) {
+        return;
+    }
+    // @ts-ignore
     if (e.currentTarget.checked) {
         hideElement('right')
         hideElement('left')
@@ -65,7 +69,7 @@ function handleSideSwitcherChange(e) {
     }
 }
 
-function getSideGroup(osm, side) {
+function getSideGroup(osm: any, side: string) {
     return hyper`
         <div id=${side}
              class="tags-block_${side}">
@@ -86,7 +90,7 @@ const parkingLaneTagTemplates = [
     'parking:condition:{side}:capacity',
 ]
 
-function getTagInupts(osm, side) {
+function getTagInupts(osm: any, side: string) {
     const inputs = []
     const type = osm.tags[`parking:lane:${side}`] || 'type'
     for (const tagTemplate of parkingLaneTagTemplates)
@@ -94,7 +98,7 @@ function getTagInupts(osm, side) {
     return inputs
 }
 
-function getTagInupt(osm, side, parkingType, tagTemplate) {
+function getTagInupt(osm: any, side: string, parkingType: any, tagTemplate: any) {
     const tag = tagTemplate
         .replace('{side}', side)
         .replace('{type}', parkingType)
@@ -151,8 +155,13 @@ function getTagInupt(osm, side, parkingType, tagTemplate) {
             break
     }
 
-    input.onchange = e => {
+    input.onchange = (e: Event) => {
+        if(e.currentTarget === null) {
+            return;
+        }
+        // @ts-ignore
         const newOsm = formToOsmWay(osm, e.currentTarget.form)
+        // @ts-ignore
         osmChangeListener?.(newOsm)
     }
 
@@ -166,7 +175,7 @@ function getTagInupt(osm, side, parkingType, tagTemplate) {
         </tr>`
 }
 
-function getSelectInput(tag, value, values) {
+function getSelectInput(tag: string, value: any, values: any[]) {
     const options = values.includes(value) ?
         ['', ...values] :
         ['', value, ...values]
@@ -177,7 +186,7 @@ function getSelectInput(tag, value, values) {
         </select>`
 }
 
-function getTextInput(tag, value) {
+function getTextInput(tag: string, value: any) {
     return hyper`
         <input type="text" 
                placeholder="${tag}"
@@ -185,7 +194,7 @@ function getTextInput(tag, value) {
                value="${value != null ? value : ''}">`
 }
 
-function getPresetSigns(osm, side) {
+function getPresetSigns(osm: any, side: any) {
     return presets.map(x => hyper`
         <img src=${x.img.src}
              class="sign-preset"
@@ -196,53 +205,71 @@ function getPresetSigns(osm, side) {
              onclick=${() => handlePresetClick(x.tags, osm, side)}>`)
 }
 
-function handlePresetClick(tags, osm, side) {
-    for (const tag of tags)
+function handlePresetClick(tags: any, osm: any, side: any) {
+    for (const tag of tags) {
+        // @ts-ignore
         document.getElementById(osm.id)[tag.k.replace('{side}', side)].value = tag.v
+    }
 
+    // @ts-ignore
     document.getElementById(osm.id)['parking:lane:' + side].dispatchEvent(new Event('change'))
 }
 
 function handleLaneTagInput() {
+    // @ts-ignore
     const side = this.name.split(':')[2]
     // Type tag should only exist when parking:lane:side has one on the following values
+    // @ts-ignore
     if (['parallel', 'diagonal', 'perpendicular'].includes(this.value)) {
         // exact name of the tag depends on parking:lane:side value
         const typeTagTr = document.querySelector('[id^="parking:lane:' + side + ':"]')
+        // @ts-ignore
         typeTagTr.style.display = ''
 
         const typeTagSelect = document.querySelector('[name^="parking:lane:' + side + ':"]')
+        // @ts-ignore
         typeTagSelect.name = 'parking:lane:' + side + ':' + this.value
     } else {
+        // @ts-ignore
         document.querySelector('[id^="parking:lane:' + side + ':"]').style.display = 'none'
     }
 }
 
 function handleConditionTagInput() {
+    // @ts-ignore
     const side = this.name.split(':')[2]
     const maxstayTr = document.getElementById('parking:condition:' + side + ':maxstay')
 
-    if (this.value === 'disc')
+    // @ts-ignore
+    if (this.value === 'disc') {
+        // @ts-ignore
         hideElement(maxstayTr.id)
-    else
+    } else {
+        // @ts-ignore
         showElement(maxstayTr.id)
+    }
 }
 
 function handleTimeIntervalTagInput() {
+    // @ts-ignore
     const side = this.name.split(':')[2]
     const defaultConditionTr = document.getElementById('parking:condition:' + side + ':default')
-    if (this.value === '')
+    // @ts-ignore
+    if (this.value === '') {
+        // @ts-ignore
         hideElement(defaultConditionTr.id)
-    else
+    } else {
+        // @ts-ignore
         showElement(defaultConditionTr.id)
+    }
 }
 
-function showElement(id) {
-    document.getElementById(id).style.display = ''
+function showElement(id: string) {
+    (document.getElementById(id) as HTMLElement).style.display = ''
 }
 
-function hideElement(id) {
-    document.getElementById(id).style.display = 'none'
+function hideElement(id: string) {
+    (document.getElementById(id) as HTMLElement).style.display = 'none'
 }
 
 const displayNone = { display: 'none' }
@@ -276,13 +303,13 @@ const conditionValues = [
     'private',
 ]
 
-let osmChangeListener
+let osmChangeListener: any
 
-export function setOsmChangeListener(listener) {
+export function setOsmChangeListener(listener: any) {
     osmChangeListener = listener
 }
 
-function formToOsmWay(osm, form) {
+function formToOsmWay(osm: any, form:any) {
     const regex = /^parking:/
 
     const supprtedTags = parkingLaneTagTemplates

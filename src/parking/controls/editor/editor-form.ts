@@ -1,8 +1,8 @@
 import { hyper } from 'hyperhtml/esm'
-import { OSMKeyValue, OSMWay } from '../../../utils/interfaces'
+import { OsmKeyValue, OsmWay } from '../../../utils/interfaces'
 import { presets } from './presets'
 
-export function getLaneEditForm(osm: OSMWay, waysInRelation: any, cutLaneListener: any) {
+export function getLaneEditForm(osm: OsmWay, waysInRelation: any, cutLaneListener: any) {
     const form = hyper`
         <form id="${osm.id}"
               class="editor-form">
@@ -70,7 +70,7 @@ function handleSideSwitcherChange(e: Event) {
     }
 }
 
-function getSideGroup(osm: OSMWay, side: 'both'|'left'|'right') {
+function getSideGroup(osm: OsmWay, side: 'both'|'left'|'right') {
     return hyper`
         <div id=${side}
              class="tags-block_${side}">
@@ -91,7 +91,7 @@ const parkingLaneTagTemplates = [
     'parking:condition:{side}:capacity',
 ]
 
-function getTagInputs(osm: OSMWay, side: 'both'|'left'|'right') {
+function getTagInputs(osm: OsmWay, side: 'both'|'left'|'right') {
     const inputs = []
     const type = osm.tags[`parking:lane:${side}`] || 'type'
     for (const tagTemplate of parkingLaneTagTemplates)
@@ -99,7 +99,7 @@ function getTagInputs(osm: OSMWay, side: 'both'|'left'|'right') {
     return inputs
 }
 
-function getTagInput(osm: OSMWay, side: string, parkingType: any, tagTemplate: any) {
+function getTagInput(osm: OsmWay, side: string, parkingType: any, tagTemplate: any) {
     const tag = tagTemplate
         .replace('{side}', side)
         .replace('{type}', parkingType)
@@ -196,7 +196,7 @@ function getTextInput(tag: string, value: any): HTMLInputElement {
                value="${value != null ? value : ''}">`
 }
 
-function getPresetSigns(osm: OSMWay, side: 'both'|'left'|'right') {
+function getPresetSigns(osm: OsmWay, side: 'both'|'left'|'right') {
     return presets.map(x => hyper`
         <img src=${x.img.src}
              class="sign-preset"
@@ -214,7 +214,7 @@ function getPresetSigns(osm: OSMWay, side: 'both'|'left'|'right') {
  * @param side What side of the OSM way we are applying this preset to
  */
 function handlePresetClick(
-        tags: OSMKeyValue[], osm: OSMWay, side: 'both' | 'left' | 'right'
+        tags: OsmKeyValue[], osm: OsmWay, side: 'both' | 'left' | 'right'
     ): void {
     for (const tag of tags) {
         // The id of the form is the OSM way ID
@@ -331,7 +331,7 @@ export function setOsmChangeListener(listener: any) {
     osmChangeListener = listener
 }
 
-function formToOsmWay(osm: OSMWay, form: HTMLInputElement[]) {
+function formToOsmWay(osm: OsmWay, form: HTMLInputElement[]) {
     const regex = /^parking:/
 
     const supprtedTags = parkingLaneTagTemplates

@@ -42,25 +42,25 @@ export interface ConditionColorDefinition {
 }
 
 export interface OverpassTurboResponse {
-    ways: OSMWays;
+    ways: OsmWays;
     nodes: { [key: number]: L.LatLngTuple};
     waysInRelation: { [key: number]: boolean};
 }
 
-export type OSMElement = OSMNode | OSMWay | OSMRelation;
+export type OsmElement = OsmNode | OsmWay | OsmRelation;
 export interface OverpassTurboRawResponse {
-  elements: OSMElement[];
+  elements: OsmElement[];
 }
 
 /** EG: { k: 'parking:lane:{side}', v: 'no_stopping' } */
-export interface OSMKeyValue {
+export interface OsmKeyValue {
   k: string,
   v: string;
 }
 export interface Preset {
   /** Name of this preset */
   key: string,
-  tags: OSMKeyValue[],
+  tags: OsmKeyValue[],
   img: {
       src: string,
       height: number,
@@ -70,7 +70,7 @@ export interface Preset {
   },
 }
 ////// OSM Types
-interface OSMObject {
+interface OsmObject {
   id: number;
   uid: number;
   user: string;
@@ -79,23 +79,23 @@ interface OSMObject {
   version: number;
   changeset: number;
 }
-interface OSMRelation extends OSMObject {
+interface OsmRelation extends OsmObject {
     type: "relation";
     members: any[];
     tags: { [key: string]: string };
 }
 
-export interface OSMNode extends OSMObject {
+export interface OsmNode extends OsmObject {
   type: "node";
   lat: number;
   lon: number;
 }
 
-export interface OSMWay extends OSMObject {
+export interface OsmWay extends OsmObject {
     type: "way";
     nodes: number[];
     tags: { [key: string]: string };
 }
 
-export type OSMWays  = { [key: number]: OSMWay }
-export type OSMNodes  = { [key: number]: OSMNode }
+export type OsmWays  = { [key: number]: OsmWay }
+export type OsmNodes  = { [key: number]: OsmNode }

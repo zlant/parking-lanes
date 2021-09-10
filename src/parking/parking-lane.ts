@@ -2,11 +2,11 @@ import L from 'leaflet'
 import { parseOpeningHourse, getOpeningHourseState } from '../utils/opening-hours'
 import { legend } from './legend'
 import { laneStyleByZoom as laneStyle } from './lane-styles'
-import {ConditionColor, ConditionsInterface, ParkingLanes, Side, OSMWay, OSMNodes, OSMNode} from '../utils/interfaces';
+import {ConditionColor, ConditionsInterface, ParkingLanes, Side, OsmWay } from '../utils/interfaces';
 
 const highwayRegex = /'^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street'/
 
-export function parseParkingLane(way: OSMWay, nodes: { [key: number]: number[]}, zoom: number, editorMode: boolean) {
+export function parseParkingLane(way: OsmWay, nodes: { [key: number]: number[]}, zoom: number, editorMode: boolean) {
     const isMajor = wayIsMajor(way.tags)
 
     if (typeof isMajor !== 'boolean') {
@@ -44,7 +44,7 @@ export function parseParkingLane(way: OSMWay, nodes: { [key: number]: number[]},
     return lanes
 }
 
-export function parseChangedParkingLane(newOsm: OSMWay, lanes: { [key: string]: any }, datetime: Date, zoom:Number) {
+export function parseChangedParkingLane(newOsm: OsmWay, lanes: { [key: string]: any }, datetime: Date, zoom:Number) {
     const lane = lanes['right' + newOsm.id] || lanes['left' + newOsm.id] || lanes['empty' + newOsm.id]
     const polyline = lane.getLatLngs()
     let emptyway = true
@@ -90,14 +90,14 @@ export function parseChangedParkingLane(newOsm: OSMWay, lanes: { [key: string]: 
     return newLanes
 }
 
-function generateLaneId(osm: OSMWay, side?: any, conditions?: any) {
+function generateLaneId(osm: OsmWay, side?: any, conditions?: any) {
     if (!conditions)
         return 'empty' + osm.id
 
     return side + osm.id
 }
 
-function createPolyline(line:L.LatLngLiteral[], conditions: Object, side: string, osm: OSMWay, offset: number, isMajor:boolean, zoom: number) {
+function createPolyline(line:L.LatLngLiteral[], conditions: Object, side: string, osm: OsmWay, offset: number, isMajor:boolean, zoom: number) {
     return L.polyline(line,
         {
             // @ts-ignore

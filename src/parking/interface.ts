@@ -40,12 +40,10 @@ import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
 import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '../utils/changes-store'
 import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-client'
-import { ParkingLanes } from '../utils/interfaces'
+import { OurWindow, OverpassTurboResponse, ParkingLanes, OsmWay } from '../utils/interfaces'
 
 const editorName = 'PLanes'
 const version = '0.4.2'
-
-let map: L.Map;
 
 let editorMode = false
 const useDevServer = false
@@ -79,7 +77,7 @@ const layersControl = L.control.layers(
 
 export function initMap() {
     const root = document.querySelector('#map') as HTMLElement;
-    map = L.map(root, { fadeAnimation: false })
+    const map = L.map(root, { fadeAnimation: false })
 
     if (document.location.href.indexOf('#') === -1) {
         const cookieLocation = getLocationFromCookie();
@@ -109,12 +107,10 @@ export function initMap() {
         .setOsmChangeListener(handleOsmChange)
 
     map.on('moveend', handleMapMoveEnd)
-    // @ts-ignore
     map.on('click', closeLaneInfo)
 
     // @ts-ignore
     const hash = new L.Hash(map)
-
     return map
 }
 
@@ -131,7 +127,7 @@ export const DownloadControl = L.Control.extend({
     onAdd: (map: L.Map) => hyper`
         <div id="download-btn"
              class="leaflet-control-layers control-padding control-bigfont control-button"
-             onclick=${() => downloadParkinkLanes(map)}>
+             onclick=${() => downloadParkingLanes(map)}>
             Download bbox
         </div>`,
 })
@@ -148,17 +144,17 @@ export const SaveControl = L.Control.extend({
 
 function handleDatetimeChange(newDatetime: Date) {
     datetime = newDatetime
-    updateLaneColorsByDate(lanes, datetime)
+    updateLaneColorsByDate(lanes, newDatetime)
 }
 
 const lanes: ParkingLanes = {}
-const markers = {}
+const markers: { [key: string]: any} = {}
 
-async function downloadParkinkLanes(map: L.Map) {
+async function downloadParkingLanes(map: L.Map) {
     (document.getElementById('download-btn') as HTMLButtonElement)
         .innerText = 'Downloading...'
     const url = getUrl(map.getBounds(), editorMode, useDevServer)
-    const newData = await downloadBbox(map.getBounds(), url);
+    const newData: OverpassTurboResponse | null = await downloadBbox(map.getBounds(), url);
     (document.getElementById('download-btn') as HTMLButtonElement).innerText = 'Download bbox'
 
     if (!newData) {
@@ -176,65 +172,60 @@ async function downloadParkinkLanes(map: L.Map) {
     }
 }
 
-function addNewLanes(newLanes: ParkingLanes, map: L.Map) {
+function addNewLanes(newLanes: ParkingLanes, map: L.Map): void {
     updateLaneColorsByDate(newLanes, datetime)
     Object.assign(lanes, newLanes)
     for (const newLane of Object.values(newLanes)) {
-        // @ts-ignore
         newLane.on('click', handleLaneClick)
-        // @ts-ignore
         newLane.addTo(map)
+        // L.path is added by plugin, types don't exist. 
         // @ts-ignore
         L.path.touchHelper(newLane).addTo(map)
     }
 }
 
 function handleLaneClick(e: Event) {
-    closeLaneInfo(e)
+    const {map} = (window as OurWindow);
+    closeLaneInfo()
 
+    // I don't know where this gets set, but it appears to be a way
     // @ts-ignore
-    const osmId = e.target.options.osm.id
-    // @ts-ignore
+    const osm: OsmWay = e.target.options.osm;
+
+    const osmId = osm.id
     const lane = lanes['right' + osmId] || lanes['left' + osmId] || lanes['empty' + osmId]
     const backligntPolylines = getBacklights(lane.getLatLngs(), map.getZoom())
-    // @ts-ignore
     lanes.right = backligntPolylines.right.addTo(map)
-    // @ts-ignore
     lanes.left = backligntPolylines.left.addTo(map)
 
     if (editorMode) {
         laneInfoControl.showEditForm(
-            // @ts-ignore
-            e.target.options.osm,
+            osm,
             osmData.waysInRelation,
             handleCutLaneClick)
     } else {
-        // @ts-ignore
-        laneInfoControl.showLaneInfo(e.target.options.osm)
+        laneInfoControl.showLaneInfo(osm)
     }
 
     L.DomEvent.stopPropagation(e)
 }
 
-function closeLaneInfo(e: Event) {
+function closeLaneInfo(){
     laneInfoControl.closeLaneInfo()
 
     for (const marker in markers) {
-        // @ts-ignore
         markers[marker].remove()
-        // @ts-ignore
         delete markers[marker]
     }
 
-    // @ts-ignore
     lanes.right?.remove()
-    // @ts-ignore
     lanes.left?.remove()
 }
 
 // Map move handler
 
 function handleMapMoveEnd() {
+    const {map} = (window as OurWindow);
     (document.getElementById('ghc-josm') as HTMLLinkElement).href = josmUrl + overpassUrl + getHighwaysOverpassQuery();
     (document.getElementById('ghc-id') as HTMLLinkElement).href = idUrl + '#map=' +
     document.location.href.substring(document.location.href.indexOf('#') + 1)
@@ -250,10 +241,11 @@ function handleMapMoveEnd() {
     if (zoom < viewMinZoom)
         return
 
-    downloadParkinkLanes(map)
+    downloadParkingLanes(map)
 }
 
 function getHighwaysOverpassQuery() {
+    const {map} = (window as OurWindow);
     const bounds = map.getBounds()
     const bbox = [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',')
     const tag = 'highway~"^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street"'
@@ -263,6 +255,7 @@ function getHighwaysOverpassQuery() {
 // Editor
 
 async function handleEditorModeCheckboxChange(e: Event) {
+    const {map} = (window as OurWindow);
     // @ts-ignore
     if (e.currentTarget.checked) {
         try {
@@ -305,8 +298,8 @@ async function handleEditorModeCheckboxChange(e: Event) {
     }
 }
 
-function handleOsmChange(newOsm: any) {
-    // @ts-ignore
+function handleOsmChange(newOsm: OsmWay) {
+    const {map} = (window as OurWindow);
     const newLanes = parseChangedParkingLane(newOsm, lanes, datetime, map.getZoom())
     newLanes.forEach(lane => lane.addTo(map))
 
@@ -334,14 +327,13 @@ const cutIcon = L.divIcon({
     html: '✂',
 })
 
-function handleCutLaneClick(osm: any) {
+function handleCutLaneClick(osm: OsmWay) {
     if (Object.keys(markers).length > 0)
         return
 
+    const {map} = (window as OurWindow);
     for (const nd of osm.nodes.slice(1, osm.nodes.length - 1)) {
-        // @ts-ignore
         markers[nd] = L.marker(
-            // @ts-ignore
             osmData.nodes[nd],
             {
                 icon: cutIcon,
@@ -357,11 +349,9 @@ function handleCutLaneClick(osm: any) {
 let newWayId = -1
 
 function cutWay(arg: any) {
-    // @ts-ignore
     const oldWay = osmData.ways[arg.target.options.wayId]
     const newWay = JSON.parse(JSON.stringify(oldWay))
 
-    // @ts-ignore
     const ndIndex = oldWay.nodes.findIndex(e => e === arg.target.options.ndId)
 
     oldWay.nodes = oldWay.nodes.slice(0, ndIndex + 1)
@@ -372,27 +362,20 @@ function cutWay(arg: any) {
     delete newWay.uid
     delete newWay.timestamp
 
-    // @ts-ignore
     lanes['right' + oldWay.id]?.setLatLngs(oldWay.nodes.map(x => osmData.nodes[x]))
-    // @ts-ignore
     lanes['left' + oldWay.id]?.setLatLngs(oldWay.nodes.map(x => osmData.nodes[x]))
-    // @ts-ignore
     lanes['empty' + oldWay.id]?.setLatLngs(oldWay.nodes.map(x => osmData.nodes[x]))
 
-    // @ts-ignore
     lanes.left?.setLatLngs(oldWay.nodes.map(x => osmData.nodes[x]))
-    // @ts-ignore
     lanes.right?.setLatLngs(oldWay.nodes.map(x => osmData.nodes[x]))
 
     for (const marker in markers) {
-        // @ts-ignore
         markers[marker].remove()
-        // @ts-ignore
         delete markers[marker]
     }
 
-    // @ts-ignore
     osmData.ways[newWay.id] = newWay
+    const {map} = (window as OurWindow);
     const newLanes = parseParkingLane(newWay, osmData.nodes, map.getZoom(), editorMode)
     // @ts-ignore
     addNewLanes(newLanes, map)

@@ -1,5 +1,6 @@
 import * as JXON from 'jxon'
 import osmAuth from 'osm-auth'
+import { OsmWay } from './interfaces'
 import { osmProdUrl, osmDevUrl } from './links'
 
 let auth: OSMAuth.OSMAuthInstance| null = null
@@ -148,7 +149,7 @@ function closeChangeset(changesetId: string) {
     })
 }
 
-function wayToJxon(osm: any, changesetId: string) {
+function wayToJxon(osm: OsmWay, changesetId: string) {
     const jxonWay = {
         $id: osm.id,
         $version: osm.version || 0,

@@ -2,29 +2,32 @@ import L from 'leaflet'
 import { parseOpeningHourse, getOpeningHourseState } from '../utils/opening-hours'
 import { legend } from './legend'
 import { laneStyleByZoom as laneStyle } from './lane-styles'
-import {ConditionColor, ConditionsInterface, ParkingLanes, Side, Way} from '../utils/interfaces';
+import {ConditionColor, ConditionsInterface, ParkingLanes, Side, OsmWay } from '../utils/interfaces';
 
 const highwayRegex = /'^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street'/
 
-export function parseParkingLane(way: Way, nodes: Object, zoom: number, editorMode: boolean) {
+export function parseParkingLane(way: OsmWay, nodes: { [key: number]: number[]}, zoom: number, editorMode: boolean) {
     const isMajor = wayIsMajor(way.tags)
 
     if (typeof isMajor !== 'boolean') {
         return
     }
 
-    // @ts-ignore
-    const polyline = way.nodes.map(x => nodes[x])
+    const polylineNodes = way.nodes.map(x => nodes[x])
+    const polyline: L.LatLngLiteral[] = polylineNodes.map((node) => ({lat: node[0], lng: node[1]}))
+
     let emptyway = true
 
-    const lanes:ParkingLanes = {}
+    const lanes: ParkingLanes = {}
 
     for (const side of ['right', 'left'] as Side[]) {
         const conditions = getConditions(side, way.tags)
         if (conditions.default != null || (conditions.intervals && conditions.intervals.length > 0)) {
             const laneId = generateLaneId(way, side, conditions)
-            // @ts-ignore
-            const leafletPolyline = createPolyline(polyline, conditions, side, way, isMajor ? laneStyle[zoom].offsetMajor : laneStyle[zoom].offsetMinor, isMajor, zoom)
+            const offset: number = isMajor
+                ? laneStyle[zoom].offsetMajor as number
+                : laneStyle[zoom].offsetMinor as number;
+            const leafletPolyline = createPolyline(polyline, conditions, side, way, offset, isMajor, zoom)
             lanes[laneId] = leafletPolyline
             emptyway = false
         }
@@ -35,14 +38,13 @@ export function parseParkingLane(way: Way, nodes: Object, zoom: number, editorMo
         highwayRegex.test(way.tags.highway)) {
         const laneId = generateLaneId(way)
         const leafletPolyline = createPolyline(polyline, {}, 'right', way, 0, isMajor, zoom)
-        // @ts-ignore
         lanes[laneId] = leafletPolyline
     }
 
     return lanes
 }
 
-export function parseChangedParkingLane(newOsm: any, lanes: { [key: string]: any }, datetime: Date, zoom:Number) {
+export function parseChangedParkingLane(newOsm: OsmWay, lanes: { [key: string]: any }, datetime: Date, zoom:Number) {
     const lane = lanes['right' + newOsm.id] || lanes['left' + newOsm.id] || lanes['empty' + newOsm.id]
     const polyline = lane.getLatLngs()
     let emptyway = true
@@ -88,14 +90,14 @@ export function parseChangedParkingLane(newOsm: any, lanes: { [key: string]: any
     return newLanes
 }
 
-function generateLaneId(osm: any, side?: any, conditions?: any) {
+function generateLaneId(osm: OsmWay, side?: any, conditions?: any) {
     if (!conditions)
         return 'empty' + osm.id
 
     return side + osm.id
 }
 
-function createPolyline(line:L.LatLngExpression[], conditions: Object, side: string, osm: any, offset: number, isMajor:boolean, zoom: number) {
+function createPolyline(line:L.LatLngLiteral[], conditions: Object, side: string, osm: OsmWay, offset: number, isMajor:boolean, zoom: number) {
     return L.polyline(line,
         {
             // @ts-ignore
@@ -132,7 +134,7 @@ function wayIsMajor(tags: Object) {
 }
 
 
-function getConditions(side: 'left' | 'right', tags: { [key: string]: any }): ConditionsInterface {
+function getConditions(side: 'left' | 'right', tags: { [key: string]: string }): ConditionsInterface {
     const conditions: ConditionsInterface = { intervals: [], default: null }
     const sides = ['both', side]
 
@@ -203,10 +205,9 @@ function getConditions(side: 'left' | 'right', tags: { [key: string]: any }): Co
     return conditions
 }
 
-export function updateLaneColorsByDate(lanes: ParkingLanes | undefined, datetime: Date) {
+/** The time effects the current parking restrictions. Update colors based on this. */
+export function updateLaneColorsByDate(lanes: ParkingLanes, datetime: Date): void {
     for (const lane in lanes) {
-        //
-        // const conditions = lane[lane].options.conditions
         const color = getColorByDate(lanes[lane].options.conditions, datetime)
         lanes[lane].setStyle({ color })
     }

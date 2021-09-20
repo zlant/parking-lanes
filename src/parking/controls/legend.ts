@@ -38,7 +38,10 @@ function handleLegendMouseLeave(e: Event) {
 
 function setLegendBody(el: Element) {
     el.innerHTML = legend
-        .map(x => "<div class='legend-element' style='background-color:" + x.color + ";'></div> " + x.text)
+        .map(x => `<div class='legend-element' style='background-color:${x.color};'></div>
+            ${x.text}
+            ${x.subline ? `<br /><span class='legend-subline'>${x.subline}</span>` : ''}
+            `)
         .join('<br />')
 }
 

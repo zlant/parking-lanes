@@ -26,7 +26,7 @@ import {
     getBacklights,
 } from './parking-lane'
 
-import { getLocationFromCookie, setLocationToCookie } from '../utils/location-ccokie'
+import { getLocationFromCookie, setLocationToCookie } from '../utils/location-cookie'
 import { idUrl, josmUrl, overpassDeUrl } from '../utils/links'
 import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
 import { getUrl } from './data-url'

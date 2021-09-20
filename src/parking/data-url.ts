@@ -22,7 +22,7 @@ function getOverpassEditorQuery(bounds: L.LatLngBounds) {
     return `
         [out:json];
         (
-            way[highway~"^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street"][service!=parking_aisle][service!=driveway][access!=private](${convertBoundsToOverpassBbox(bounds)});
+            way[highway~"^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street"][service!=emergency_access][service!=parking_aisle][service!=driveway][access!=private](${convertBoundsToOverpassBbox(bounds)});
         )->.a;
         (
             .a;

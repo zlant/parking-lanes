@@ -1,9 +1,7 @@
-import { StyleMapInterface } from "../utils/interfaces"
+import { StyleMapInterface } from '../utils/types/parking'
 
-
-
-function generateStyleMapByZoom(): { [key: number]: StyleMapInterface; } {
-    const map: { [key: number]: StyleMapInterface; }  = {}
+function generateStyleMapByZoom(): { [key: number]: StyleMapInterface } {
+    const map: { [key: number]: StyleMapInterface } = {}
 
     for (const zoom of [...Array(20).keys()]) {
         map[zoom] = {}

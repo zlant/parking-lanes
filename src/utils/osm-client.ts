@@ -1,19 +1,22 @@
 import * as JXON from 'jxon'
 import osmAuth from 'osm-auth'
-import { OsmWay } from './interfaces'
 import { osmProdUrl, osmDevUrl } from './links'
 
-let auth: OSMAuth.OSMAuthInstance| null = null
+import { OsmWay } from './types/osm-data'
+
+let auth: OSMAuth.OSMAuthInstance | null = null
 
 function craeteOsmAuth(useDevServer: boolean) {
     return useDevServer ?
         // Used to not have these new keywords
+        // eslint-disable-next-line new-cap
         new osmAuth({
             url: osmDevUrl,
             oauth_consumer_key: 'FhbDyU5roZ0wAPffly1yfiYChg8RaNuFlJTB0SE1',
             oauth_secret: 'gTzuFDWUqmZnwho2NIaVoxpgSX47Xyqq65lTw8do',
             auto: true,
         }) :
+        // eslint-disable-next-line new-cap
         new osmAuth({
             url: osmProdUrl,
             oauth_consumer_key: 'Np0gmfYoqo6Ronla4wuFTXEUgypODL0jPRzjiFW6',
@@ -22,48 +25,42 @@ function craeteOsmAuth(useDevServer: boolean) {
         })
 }
 
-/**
- * @param {OSMAuth.OSMAuthXHROptions} options
- */
-function osmXhr(options: any) {
+function osmXhr(options: OSMAuth.OSMAuthXHROptions): Promise<any> {
     return new Promise((resolve, reject) => {
-            if(auth === null) {
-                return;
-            }
-            return auth.xhr(
-                options,
-                (err, details) => {
-                    if (err)
-                        reject(err)
-                    else
-                        resolve(details)
-                },
-            );
-        }
+        if (auth === null)
+            return
+
+        return auth.xhr(
+            options,
+            (err, details) => {
+                if (err)
+                    reject(err)
+                else
+                    resolve(details)
+            },
+        )
+    },
     )
 }
 
-/**
- * @param {boolean} useDevServer
- */
-export function authenticate(useDevServer: boolean) {
+export function authenticate(useDevServer: boolean): Promise<any> {
     auth ??= craeteOsmAuth(useDevServer)
     return new Promise((resolve, reject) => {
-        if(auth === null) {
+        if (auth === null)
             return
-        }
-        return auth.authenticate((err, oauth) => err ? reject(err) : resolve(oauth));
+
+        return auth.authenticate((err, oauth) => err ? reject(err) : resolve(oauth))
     })
 }
 
 export function logout() {
-    if(auth === null) {
-        return;
-    }
+    if (auth === null)
+        return
+
     return auth.logout()
 }
 
-export function userInfo() {
+export function userInfo(): Promise<any> {
     return osmXhr({
         method: 'GET',
         path: '/api/0.6/user/details',
@@ -71,15 +68,10 @@ export function userInfo() {
     })
 }
 
-/**
- * @param {string} editorName
- * @param {number} editorVersion
- */
-export async function uploadChanges(editorName: string, editorVersion: string, changesStore: any) {
+export async function uploadChanges(editorName: string, editorVersion: string, changesStore: any): Promise<void> {
     try {
         const changesetId = await createChangeset(editorName, editorVersion)
         await saveChangesets(changesStore, changesetId, editorName)
-        // @ts-ignore
         await closeChangeset(changesetId)
 
         for (const way of changesStore.modify.way)
@@ -93,7 +85,7 @@ export async function uploadChanges(editorName: string, editorVersion: string, c
     }
 }
 
-function createChangeset(editorName: string, editorVersion: string) {
+function createChangeset(editorName: string, editorVersion: string): Promise<string> {
     const change = {
         osm: {
             changeset: {
@@ -122,12 +114,10 @@ function saveChangesets(changesStore: any, changesetId: any, editorName: string)
             $generator: editorName,
             modify: {
                 way: changesStore.modify.way
-                    // @ts-ignore
                     .map(x => wayToJxon(x, changesetId)),
             },
             create: {
                 way: changesStore.create.way
-                    // @ts-ignore
                     .map(x => wayToJxon(x, changesetId)),
             },
         },
@@ -150,20 +140,17 @@ function closeChangeset(changesetId: string) {
 }
 
 function wayToJxon(osm: OsmWay, changesetId: string) {
-    const jxonWay = {
+    const jxonWay: any = {
         $id: osm.id,
         $version: osm.version || 0,
         tag: Object.keys(osm.tags)
             .map(k => ({ $k: k, $v: osm.tags[k] })),
         nd: osm.nodes
-            // @ts-ignore
             .map(id => ({ $ref: id })),
     }
 
-    if (changesetId) {
-        // @ts-ignore
+    if (changesetId)
         jxonWay.$changeset = changesetId
-    }
 
     return jxonWay
 }

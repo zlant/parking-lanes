@@ -24,17 +24,14 @@ export default L.Control.extend({
         </div>`,
 
     setEditorModeCheckboxListener(listener: any) {
-        // @ts-ignore
-        document.getElementById('ghc-editor-mode').onchange = listener
+        document.getElementById('ghc-editor-mode')!.onchange = listener
     },
 })
 
 function showExternalEditorLinks() {
-    // @ts-ignore
-    document.getElementById('ghc-editors').style.display = 'inline'
+    document.getElementById('ghc-editors')!.style.display = 'inline'
 }
 
 function hideExternalEditorLinks() {
-    // @ts-ignore
-    document.getElementById('ghc-editors').style.display = 'none'
+    document.getElementById('ghc-editors')!.style.display = 'none'
 }

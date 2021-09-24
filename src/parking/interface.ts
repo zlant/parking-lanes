@@ -128,7 +128,7 @@ export const DownloadControl = L.Control.extend({
         <div id="download-btn"
              class="leaflet-control-layers control-padding control-bigfont control-button"
              onclick=${() => downloadParkingLanes(map)}>
-            Download bbox
+            Fetch parking data
         </div>`,
 })
 
@@ -150,12 +150,25 @@ function handleDatetimeChange(newDatetime: Date) {
 const lanes: ParkingLanes = {}
 const markers: { [key: string]: any} = {}
 
-async function downloadParkingLanes(map: L.Map) {
+function setDownloadButtonText(s: string): void {
     (document.getElementById('download-btn') as HTMLButtonElement)
-        .innerText = 'Downloading...'
+            .innerText = s;
+}
+async function downloadParkingLanes(map: L.Map): Promise<void> {
+    setDownloadButtonText('Fetching data...');
     const url = getUrl(map.getBounds(), editorMode, useDevServer)
-    const newData: OverpassTurboResponse | null = await downloadBbox(map.getBounds(), url);
-    (document.getElementById('download-btn') as HTMLButtonElement).innerText = 'Download bbox'
+
+    let newData: OverpassTurboResponse | null = null;
+    try {
+        newData = await downloadBbox(map.getBounds(), url);
+    } catch(e: any) {
+        const errorMessage = e && e.message ===  'Request failed with status code 429'
+            ? 'Error: Too many requests - try again soon'
+            : 'Unknown error, please try again';
+            setDownloadButtonText(errorMessage);
+            return;
+    }
+    setDownloadButtonText('Fetch parking data');
 
     if (!newData) {
         return

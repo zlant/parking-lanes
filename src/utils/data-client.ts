@@ -9,16 +9,21 @@ export const osmData: OverpassTurboResponse = {
 
 let lastBounds: L.LatLngBounds | undefined;
 
+/**
+ * Get OSM data within specified bounds
+ * @throws {Error} Throws error when HTTP request fails (eg. HTTP 429 when too many requests)
+ * @param bounds Which area do we search, to check if we've already searched here
+ * @param url Overpass Turbo request URL
+ * @returns Object containing nodes, ways and ways in relation
+ */
 export async function downloadBbox(bounds: L.LatLngBounds, url: string): Promise<OverpassTurboResponse | null> {
     if (lastBounds !== undefined && withinLastBounds(bounds, lastBounds))
         return null
 
     lastBounds = bounds
 
-    const osmResp: OverpassTurboRawResponse | null = await downloadContent(url)
-
-    if (!osmResp)
-        return null
+    // This may throw - if it does we handle in calling function
+    const osmResp: OverpassTurboRawResponse = await downloadContent(url)
 
     const newData = parseOsmResp(osmResp)
 
@@ -34,25 +39,24 @@ export async function downloadBbox(bounds: L.LatLngBounds, url: string): Promise
 /** Check if the new bounds (lat/lng + zoom) is contained within the old bounds */
 function withinLastBounds(newBounds: L.LatLngBounds, oldBounds: L.LatLngBounds) {
     return newBounds.getWest() > oldBounds.getWest() && newBounds.getSouth() > oldBounds.getSouth() &&
-           newBounds.getEast() < oldBounds.getEast() && newBounds.getNorth() < oldBounds.getNorth()
+        newBounds.getEast() < oldBounds.getEast() && newBounds.getNorth() < oldBounds.getNorth()
 }
 
 export function resetLastBounds() {
     lastBounds = undefined;
 }
 
-async function downloadContent(url: string): Promise<null | any> {
-    try {
-        const resp = await axios.get(url, {
-            headers: {
-                Accept: 'application/json',
-            },
-        })
-        return resp.data
-    } catch (err) {
-        console.error(err)
-        return null
-    }
+/**
+ * Make a GET request to the specified URL.
+ * @throws {Error}
+ */
+async function downloadContent(url: string): Promise<any> {
+    const resp = await axios.get(url, {
+        headers: {
+            Accept: 'application/json',
+        },
+    })
+    return resp.data
 }
 
 function parseOsmResp(osmResp: OverpassTurboRawResponse): OverpassTurboResponse {

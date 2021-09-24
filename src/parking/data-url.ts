@@ -4,6 +4,7 @@ import L from 'leaflet'
 import { overpassUrl, osmDevUrl } from '../utils/links'
 
 /**
+ * Get the API request URL (eg. Overpass Turbo query URL *./
  * @param {L.LatLngBounds} bounds
  * @param {boolean} editorMode
  * @param {boolean} useDevServer

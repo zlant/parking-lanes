@@ -13,7 +13,7 @@ const majorHighwayRegex = /^motorway|trunk|primary|secondary|tertiary|unclassifi
 
 export function parseParkingLane(
     way: OsmWay,
-    nodes: { [key: number]: number[]},
+    nodes: { [key: number]: number[] },
     zoom: number,
     editorMode: boolean): ParkingLanes | undefined {
     const isMajor = wayIsMajor(way.tags)

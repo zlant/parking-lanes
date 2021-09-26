@@ -3,6 +3,7 @@ import osmAuth from 'osm-auth'
 import { osmProdUrl, osmDevUrl } from './links'
 
 import { OsmWay } from './types/osm-data'
+import { ChangesStore, JxonOsmWay } from './types/changes-store'
 
 let auth: OSMAuth.OSMAuthInstance | null = null
 
@@ -68,14 +69,14 @@ export function userInfo(): Promise<any> {
     })
 }
 
-export async function uploadChanges(editorName: string, editorVersion: string, changesStore: any): Promise<void> {
+export async function uploadChanges(editorName: string, editorVersion: string, changesStore: ChangesStore): Promise<void> {
     try {
         const changesetId = await createChangeset(editorName, editorVersion)
         await saveChangesets(changesStore, changesetId, editorName)
         await closeChangeset(changesetId)
 
         for (const way of changesStore.modify.way)
-            way.$version = parseInt(way.$version) + 1
+            way.version = way.version + 1
 
         changesStore.modify.way = []
         changesStore.create.way = []
@@ -107,7 +108,7 @@ function createChangeset(editorName: string, editorVersion: string): Promise<str
     })
 }
 
-function saveChangesets(changesStore: any, changesetId: any, editorName: string) {
+function saveChangesets(changesStore: ChangesStore, changesetId: string, editorName: string) {
     const change = {
         osmChange: {
             $version: '0.6',
@@ -139,8 +140,8 @@ function closeChangeset(changesetId: string) {
     })
 }
 
-function wayToJxon(osm: OsmWay, changesetId: string) {
-    const jxonWay: any = {
+function wayToJxon(osm: OsmWay, changesetId: string): JxonOsmWay {
+    const jxonWay: JxonOsmWay = {
         $id: osm.id,
         $version: osm.version || 0,
         tag: Object.keys(osm.tags)

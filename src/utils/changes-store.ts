@@ -1,4 +1,5 @@
 import { ChangesStore } from './types/changes-store'
+import { OsmWay } from './types/osm-data'
 
 export const changesStore: ChangesStore = {
     modify: {
@@ -9,12 +10,7 @@ export const changesStore: ChangesStore = {
     },
 }
 
-export function addChangedEntity(osm: any): number {
-    // TODO: May need to duplicate osm object or change type
-    delete osm.user
-    delete osm.uid
-    delete osm.timestamp
-
+export function addChangedEntity(osm: OsmWay): number {
     if (osm.id > 0) {
         const index = changesStore.modify.way.findIndex(x => x.id === osm.id)
         if (index > -1)

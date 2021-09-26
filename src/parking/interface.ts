@@ -36,7 +36,7 @@ import { ParsedOsmData } from '../utils/types/osm-data-storage'
 import { ParkingLanes } from '../utils/types/parking'
 
 const editorName = 'PLanes'
-const version = '0.4.2'
+const version = '0.5.0'
 
 let editorMode = false
 const useDevServer = false

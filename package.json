@@ -4,8 +4,9 @@
   "description": "Parking lanes viewer from OpenStreetMap",
   "main": "index.js",
   "scripts": {
-    "build": "cross-env NODE_ENV='production' webpack",
+    "dev": "webpack serve",
     "start": "webpack serve",
+    "build": "cross-env NODE_ENV='production' webpack",
     "analyze": "cross-env NODE_ENV='production' cross-env ANALYZE=true webpack",
     "deploy": "gh-pages -d dist",
     "typecheck": "tsc --noEmit"

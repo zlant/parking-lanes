@@ -35,8 +35,6 @@ import { OsmWay } from '../utils/types/osm-data'
 import { ParsedOsmData } from '../utils/types/osm-data-storage'
 import { ParkingLanes } from '../utils/types/parking'
 
-// eslint-disable-next-line no-unused-expressions
-
 const editorName = 'PLanes'
 const version = '0.4.2'
 
@@ -57,8 +55,6 @@ const tileLayers = {
         attribution: "<a href='https://wiki.openstreetmap.org/wiki/Esri'>Terms & Feedback</a>",
         maxZoom: 19,
         maxNativeZoom: 19,
-        // @ts-expect-error
-        ref: 'esric',
     }),
 }
 
@@ -76,13 +72,9 @@ export function initMap(): L.Map {
 
     if (!document.location.href.includes('#')) {
         const cookieLocation = getLocationFromCookie()
-        const defaultLocation: L.LatLng = new L.LatLng(51.591, 24.609)
-        const defaultZoom = 5
-
-        const location = cookieLocation !== undefined ? cookieLocation.location : defaultLocation
-        const zoom = cookieLocation !== undefined ? cookieLocation.zoom : defaultZoom
-
-        map.setView(location, zoom)
+        map.setView(
+            cookieLocation?.location ?? new L.LatLng(51.591, 24.609),
+            cookieLocation?.zoom ?? 5)
     }
 
     tileLayers.mapnik.addTo(map)
@@ -159,7 +151,7 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
     try {
         newData = await downloadBbox(map.getBounds(), url)
     } catch (e: any) {
-        const errorMessage = e && e.message === 'Request failed with status code 429' ?
+        const errorMessage = e?.message === 'Request failed with status code 429' ?
             'Error: Too many requests - try again soon' :
             'Unknown error, please try again'
         setDownloadButtonText(errorMessage)

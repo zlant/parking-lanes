@@ -15,6 +15,7 @@ import DatetimeControl from './controls/datetime'
 import GithubControl from './controls/github'
 import LegendControl from './controls/legend'
 import LaneInfoControl from './controls/lane-info'
+import FetchControl from './controls/fetch'
 
 import {
     parseParkingLane,
@@ -31,7 +32,7 @@ import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '../utils/changes-store'
 import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-client'
 import { OurWindow } from '../utils/types/interfaces'
-import { OsmWay } from '../utils/types/osm-data'
+import { OsmDataSource, OsmWay } from '../utils/types/osm-data'
 import { ParsedOsmData } from '../utils/types/osm-data-storage'
 import { ParkingLanes } from '../utils/types/parking'
 
@@ -42,6 +43,7 @@ let editorMode = false
 const useDevServer = false
 let datetime = new Date()
 const viewMinZoom = 15
+let dataSource = OsmDataSource.OsmOrg
 
 const laneInfoControl = new LaneInfoControl({ position: 'topright' })
 
@@ -87,8 +89,11 @@ export function initMap(): L.Map {
     new DatetimeControl({ position: 'topright' }).addTo(map)
         .setDatetime(datetime)
         .setDatetimeChangeListener(handleDatetimeChange)
+    new FetchControl({ position: 'topright' }).addTo(map)
+        .setFetchDataBtnClickListener(() => downloadParkingLanes(map))
+        .setDataSource(dataSource)
+        .setDataSourceChangeListener(handleDataSourceChange)
     new InfoControl({ position: 'topright' }).addTo(map)
-    new DownloadControl({ position: 'topright' }).addTo(map)
     new SaveControl({ position: 'topright' }).addTo(map)
     laneInfoControl.addTo(map)
         .setOsmChangeListener(handleOsmChange)
@@ -111,15 +116,6 @@ export const InfoControl = L.Control.extend({
         </div>`,
 })
 
-export const DownloadControl = L.Control.extend({
-    onAdd: (map: L.Map) => hyper`
-        <div id="download-btn"
-             class="leaflet-control-layers control-padding control-bigfont control-button"
-             onclick=${() => downloadParkingLanes(map)}>
-            Fetch parking data
-        </div>`,
-})
-
 export const SaveControl = L.Control.extend({
     onAdd: (map: L.Map) => hyper`
         <button id="save-btn"
@@ -135,6 +131,10 @@ function handleDatetimeChange(newDatetime: Date) {
     updateLaneColorsByDate(lanes, newDatetime)
 }
 
+function handleDataSourceChange(newDataSource: OsmDataSource) {
+    dataSource = newDataSource
+}
+
 const lanes: ParkingLanes = {}
 const markers: { [key: string]: L.Marker<any>} = {}
 
@@ -145,7 +145,7 @@ function setDownloadButtonText(s: string): void {
 
 async function downloadParkingLanes(map: L.Map): Promise<void> {
     setDownloadButtonText('Fetching data...')
-    const url = getUrl(map.getBounds(), editorMode, useDevServer)
+    const url = getUrl(map.getBounds(), editorMode, useDevServer, dataSource)
 
     let newData: ParsedOsmData | null = null
     try {

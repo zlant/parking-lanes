@@ -34,3 +34,8 @@ export type OsmElement = OsmNode | OsmWay | OsmRelation
 export interface RawOsmData {
     elements: OsmElement[]
 }
+
+export enum OsmDataSource {
+    OverpassTurbo,
+    OsmOrg,
+}

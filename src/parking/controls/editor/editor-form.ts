@@ -1,8 +1,9 @@
 import { hyper } from 'hyperhtml/esm'
-import { OsmKeyValue, OsmWay } from '../../../utils/interfaces'
+import { OsmWay } from '../../../utils/types/osm-data'
+import { OsmKeyValue } from '../../../utils/types/preset'
 import { presets } from './presets'
 
-export function getLaneEditForm(osm: OsmWay, waysInRelation: any, cutLaneListener: any) {
+export function getLaneEditForm(osm: OsmWay, waysInRelation: any, cutLaneListener: (arg0: OsmWay) => void): any {
     const form = hyper`
         <form id="${osm.id}"
               class="editor-form">
@@ -54,11 +55,10 @@ function existsSideTags(form: any, side: string) {
     return false
 }
 
-function handleSideSwitcherChange(e: Event) {
-    if(e.currentTarget === null) {
-        return;
-    }
-    // @ts-ignore
+function handleSideSwitcherChange(e: InputEvent | any) {
+    if (e.currentTarget === null)
+        return
+
     if (e.currentTarget.checked) {
         hideElement('right')
         hideElement('left')
@@ -92,7 +92,7 @@ const parkingLaneTagTemplates = [
 ]
 
 function getTagInputs(osm: OsmWay, side: 'both'|'left'|'right') {
-    const inputs = []
+    const inputs: any[] = []
     const type = osm.tags[`parking:lane:${side}`] || 'type'
     for (const tagTemplate of parkingLaneTagTemplates)
         inputs.push(getTagInput(osm, side, type, tagTemplate))
@@ -109,7 +109,7 @@ function getTagInput(osm: OsmWay, side: string, parkingType: any, tagTemplate: a
 
     const value = osm.tags[tag]
 
-    let input: HTMLInputElement | HTMLSelectElement;
+    let input: HTMLInputElement | HTMLSelectElement
 
     let hide = false
     switch (tagTemplate) {
@@ -156,12 +156,12 @@ function getTagInput(osm: OsmWay, side: string, parkingType: any, tagTemplate: a
     }
 
     input.onchange = (e) => {
-        if(e.currentTarget === null) {
-            return;
-        }
+        if (e.currentTarget === null)
+            return
+
         // This seems to work, but isn't in the TS definition
-        // @ts-ignore
-        const form: HTMLInputElement[] = e.currentTarget.form;
+        // @ts-expect-error
+        const form: HTMLInputElement[] = e.currentTarget.form
 
         const newOsm = formToOsmWay(osm, form)
         osmChangeListener?.(newOsm)
@@ -177,7 +177,7 @@ function getTagInput(osm: OsmWay, side: string, parkingType: any, tagTemplate: a
         </tr>`
 }
 
-function getSelectInput(tag: string, value: any, values: any[]):HTMLSelectElement {
+function getSelectInput(tag: string, value: any, values: any[]): HTMLSelectElement {
     const options = values.includes(value) ?
         ['', ...values] :
         ['', value, ...values]
@@ -214,74 +214,71 @@ function getPresetSigns(osm: OsmWay, side: 'both'|'left'|'right') {
  * @param side What side of the OSM way we are applying this preset to
  */
 function handlePresetClick(
-        tags: OsmKeyValue[], osm: OsmWay, side: 'both' | 'left' | 'right'
-    ): void {
+    tags: OsmKeyValue[], osm: OsmWay, side: 'both' | 'left' | 'right',
+): void {
     for (const tag of tags) {
-        // The id of the form is the OSM way ID
-        const formElement = document.getElementById(osm.id.toString()) as HTMLFormElement;
-
         // Replace the placeholder `{side}` in the key with the actual side
-        const osmTagKey = tag.k.replace('{side}', side);
+        const osmTagKey = tag.k.replace('{side}', side)
 
         // Some controls are selects, some are textboxes
-        const inputSelector = `form[id='${osm.id}'] [name='${osmTagKey}']`;
+        const inputSelector = `form[id='${osm.id}'] [name='${osmTagKey}']`
         const currentInput = document.querySelector(inputSelector) as
-            HTMLInputElement | HTMLSelectElement;
+            HTMLInputElement | HTMLSelectElement
 
         // Set the textbox/select content
         currentInput.value = tag.v
     }
 
-    const inputSelector = `form[id='${osm.id}'] [name='${`parking:lane:` + side}']`;
-    const element = document.querySelector(inputSelector) as HTMLInputElement | HTMLSelectElement;
+    const inputSelector = `form[id='${osm.id}'] [name='${'parking:lane:' + side}']`
+    const element = document.querySelector(inputSelector) as HTMLInputElement | HTMLSelectElement
     element.dispatchEvent(new Event('change'))
 }
 
 function handleLaneTagInput() {
-    // @ts-ignore
+    // @ts-expect-error
     const side = this.name.split(':')[2]
     // Type tag should only exist when parking:lane:side has one on the following values
-    // @ts-ignore
+    // @ts-expect-error
     if (['parallel', 'diagonal', 'perpendicular'].includes(this.value)) {
         // exact name of the tag depends on parking:lane:side value
         const typeTagTr = document.querySelector('[id^="parking:lane:' + side + ':"]')
-        // @ts-ignore
+        // @ts-expect-error
         typeTagTr.style.display = ''
 
         const typeTagSelect = document.querySelector('[name^="parking:lane:' + side + ':"]')
-        // @ts-ignore
+        // @ts-expect-error
         typeTagSelect.name = 'parking:lane:' + side + ':' + this.value
     } else {
-        // @ts-ignore
+        // @ts-expect-error
         document.querySelector('[id^="parking:lane:' + side + ':"]').style.display = 'none'
     }
 }
 
 function handleConditionTagInput() {
-    // @ts-ignore
+    // @ts-expect-error
     const side = this.name.split(':')[2]
     const maxstayTr = document.getElementById('parking:condition:' + side + ':maxstay')
 
-    // @ts-ignore
+    // @ts-expect-error
     if (this.value === 'disc') {
-        // @ts-ignore
+        // @ts-expect-error
         hideElement(maxstayTr.id)
     } else {
-        // @ts-ignore
+        // @ts-expect-error
         showElement(maxstayTr.id)
     }
 }
 
 function handleTimeIntervalTagInput() {
-    // @ts-ignore
+    // @ts-expect-error
     const side = this.name.split(':')[2]
     const defaultConditionTr = document.getElementById('parking:condition:' + side + ':default')
-    // @ts-ignore
+    // @ts-expect-error
     if (this.value === '') {
-        // @ts-ignore
+        // @ts-expect-error
         hideElement(defaultConditionTr.id)
     } else {
-        // @ts-ignore
+        // @ts-expect-error
         showElement(defaultConditionTr.id)
     }
 }

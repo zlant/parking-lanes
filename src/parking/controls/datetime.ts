@@ -19,8 +19,7 @@ export default L.Control.extend({
     },
 
     setDatetimeChangeListener(listener: any) {
-        (document.getElementById('datetime-input') as HTMLInputElement).oninput = e => {
-            // @ts-ignore
+        (document.getElementById('datetime-input') as HTMLInputElement).oninput = (e: Event | any) => {
             const newDatetime = dayjs(e.target.value)
             if (newDatetime.isValid())
                 listener(newDatetime.toDate())

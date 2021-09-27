@@ -1,4 +1,4 @@
-import {ConditionColorDefinition} from '../utils/interfaces'
+import { ConditionColorDefinition } from '../utils/types/conditions'
 
 export const legend: ConditionColorDefinition[] = [
     /* eslint-disable no-multi-spaces */

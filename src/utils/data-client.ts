@@ -1,13 +1,14 @@
 import axios from 'axios'
-import { OverpassTurboRawResponse, OverpassTurboResponse } from './interfaces';
+import { RawOsmData } from './types/osm-data'
+import { ParsedOsmData } from './types/osm-data-storage'
 
-export const osmData: OverpassTurboResponse = {
+export const osmData: ParsedOsmData = {
     ways: {},
     nodes: {},
     waysInRelation: {},
 }
 
-let lastBounds: L.LatLngBounds | undefined;
+let lastBounds: L.LatLngBounds | undefined
 
 /**
  * Get OSM data within specified bounds
@@ -16,14 +17,14 @@ let lastBounds: L.LatLngBounds | undefined;
  * @param url Overpass Turbo request URL
  * @returns Object containing nodes, ways and ways in relation
  */
-export async function downloadBbox(bounds: L.LatLngBounds, url: string): Promise<OverpassTurboResponse | null> {
+export async function downloadBbox(bounds: L.LatLngBounds, url: string): Promise<ParsedOsmData | null> {
     if (lastBounds !== undefined && withinLastBounds(bounds, lastBounds))
         return null
 
     lastBounds = bounds
 
     // This may throw - if it does we handle in calling function
-    const osmResp: OverpassTurboRawResponse = await downloadContent(url)
+    const osmResp: RawOsmData = await downloadContent(url)
 
     const newData = parseOsmResp(osmResp)
 
@@ -39,18 +40,18 @@ export async function downloadBbox(bounds: L.LatLngBounds, url: string): Promise
 /** Check if the new bounds (lat/lng + zoom) is contained within the old bounds */
 function withinLastBounds(newBounds: L.LatLngBounds, oldBounds: L.LatLngBounds) {
     return newBounds.getWest() > oldBounds.getWest() && newBounds.getSouth() > oldBounds.getSouth() &&
-        newBounds.getEast() < oldBounds.getEast() && newBounds.getNorth() < oldBounds.getNorth()
+           newBounds.getEast() < oldBounds.getEast() && newBounds.getNorth() < oldBounds.getNorth()
 }
 
-export function resetLastBounds() {
-    lastBounds = undefined;
+export function resetLastBounds(): void {
+    lastBounds = undefined
 }
 
 /**
  * Make a GET request to the specified URL.
  * @throws {Error}
  */
-async function downloadContent(url: string): Promise<any> {
+async function downloadContent(url: string): Promise<RawOsmData> {
     const resp = await axios.get(url, {
         headers: {
             Accept: 'application/json',
@@ -59,8 +60,8 @@ async function downloadContent(url: string): Promise<any> {
     return resp.data
 }
 
-function parseOsmResp(osmResp: OverpassTurboRawResponse): OverpassTurboResponse {
-    const newData: OverpassTurboResponse = {
+function parseOsmResp(osmResp: RawOsmData): ParsedOsmData {
+    const newData: ParsedOsmData = {
         ways: {},
         nodes: {},
         waysInRelation: {},
@@ -85,7 +86,7 @@ function parseOsmResp(osmResp: OverpassTurboRawResponse): OverpassTurboResponse 
 
             default:
                 // This shouldn't happen, but in case.
-                // @ts-ignore
+                // @ts-expect-error
                 throw new Error('Not supported osm type ' + el.type)
         }
     }

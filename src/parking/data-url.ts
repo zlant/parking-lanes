@@ -1,15 +1,10 @@
-
-// eslint-disable-next-line no-unused-vars
 import L from 'leaflet'
 import { overpassUrl, osmDevUrl } from '../utils/links'
 
 /**
  * Get the API request URL (eg. Overpass Turbo query URL *./
- * @param {L.LatLngBounds} bounds
- * @param {boolean} editorMode
- * @param {boolean} useDevServer
  */
-export function getUrl(bounds: L.LatLngBounds, editorMode: boolean, useDevServer: boolean) {
+export function getUrl(bounds: L.LatLngBounds, editorMode: boolean, useDevServer: boolean): string {
     if (useDevServer) {
         const bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()].join(',')
         return osmDevUrl + '/api/0.6/map?bbox=' + bbox
@@ -49,7 +44,6 @@ function getOverpassViewerQuery(bounds: L.LatLngBounds) {
         out meta;`
 }
 
-/** @param {L.LatLngBounds} bounds */
 function convertBoundsToOverpassBbox(bounds: L.LatLngBounds) {
     return [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',')
 }

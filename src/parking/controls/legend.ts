@@ -16,38 +16,32 @@ export default L.Control.extend({
 let legendPinned = false
 
 function changeLegendPinning(e: Event) {
-    if (legendPinned)
-        setLegendHead(e)
-    else
-        setLegendBody(e)
+    if (e.currentTarget instanceof Element) {
+        if (legendPinned)
+            setLegendHead(e.currentTarget)
+        else
+            setLegendBody(e.currentTarget)
+    }
 
     legendPinned = !legendPinned
 }
 
 function handleLegendMouseEnter(e: Event) {
-    if (!legendPinned)
-        setLegendBody(e)
+    if (!legendPinned && e.currentTarget instanceof Element)
+        setLegendBody(e.currentTarget)
 }
 
 function handleLegendMouseLeave(e: Event) {
-    if (!legendPinned)
-        setLegendHead(e)
+    if (!legendPinned && e.currentTarget instanceof Element)
+        setLegendHead(e.currentTarget)
 }
 
-function setLegendBody(e: Event) {
-    if(e.currentTarget === null) {
-        return;
-    }
-    // @ts-ignore
-    e.currentTarget.innerHTML = legend
+function setLegendBody(el: Element) {
+    el.innerHTML = legend
         .map(x => "<div class='legend-element' style='background-color:" + x.color + ";'></div> " + x.text)
         .join('<br />')
 }
 
-function setLegendHead(e: Event) {
-    if(e.currentTarget === null) {
-        return;
-    }
-    // @ts-ignore
-    e.currentTarget.innerHTML = 'Legend'
+function setLegendHead(el: Element) {
+    el.innerHTML = 'Legend'
 }

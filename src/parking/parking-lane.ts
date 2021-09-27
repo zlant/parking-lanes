@@ -2,19 +2,27 @@ import L from 'leaflet'
 import { parseOpeningHourse, getOpeningHourseState } from '../utils/opening-hours'
 import { legend } from './legend'
 import { laneStyleByZoom as laneStyle } from './lane-styles'
-import {ConditionColor, ConditionsInterface, ParkingLanes, Side, OsmWay } from '../utils/interfaces';
 
-const highwayRegex = /'^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street'/
+import { ConditionColor, ConditionsInterface } from '../utils/types/conditions'
+import { OsmWay, OsmTags } from '../utils/types/osm-data'
+import { ParkingLanes, Side } from '../utils/types/parking'
+import { MyPolylineOptions } from '../utils/types/leaflet'
 
-export function parseParkingLane(way: OsmWay, nodes: { [key: number]: number[]}, zoom: number, editorMode: boolean) {
+const highwayRegex = /^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street/
+const majorHighwayRegex = /^motorway|trunk|primary|secondary|tertiary|unclassified|residential/
+
+export function parseParkingLane(
+    way: OsmWay,
+    nodes: { [key: number]: number[] },
+    zoom: number,
+    editorMode: boolean): ParkingLanes | undefined {
     const isMajor = wayIsMajor(way.tags)
 
-    if (typeof isMajor !== 'boolean') {
+    if (typeof isMajor !== 'boolean')
         return
-    }
 
     const polylineNodes = way.nodes.map(x => nodes[x])
-    const polyline: L.LatLngLiteral[] = polylineNodes.map((node) => ({lat: node[0], lng: node[1]}))
+    const polyline: L.LatLngLiteral[] = polylineNodes.map((node) => ({ lat: node[0], lng: node[1] }))
 
     let emptyway = true
 
@@ -24,9 +32,9 @@ export function parseParkingLane(way: OsmWay, nodes: { [key: number]: number[]},
         const conditions = getConditions(side, way.tags)
         if (conditions.default != null || (conditions.intervals && conditions.intervals.length > 0)) {
             const laneId = generateLaneId(way, side, conditions)
-            const offset: number = isMajor
-                ? laneStyle[zoom].offsetMajor as number
-                : laneStyle[zoom].offsetMinor as number;
+            const offset: number = isMajor ?
+                laneStyle[zoom].offsetMajor as number :
+                laneStyle[zoom].offsetMinor as number
             const leafletPolyline = createPolyline(polyline, conditions, side, way, offset, isMajor, zoom)
             lanes[laneId] = leafletPolyline
             emptyway = false
@@ -44,12 +52,12 @@ export function parseParkingLane(way: OsmWay, nodes: { [key: number]: number[]},
     return lanes
 }
 
-export function parseChangedParkingLane(newOsm: OsmWay, lanes: { [key: string]: any }, datetime: Date, zoom:Number) {
+export function parseChangedParkingLane(newOsm: OsmWay, lanes: ParkingLanes, datetime: Date, zoom: number): L.Polyline[] {
     const lane = lanes['right' + newOsm.id] || lanes['left' + newOsm.id] || lanes['empty' + newOsm.id]
     const polyline = lane.getLatLngs()
     let emptyway = true
 
-    const newLanes = []
+    const newLanes: L.Polyline[] = []
 
     for (const side of ['right', 'left'] as Side[]) {
         const conditions = getConditions(side, newOsm.tags)
@@ -61,8 +69,7 @@ export function parseChangedParkingLane(newOsm: OsmWay, lanes: { [key: string]: 
             } else {
                 const isMajor = wayIsMajor(newOsm.tags)
                 const laneId = generateLaneId(newOsm, side, conditions)
-                //@ts-ignore
-                const leafletPolyline = createPolyline(polyline, conditions, side, newOsm, isMajor ? laneStyle[zoom].offsetMajor : laneStyle[zoom].offsetMinor, isMajor, zoom)
+                const leafletPolyline = createPolyline(polyline, conditions, side, newOsm, isMajor ? laneStyle[zoom].offsetMajor ?? 1 : laneStyle[zoom].offsetMinor ?? 0.5, isMajor, zoom)
                 lanes[laneId] = leafletPolyline
                 newLanes.push(leafletPolyline)
             }
@@ -77,7 +84,6 @@ export function parseChangedParkingLane(newOsm: OsmWay, lanes: { [key: string]: 
         if (!lanes['empty' + newOsm.id]) {
             const isMajor = wayIsMajor(newOsm.tags)
             const laneId = generateLaneId(newOsm)
-            // @ts-ignore
             const leafletPolyline = createPolyline(polyline, {}, 'right', newOsm, 0, isMajor, zoom)
             lanes[laneId] = leafletPolyline
             newLanes.push(leafletPolyline)
@@ -90,31 +96,28 @@ export function parseChangedParkingLane(newOsm: OsmWay, lanes: { [key: string]: 
     return newLanes
 }
 
-function generateLaneId(osm: OsmWay, side?: any, conditions?: any) {
+function generateLaneId(osm: OsmWay, side?: 'left' | 'right', conditions?: ConditionsInterface) {
     if (!conditions)
         return 'empty' + osm.id
 
-    return side + osm.id
+    return side! + osm.id
 }
 
-function createPolyline(line:L.LatLngLiteral[], conditions: Object, side: string, osm: OsmWay, offset: number, isMajor:boolean, zoom: number) {
+function createPolyline(line: L.LatLngLiteral[], conditions: ConditionsInterface, side: string, osm: OsmWay, offset: number, isMajor: boolean, zoom: number) {
     return L.polyline(line,
         {
-            // @ts-ignore
             color: getColor(conditions?.default),
             weight: isMajor ? laneStyle[zoom].weightMajor : laneStyle[zoom].weightMinor,
-            // @ts-ignore
             offset: side === 'right' ? offset : -offset,
             conditions: conditions,
             osm: osm,
             isMajor: isMajor,
-        })
+        } as MyPolylineOptions)
 }
 
 function getColor(condition: string | null | undefined): ConditionColor | undefined {
-    if (!condition) {
-        return undefined;
-    }
+    if (!condition)
+        return undefined
 
     for (const element of legend) {
         if (condition === element.condition)
@@ -122,17 +125,9 @@ function getColor(condition: string | null | undefined): ConditionColor | undefi
     }
 }
 
-function wayIsMajor(tags: Object) {
-    // @ts-ignore
-    if (tags.highway) {
-        // @ts-ignore
-        if (tags.highway.search(/^motorway|trunk|primary|secondary|tertiary|unclassified|residential/) >= 0)
-            return true
-        else
-            return false
-    }
+function wayIsMajor(tags: OsmTags) {
+    return tags.highway.search(majorHighwayRegex) >= 0
 }
-
 
 function getConditions(side: 'left' | 'right', tags: { [key: string]: string }): ConditionsInterface {
     const conditions: ConditionsInterface = { intervals: [], default: null }
@@ -141,9 +136,9 @@ function getConditions(side: 'left' | 'right', tags: { [key: string]: string }):
     const defaultTags = sides.map(side => 'parking:condition:' + side + ':default')
         .concat(sides.map(side => 'parking:lane:' + side))
 
-    let findResult: any;
+    let findResult: string
     for (const tag of defaultTags) {
-        findResult = tags[tag];
+        findResult = tags[tag]
         if (findResult)
             conditions.default = findResult
 
@@ -158,42 +153,31 @@ function getConditions(side: 'left' | 'right', tags: { [key: string]: string }):
         const conditionTags = sides.map(side => 'parking:condition:' + side + index)
         const intervalTags = sides.map(side => 'parking:condition:' + side + index + ':time_interval')
 
-        const cond = {}
+        const cond: any = {}
 
         for (let j = 0; j < sides.length; j++) {
-            // @ts-ignore
             findResult = tags[laneTags[j]]
-            if (findResult && legend.findIndex(x => x.condition === findResult) >= 0) {
-                // @ts-ignore
+            if (findResult && legend.findIndex(x => x.condition === findResult) >= 0)
                 cond.condition = findResult
-            }
 
-            // @ts-ignore
             findResult = tags[conditionTags[j]]
-            if (findResult) {
-                // @ts-ignore
+            if (findResult)
                 cond.condition = findResult
-            }
 
-            // @ts-ignore
             findResult = tags[intervalTags[j]]
-            if (findResult) {
-                // @ts-ignore
+            if (findResult)
                 cond.interval = parseOpeningHourse(findResult)
-            }
         }
 
-        // @ts-ignore
         if (i === 1 && cond.interval == null) {
             if ('condition' in cond)
-                // @ts-ignore
-                conditions.default = cond.condition;
+                conditions.default = cond.condition
 
             break
         }
 
         if ('condition' in cond)
-            // @ts-ignore
+            // @ts-expect-error
             conditions.intervals[i - 1] = cond
         else
             break
@@ -215,9 +199,8 @@ export function updateLaneColorsByDate(lanes: ParkingLanes, datetime: Date): voi
 
 function getColorByDate(conditions: ConditionsInterface, datetime: Date): ConditionColor | undefined {
     // Is object empty?
-    if (Object.keys(conditions).length === 0) {
+    if (Object.keys(conditions).length === 0)
         return 'black'
-    }
 
     // If conditions.intervals not defined, return the default color
     for (const interval of conditions.intervals ?? []) {
@@ -227,19 +210,18 @@ function getColorByDate(conditions: ConditionsInterface, datetime: Date): Condit
     return getColor(conditions.default)
 }
 
-export function updateLaneStylesByZoom(lanes: any, zoom: number) {
+export function updateLaneStylesByZoom(lanes: ParkingLanes, zoom: number): void {
     for (const lane in lanes) {
-        if (lane === 'right' || lane === 'left' || lane.startsWith('empty')) {
+        if (lane === 'right' || lane === 'left' || lane.startsWith('empty'))
             continue
-        }
 
         const sideOffset = lanes[lane].options.offset > 0 ? 1 : -1
         const isMajor = lanes[lane].options.isMajor
         const offset = isMajor ? laneStyle[zoom].offsetMajor : laneStyle[zoom].offsetMinor
         const weight = isMajor ? laneStyle[zoom].weightMajor : laneStyle[zoom].weightMinor
-        
-        if(offset !== undefined) {
-            if(lanes[lane] !== undefined && lanes[lane].setOffset) {
+
+        if (offset !== undefined) {
+            if (lanes[lane]?.setOffset) {
                 lanes[lane].setOffset(sideOffset * offset)
                 lanes[lane].setStyle({ weight })
             } else {
@@ -247,34 +229,29 @@ export function updateLaneStylesByZoom(lanes: any, zoom: number) {
                 console.log(lanes[lane])
             }
         } else {
-            console.error("Offset is undefined!")
+            console.error('Offset is undefined!')
         }
-
     }
 }
 
-export function getBacklights(polyline: L.LatLngExpression[], zoom: Number) {
+export function getBacklights(polyline: L.LatLngExpression[], zoom: number): { right: L.Polyline, left: L.Polyline } {
     const n = 3
 
     return {
         right: L.polyline(polyline,
             {
                 color: 'fuchsia',
-                // @ts-ignore
-                weight: laneStyle[zoom].offsetMajor * n - 4,
-                // @ts-ignore
-                offset: laneStyle[zoom].offsetMajor * n,
+                weight: (laneStyle[zoom].offsetMajor ?? 1) * n - 4,
+                offset: (laneStyle[zoom].offsetMajor ?? 1) * n,
                 opacity: 0.4,
-            }),
+            } as MyPolylineOptions),
 
         left: L.polyline(polyline,
             {
                 color: 'cyan',
-                // @ts-ignore
-                weight: laneStyle[zoom].offsetMajor * n - 4,
-                // @ts-ignore
-                offset: -laneStyle[zoom].offsetMajor * n,
+                weight: (laneStyle[zoom].offsetMajor ?? 0.5) * n - 4,
+                offset: -(laneStyle[zoom].offsetMajor ?? 0.5) * n,
                 opacity: 0.4,
-            }),
+            } as MyPolylineOptions),
     }
 }

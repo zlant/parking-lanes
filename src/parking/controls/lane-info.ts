@@ -3,7 +3,7 @@ import { hyper } from 'hyperhtml/esm'
 import { handleJosmLinkClick } from '../..//utils/josm'
 import { idUrl, josmUrl, overpassUrl } from '../../utils/links'
 import { getLaneEditForm, setOsmChangeListener } from './editor/editor-form'
-import { OsmWay } from '../../utils/interfaces'
+import { OsmTags, OsmWay } from '../../utils/types/osm-data'
 
 export default L.Control.extend({
     onAdd: (map: L.Map) => hyper`
@@ -17,18 +17,18 @@ export default L.Control.extend({
 
     showLaneInfo(osm: OsmWay) {
         const laneinfo = document.getElementById('lane-control')
-        if(laneinfo === null) {
-            return;
-        }
+        if (laneinfo === null)
+            return
+
         laneinfo.appendChild(getPanel(osm, getLaneInfo(osm)))
         laneinfo.style.display = 'block'
     },
 
     showEditForm(osm: OsmWay, waysInRelation: any, cutLaneListener: any) {
         const laneinfo = document.getElementById('lane-control')
-        if(laneinfo === null) {
-            return;
-        }
+        if (laneinfo === null)
+            return
+
         laneinfo.appendChild(getPanel(osm, getLaneEditForm(osm, waysInRelation, cutLaneListener)))
         laneinfo.style.display = 'block'
     },
@@ -40,9 +40,9 @@ export default L.Control.extend({
 
     closeLaneInfo() {
         const laneinfo = document.getElementById('lane-control')
-        if(laneinfo === null) {
-            return;
-        }
+        if (laneinfo === null)
+            return
+
         laneinfo.style.display = 'none'
         laneinfo.innerHTML = ''
     },
@@ -86,12 +86,11 @@ function getLaneInfo(osm: OsmWay) {
             ${getTagsBlock(osm.tags, 'left')}
         </div>`
 
-    function getTagsBlock(tags: Object, side: string) {
+    function getTagsBlock(tags: OsmTags, side: string) {
         const regex = new RegExp('^parking:.*(?:' + side + '|both)')
 
         const filteredTags = Object.keys(tags)
             .filter(tag => regex.test(tag))
-            // @ts-ignore
             .map(tag => tag + ' = ' + tags[tag])
 
         return hyper`

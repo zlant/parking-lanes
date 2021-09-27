@@ -1,20 +1,10 @@
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-import locatecontrol from 'leaflet.locatecontrol'
-locatecontrol
-
-// @ts-ignore
-import polylineoffset from 'leaflet-polylineoffset'
-polylineoffset
-
-// @ts-ignore
-import leaflethash from 'leaflet-hash'
-leaflethash
-
-// @ts-ignore
-import leaflettouchhelper from 'leaflet-touch-helper'
-leaflettouchhelper
+import 'leaflet.locatecontrol'
+import 'leaflet-polylineoffset'
+import 'leaflet-hash'
+import 'leaflet-touch-helper'
 
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css'
 import 'font-awesome/css/font-awesome.min.css'
@@ -40,10 +30,13 @@ import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
 import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '../utils/changes-store'
 import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-client'
-import { OurWindow, OverpassTurboResponse, ParkingLanes, OsmWay } from '../utils/interfaces'
+import { OurWindow } from '../utils/types/interfaces'
+import { OsmWay } from '../utils/types/osm-data'
+import { ParsedOsmData } from '../utils/types/osm-data-storage'
+import { ParkingLanes } from '../utils/types/parking'
 
 const editorName = 'PLanes'
-const version = '0.4.2'
+const version = '0.5.0'
 
 let editorMode = false
 const useDevServer = false
@@ -62,8 +55,6 @@ const tileLayers = {
         attribution: "<a href='https://wiki.openstreetmap.org/wiki/Esri'>Terms & Feedback</a>",
         maxZoom: 19,
         maxNativeZoom: 19,
-        // @ts-ignore
-        ref: 'esric',
     }),
 }
 
@@ -75,19 +66,15 @@ const layersControl = L.control.layers(
     undefined,
     { position: 'bottomright' })
 
-export function initMap() {
-    const root = document.querySelector('#map') as HTMLElement;
+export function initMap(): L.Map {
+    const root = document.querySelector('#map') as HTMLElement
     const map = L.map(root, { fadeAnimation: false })
 
-    if (document.location.href.indexOf('#') === -1) {
-        const cookieLocation = getLocationFromCookie();
-        const defaultLocation: L.LatLng = new L.LatLng(51.591, 24.609);
-        const defaultZoom = 5;
-
-        const location = cookieLocation !== undefined ? cookieLocation.location : defaultLocation
-        const zoom = cookieLocation !== undefined ? cookieLocation.zoom : defaultZoom
-
-        map.setView(location, zoom)
+    if (!document.location.href.includes('#')) {
+        const cookieLocation = getLocationFromCookie()
+        map.setView(
+            cookieLocation?.location ?? new L.LatLng(51.591, 24.609),
+            cookieLocation?.zoom ?? 5)
     }
 
     tileLayers.mapnik.addTo(map)
@@ -109,7 +96,8 @@ export function initMap() {
     map.on('moveend', handleMapMoveEnd)
     map.on('click', closeLaneInfo)
 
-    // @ts-ignore
+    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const hash = new L.Hash(map)
     return map
 }
@@ -148,40 +136,39 @@ function handleDatetimeChange(newDatetime: Date) {
 }
 
 const lanes: ParkingLanes = {}
-const markers: { [key: string]: any} = {}
+const markers: { [key: string]: L.Marker<any>} = {}
 
 function setDownloadButtonText(s: string): void {
     (document.getElementById('download-btn') as HTMLButtonElement)
-            .innerText = s;
+        .innerText = s
 }
+
 async function downloadParkingLanes(map: L.Map): Promise<void> {
-    setDownloadButtonText('Fetching data...');
+    setDownloadButtonText('Fetching data...')
     const url = getUrl(map.getBounds(), editorMode, useDevServer)
 
-    let newData: OverpassTurboResponse | null = null;
+    let newData: ParsedOsmData | null = null
     try {
-        newData = await downloadBbox(map.getBounds(), url);
-    } catch(e: any) {
-        const errorMessage = e && e.message ===  'Request failed with status code 429'
-            ? 'Error: Too many requests - try again soon'
-            : 'Unknown error, please try again';
-            setDownloadButtonText(errorMessage);
-            return;
-    }
-    setDownloadButtonText('Fetch parking data');
-
-    if (!newData) {
+        newData = await downloadBbox(map.getBounds(), url)
+    } catch (e: any) {
+        const errorMessage = e?.message === 'Request failed with status code 429' ?
+            'Error: Too many requests - try again soon' :
+            'Unknown error, please try again'
+        setDownloadButtonText(errorMessage)
         return
     }
+    setDownloadButtonText('Fetch parking data')
+
+    if (!newData)
+        return
 
     for (const way of Object.values(newData.ways).filter(x => x.tags?.highway)) {
         if (lanes['right' + way.id] || lanes['left' + way.id] || lanes['empty' + way.id])
             continue
 
         const newLanes = parseParkingLane(way, newData.nodes, map.getZoom(), editorMode)
-        if(newLanes !== undefined) {
+        if (newLanes !== undefined)
             addNewLanes(newLanes, map)
-        }
     }
 }
 
@@ -191,19 +178,17 @@ function addNewLanes(newLanes: ParkingLanes, map: L.Map): void {
     for (const newLane of Object.values(newLanes)) {
         newLane.on('click', handleLaneClick)
         newLane.addTo(map)
-        // L.path is added by plugin, types don't exist. 
-        // @ts-ignore
+        // L.path is added by plugin, types don't exist.
+        // @ts-expect-error
         L.path.touchHelper(newLane).addTo(map)
     }
 }
 
-function handleLaneClick(e: Event) {
-    const {map} = (window as OurWindow);
+function handleLaneClick(e: Event | any) {
+    const { map } = (window as OurWindow)
     closeLaneInfo()
 
-    // I don't know where this gets set, but it appears to be a way
-    // @ts-ignore
-    const osm: OsmWay = e.target.options.osm;
+    const osm: OsmWay = e.target.options.osm
 
     const osmId = osm.id
     const lane = lanes['right' + osmId] || lanes['left' + osmId] || lanes['empty' + osmId]
@@ -223,7 +208,7 @@ function handleLaneClick(e: Event) {
     L.DomEvent.stopPropagation(e)
 }
 
-function closeLaneInfo(){
+function closeLaneInfo() {
     laneInfoControl.closeLaneInfo()
 
     for (const marker in markers) {
@@ -238,14 +223,14 @@ function closeLaneInfo(){
 // Map move handler
 
 function handleMapMoveEnd() {
-    const {map} = (window as OurWindow);
+    const { map } = (window as OurWindow);
     (document.getElementById('ghc-josm') as HTMLLinkElement).href = josmUrl + overpassUrl + getHighwaysOverpassQuery();
     (document.getElementById('ghc-id') as HTMLLinkElement).href = idUrl + '#map=' +
     document.location.href.substring(document.location.href.indexOf('#') + 1)
 
     const zoom = map.getZoom()
     setLocationToCookie(map.getCenter(), zoom)
-    
+
     updateLaneStylesByZoom(lanes, zoom);
 
     (document.getElementById('min-zoom-btn') as HTMLButtonElement).style.display =
@@ -258,7 +243,7 @@ function handleMapMoveEnd() {
 }
 
 function getHighwaysOverpassQuery() {
-    const {map} = (window as OurWindow);
+    const { map } = (window as OurWindow)
     const bounds = map.getBounds()
     const bbox = [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',')
     const tag = 'highway~"^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street"'
@@ -267,9 +252,8 @@ function getHighwaysOverpassQuery() {
 
 // Editor
 
-async function handleEditorModeCheckboxChange(e: Event) {
-    const {map} = (window as OurWindow);
-    // @ts-ignore
+async function handleEditorModeCheckboxChange(e: Event | any) {
+    const { map } = (window as OurWindow)
     if (e.currentTarget.checked) {
         try {
             await authenticate(useDevServer)
@@ -279,7 +263,7 @@ async function handleEditorModeCheckboxChange(e: Event) {
                 logout()
                 await authenticate(useDevServer)
             }
-            editorMode = true;
+            editorMode = true
             layersControl.addTo(map);
             (document.getElementById('ghc-editor-mode-label') as HTMLLabelElement).style.color = 'green'
             resetLastBounds()
@@ -289,9 +273,9 @@ async function handleEditorModeCheckboxChange(e: Event) {
             alert(err)
         }
     } else {
-        editorMode = false;
-        // @ts-ignore
-        layersControl.remove(map);
+        editorMode = false
+        // @ts-expect-error
+        layersControl.remove(map)
         if (map.hasLayer(tileLayers.esri)) {
             map.removeLayer(tileLayers.esri)
             map.addLayer(tileLayers.mapnik)
@@ -302,9 +286,7 @@ async function handleEditorModeCheckboxChange(e: Event) {
 
         for (const lane in lanes) {
             if (lane.startsWith('empty')) {
-                // @ts-ignore
                 lanes[lane].remove()
-                // @ts-ignore
                 delete lanes[lane]
             }
         }
@@ -312,7 +294,7 @@ async function handleEditorModeCheckboxChange(e: Event) {
 }
 
 function handleOsmChange(newOsm: OsmWay) {
-    const {map} = (window as OurWindow);
+    const { map } = (window as OurWindow)
     const newLanes = parseChangedParkingLane(newOsm, lanes, datetime, map.getZoom())
     newLanes.forEach(lane => lane.addTo(map))
 
@@ -325,7 +307,7 @@ function handleOsmChange(newOsm: OsmWay) {
 async function handleSaveClick() {
     try {
         await uploadChanges(editorName, version, changesStore);
-        (document.getElementById('save-btn') as HTMLButtonElement).style.display = 'none';
+        (document.getElementById('save-btn') as HTMLButtonElement).style.display = 'none'
     } catch (err) {
         if (err instanceof XMLHttpRequest)
             alert(err.responseText || err)
@@ -344,13 +326,13 @@ function handleCutLaneClick(osm: OsmWay) {
     if (Object.keys(markers).length > 0)
         return
 
-    const {map} = (window as OurWindow);
+    const { map } = (window as OurWindow)
     for (const nd of osm.nodes.slice(1, osm.nodes.length - 1)) {
         markers[nd] = L.marker(
             osmData.nodes[nd],
             {
                 icon: cutIcon,
-                // @ts-ignore
+                // @ts-expect-error
                 ndId: nd,
                 wayId: osm.id,
             })
@@ -388,14 +370,14 @@ function cutWay(arg: any) {
     }
 
     osmData.ways[newWay.id] = newWay
-    const {map} = (window as OurWindow);
+    const { map } = (window as OurWindow)
     const newLanes = parseParkingLane(newWay, osmData.nodes, map.getZoom(), editorMode)
-    // @ts-ignore
-    addNewLanes(newLanes, map)
+    if (newLanes !== undefined)
+        addNewLanes(newLanes, map)
 
     addChangedEntity(newWay)
     const changesCount = addChangedEntity(oldWay)
-    const saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
+    const saveBtn = document.getElementById('save-btn') as HTMLButtonElement
     saveBtn.innerText = 'Save (' + changesCount + ')'
     saveBtn.style.display = 'block'
 }

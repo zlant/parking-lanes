@@ -5,7 +5,7 @@
     "moduleResolution": "node",
     "lib": ["dom", "es2017"],
     "target": "es2017",
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "pretty": true,
     "sourceRoot": "./src/",
     "rootDir": "./src/",
@@ -14,5 +14,5 @@
     "strictNullChecks": true,
     "skipLibCheck": true
   },
-  "include": ["src/parking/*.ts", "src/utils/*.ts"]
+  "include": ["src/parking/*.ts", "src/utils/*.ts", "src/utils/types/*.ts"]
 }

@@ -1,8 +1,8 @@
 import OpeningHours from 'opening_hours'
 
-export function parseOpeningHourse(value: string) {
+export function parseOpeningHourse(value: string): OpeningHours | 'even' | 'odd' | null {
     if (/\d+-\d+\/\d+$/.test(value)) {
-        // @ts-ignore
+        // @ts-expect-error
         return parseInt(value.match(/\d+/g)[0]) % 2 === 0 ?
             'even' :
             'odd'
@@ -16,7 +16,7 @@ export function parseOpeningHourse(value: string) {
     }
 }
 
-export function getOpeningHourseState(interval: any, timestamp: Date) {
+export function getOpeningHourseState(interval: OpeningHours | 'even' | 'odd', timestamp: Date): boolean {
     switch (interval) {
         case 'even':
             return timestamp.getDate() % 2 === 0

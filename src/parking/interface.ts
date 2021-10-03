@@ -46,6 +46,7 @@ const viewMinZoom = 15
 let dataSource = OsmDataSource.OsmOrg
 
 const laneInfoControl = new LaneInfoControl({ position: 'topright' })
+const fetchControl = new FetchControl({ position: 'topright' })
 
 const tileLayers = {
     mapnik: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -89,8 +90,8 @@ export function initMap(): L.Map {
     new DatetimeControl({ position: 'topright' }).addTo(map)
         .setDatetime(datetime)
         .setDatetimeChangeListener(handleDatetimeChange)
-    new FetchControl({ position: 'topright' }).addTo(map)
-        .setFetchDataBtnClickListener(() => downloadParkingLanes(map))
+    fetchControl.addTo(map)
+        .setFetchDataBtnClickListener(async() => await downloadParkingLanes(map))
         .setDataSource(dataSource)
         .setDataSourceChangeListener(handleDataSourceChange)
     new InfoControl({ position: 'topright' }).addTo(map)
@@ -138,13 +139,8 @@ function handleDataSourceChange(newDataSource: OsmDataSource) {
 const lanes: ParkingLanes = {}
 const markers: { [key: string]: L.Marker<any>} = {}
 
-function setDownloadButtonText(s: string): void {
-    (document.getElementById('download-btn') as HTMLButtonElement)
-        .innerText = s
-}
-
 async function downloadParkingLanes(map: L.Map): Promise<void> {
-    setDownloadButtonText('Fetching data...')
+    fetchControl.setFetchDataBtnText('Fetching data...')
     const url = getUrl(map.getBounds(), editorMode, useDevServer, dataSource)
 
     let newData: ParsedOsmData | null = null
@@ -154,10 +150,10 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
         const errorMessage = e?.message === 'Request failed with status code 429' ?
             'Error: Too many requests - try again soon' :
             'Unknown error, please try again'
-        setDownloadButtonText(errorMessage)
+        fetchControl.setFetchDataBtnText(errorMessage)
         return
     }
-    setDownloadButtonText('Fetch parking data')
+    fetchControl.setFetchDataBtnText('Fetch parking data')
 
     if (!newData)
         return

@@ -140,3 +140,52 @@ input[type=text] {
 .leaflet-control.save-control:hover {
     background-color: #f4f400;
 }
+
+// fetch control
+
+.fetch-control {
+    position: relative;
+    z-index: 801;
+}
+
+.fetch-control_wrapper {
+    display: flex;
+}
+
+.fetch-control_items {
+    display: none;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    background: #fff;
+}
+
+.fetch-control.opened > .fetch-control_items {
+    display: block;
+}
+
+.fetch-control_item {
+    padding: 4px 7px;
+    cursor: pointer;
+}
+
+.fetch-control_item:hover {
+    background: #f4f4f4;
+}
+
+.fetch-control_item--selected {
+    background: #f8f8f8;
+}
+
+.fetch-control_toggle {
+    width: 20px;
+    text-align: right;
+}
+
+.fetch-control_toggle::after {
+    content: '▽';
+}
+
+.fetch-control.opened .fetch-control_toggle::after {
+    content: '△';
+}

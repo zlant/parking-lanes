@@ -4,12 +4,9 @@ html {
     font-size: $font-size;
 }
 
-#map {
-    width: 100%;
+html, body, #map {
+    margin: 0;
     height: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
 }
 
 

@@ -169,7 +169,7 @@ function getTagInput(osm: OsmWay, side: string, parkingType: string, tagTemplate
     return hyper`
         <tr id="${tag}"
             style=${{ display: hide ? 'none' : null }}>
-            <td><label>${label}</label></td>
+            <td><label title="${tag}">${label}</label></td>
             <td>
                 ${input}
             </td>

@@ -3,6 +3,7 @@ import { OsmWay } from '../../../utils/types/osm-data'
 import { WaysInRelation } from '../../../utils/types/osm-data-storage'
 import { OsmKeyValue } from '../../../utils/types/preset'
 import { presets } from './presets'
+import { getAllTagsBlock } from '../lane-info'
 
 export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cutLaneListener: (way: OsmWay) => void): HTMLFormElement {
     const form = hyper`
@@ -75,11 +76,12 @@ function handleSideSwitcherChange(e: Event) {
 function getSideGroup(osm: OsmWay, side: 'both'|'left'|'right') {
     return hyper`
         <div id=${side}
-             class="tags-block_${side}">
+             class="tags-block tags-block_${side}">
             ${getPresetSigns(osm, side)}
             <table>
                 ${getTagInputs(osm, side)}
             </table>
+            ${getAllTagsBlock(osm.tags, side)}
         </div>`
 }
 
@@ -189,7 +191,7 @@ function getSelectInput(tag: string, value: string, values: string[]): HTMLSelec
 
 function getTextInput(tag: string, value: string): HTMLInputElement {
     return hyper`
-        <input type="text" 
+        <input type="text"
                placeholder="${tag}"
                name="${tag}"
                value="${value ?? ''}">`

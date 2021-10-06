@@ -70,6 +70,10 @@ input[type=text] {
 
 // lane-info
 
+.tags-block {
+    padding: 5px;
+}
+
 .tags-block_right {
     background-color: #fee2fe;
 }
@@ -80,6 +84,24 @@ input[type=text] {
 
 .tags-block__tag {
     margin: 0;
+}
+
+.tags-block__all-tags {
+    padding-top: 5px;
+    color: #606060; // some gray
+}
+
+.tags-block__all-tags--highlight {
+    font-weight: 600;
+}
+
+.tags-block__all-tags table tr:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.tags-block__all-tags table td {
+    max-width: 250px;
+    word-break: break-word;
 }
 
 // editor-panel

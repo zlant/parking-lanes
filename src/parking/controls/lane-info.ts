@@ -82,20 +82,40 @@ function getWayWithRelationsOverpassQuery(wayId: number) {
 function getLaneInfo(osm: OsmWay) {
     return hyper`
         <div>
-            ${getTagsBlock(osm.tags, 'right')}
-            ${getTagsBlock(osm.tags, 'left')}
+            ${getSideBlock(osm.tags, 'right')}
+            ${getSideBlock(osm.tags, 'left')}
         </div>`
 
-    function getTagsBlock(tags: OsmTags, side: string) {
+    function getSideBlock(tags: OsmTags, side: string) {
+        return hyper`
+            <div class="tags-block ${'tags-block_' + side}">
+                ${getParkingTagsBlock(osm.tags, side)}
+                ${getAllTagsBlock(osm.tags, side)}
+            </div>`
+    }
+
+    function getParkingTagsBlock(tags: OsmTags, side: string) {
         const regex = new RegExp('^parking:.*(?:' + side + '|both)')
 
         const filteredTags = Object.keys(tags)
             .filter(tag => regex.test(tag))
             .map(tag => tag + ' = ' + tags[tag])
 
-        return hyper`
-            <div class="tags-block ${'tags-block_' + side}">
-                ${filteredTags.map(tag => hyper`<p class="tags-block__tag">${tag}</p>`)}
-            </div>`
+        return filteredTags.map(tag => hyper`<p class="tags-block__tag">${tag}</p>`)
     }
+}
+
+export function getAllTagsBlock(tags: OsmTags, side: string) {
+    return hyper`
+        <details class="tags-block__all-tags">
+            <summary>All tags</summary>
+            <table>
+                ${Object.keys(tags).map(tag => hyper`
+                    <tr class="${tag.startsWith('parking:') ? 'tags-block__all-tags--highlight' : ''}">
+                        <td>${tag}</td>
+                        <td>${tags[tag]}</td>
+                    </tr>
+                `)}
+            </table>
+        </details>`
 }

@@ -292,7 +292,12 @@ async function handleEditorModeCheckboxChange(e: Event | any) {
 function handleOsmChange(newOsm: OsmWay) {
     const { map } = (window as OurWindow)
     const newLanes = parseChangedParkingLane(newOsm, lanes, datetime, map.getZoom())
-    newLanes.forEach(lane => lane.addTo(map))
+    for (const newLane of newLanes) {
+        newLane.on('click', handleLaneClick)
+        newLane.addTo(map)
+        // @ts-expect-error
+        L.path.touchHelper(newLane).addTo(map)
+    }
 
     const changesCount = addChangedEntity(newOsm)
     const saveBtn = (document.getElementById('save-btn') as HTMLButtonElement)

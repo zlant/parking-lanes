@@ -198,8 +198,7 @@ export function updateLaneColorsByDate(lanes: ParkingLanes, datetime: Date): voi
 }
 
 function getColorByDate(conditions: ConditionsInterface, datetime: Date): ConditionColor | undefined {
-    // Is object empty?
-    if (Object.keys(conditions).length === 0)
+    if (!conditions)
         return 'black'
 
     // If conditions.intervals not defined, return the default color

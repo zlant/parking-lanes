@@ -45,7 +45,7 @@ export function parseParkingLane(
         way.tags.highway &&
         highwayRegex.test(way.tags.highway)) {
         const laneId = generateLaneId(way)
-        const leafletPolyline = createPolyline(polyline, {}, 'right', way, 0, isMajor, zoom)
+        const leafletPolyline = createPolyline(polyline, null, 'right', way, 0, isMajor, zoom)
         lanes[laneId] = leafletPolyline
     }
 
@@ -84,7 +84,7 @@ export function parseChangedParkingLane(newOsm: OsmWay, lanes: ParkingLanes, dat
         if (!lanes['empty' + newOsm.id]) {
             const isMajor = wayIsMajor(newOsm.tags)
             const laneId = generateLaneId(newOsm)
-            const leafletPolyline = createPolyline(polyline, {}, 'right', newOsm, 0, isMajor, zoom)
+            const leafletPolyline = createPolyline(polyline, null, 'right', newOsm, 0, isMajor, zoom)
             lanes[laneId] = leafletPolyline
             newLanes.push(leafletPolyline)
         }

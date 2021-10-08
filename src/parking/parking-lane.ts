@@ -104,15 +104,15 @@ function generateLaneId(osm: OsmWay, side?: 'left' | 'right', conditions?: Condi
 }
 
 function createPolyline(line: L.LatLngLiteral[], conditions: ConditionsInterface, side: string, osm: OsmWay, offset: number, isMajor: boolean, zoom: number) {
-    return L.polyline(line,
-        {
-            color: getColor(conditions?.default),
-            weight: isMajor ? laneStyle[zoom].weightMajor : laneStyle[zoom].weightMinor,
-            offset: side === 'right' ? offset : -offset,
-            conditions: conditions,
-            osm: osm,
-            isMajor: isMajor,
-        } as MyPolylineOptions)
+    const polylineOptions: MyPolylineOptions = {
+        color: getColor(conditions?.default),
+        weight: isMajor ? laneStyle[zoom].weightMajor : laneStyle[zoom].weightMinor,
+        offset: side === 'right' ? offset : -offset,
+        conditions,
+        osm,
+        isMajor,
+    }
+    return L.polyline(line, polylineOptions)
 }
 
 function getColor(condition: string | null | undefined): ConditionColor | undefined {

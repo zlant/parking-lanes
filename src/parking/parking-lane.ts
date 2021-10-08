@@ -45,7 +45,7 @@ export function parseParkingLane(
         way.tags.highway &&
         highwayRegex.test(way.tags.highway)) {
         const laneId = generateLaneId(way)
-        const leafletPolyline = createPolyline(polyline, null, 'right', way, 0, isMajor, zoom)
+        const leafletPolyline = createPolyline(polyline, undefined, 'right', way, 0, isMajor, zoom)
         lanes[laneId] = leafletPolyline
     }
 
@@ -84,7 +84,7 @@ export function parseChangedParkingLane(newOsm: OsmWay, lanes: ParkingLanes, dat
         if (!lanes['empty' + newOsm.id]) {
             const isMajor = wayIsMajor(newOsm.tags)
             const laneId = generateLaneId(newOsm)
-            const leafletPolyline = createPolyline(polyline, null, 'right', newOsm, 0, isMajor, zoom)
+            const leafletPolyline = createPolyline(polyline, undefined, 'right', newOsm, 0, isMajor, zoom)
             lanes[laneId] = leafletPolyline
             newLanes.push(leafletPolyline)
         }
@@ -103,7 +103,7 @@ function generateLaneId(osm: OsmWay, side?: 'left' | 'right', conditions?: Condi
     return side! + osm.id
 }
 
-function createPolyline(line: L.LatLngLiteral[], conditions: ConditionsInterface, side: string, osm: OsmWay, offset: number, isMajor: boolean, zoom: number) {
+function createPolyline(line: L.LatLngLiteral[], conditions: ConditionsInterface | undefined, side: string, osm: OsmWay, offset: number, isMajor: boolean, zoom: number) {
     const polylineOptions: MyPolylineOptions = {
         color: getColor(conditions?.default),
         weight: isMajor ? laneStyle[zoom].weightMajor : laneStyle[zoom].weightMinor,

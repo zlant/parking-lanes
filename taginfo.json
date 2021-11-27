@@ -37,9 +37,9 @@
         { "key": "parking:condition:right:maxstay", "object_types": ["way"], "description": "only editable for disc parking" },
         { "key": "parking:condition:both:maxstay", "object_types": ["way"], "description": "only editable for disc parking" },
 
-        { "key": "parking:condition:left:capacity", "object_types": ["way"] },
-        { "key": "parking:condition:right:capacity", "object_types": ["way"] },
-        { "key": "parking:condition:both:capacity", "object_types": ["way"] },
+        { "key": "parking:lane:left:capacity", "object_types": ["way"] },
+        { "key": "parking:lane:right:capacity", "object_types": ["way"] },
+        { "key": "parking:lane:both:capacity", "object_types": ["way"] },
 
 
         { "key": "parking:lane:left", "value": "parallel", "object_types": ["way"] },

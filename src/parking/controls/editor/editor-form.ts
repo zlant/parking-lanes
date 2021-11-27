@@ -92,7 +92,7 @@ const parkingLaneTagTemplates = [
     'parking:condition:{side}:time_interval',
     'parking:condition:{side}:default',
     'parking:condition:{side}:maxstay',
-    'parking:condition:{side}:capacity',
+    'parking:lane:{side}:capacity',
 ]
 
 function getTagInputs(osm: OsmWay, side: 'both'|'left'|'right') {

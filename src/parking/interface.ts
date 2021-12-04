@@ -26,7 +26,7 @@ import {
 } from './parking-lane'
 
 import { getLocationFromCookie, setLocationToCookie } from '../utils/location-ccokie'
-import { idUrl, josmUrl, overpassUrl } from '../utils/links'
+import { idUrl, josmUrl, overpassDeUrl } from '../utils/links'
 import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
 import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '../utils/changes-store'
@@ -43,7 +43,7 @@ let editorMode = false
 const useDevServer = false
 let datetime = new Date()
 const viewMinZoom = 15
-let dataSource = OsmDataSource.OsmOrg
+let dataSource = OsmDataSource.OverpassVk
 
 const laneInfoControl = new LaneInfoControl({ position: 'topright' })
 const fetchControl = new FetchControl({ position: 'topright' })
@@ -220,7 +220,7 @@ function closeLaneInfo() {
 
 function handleMapMoveEnd() {
     const { map } = (window as OurWindow);
-    (document.getElementById('ghc-josm') as HTMLLinkElement).href = josmUrl + overpassUrl + getHighwaysOverpassQuery();
+    (document.getElementById('ghc-josm') as HTMLLinkElement).href = josmUrl + overpassDeUrl + getHighwaysOverpassQuery();
     (document.getElementById('ghc-id') as HTMLLinkElement).href = idUrl + '#map=' +
     document.location.href.substring(document.location.href.indexOf('#') + 1)
 

@@ -1,7 +1,7 @@
 import L from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
 import { handleJosmLinkClick } from '../..//utils/josm'
-import { idUrl, josmUrl, overpassUrl } from '../../utils/links'
+import { idUrl, josmUrl, overpassDeUrl } from '../../utils/links'
 import { getLaneEditForm, setOsmChangeListener } from './editor/editor-form'
 import { OsmTags, OsmWay } from '../../utils/types/osm-data'
 
@@ -55,7 +55,7 @@ function getPanel(osm: OsmWay, body: any) {
                 <a href="https://openstreetmap.org/way/${osm.id}" target="_blank">View in OSM</a>
                 <span style="float:right">
                     Edit: 
-                    <a href="${josmUrl + overpassUrl + getWayWithRelationsOverpassQuery(osm.id).replace(/\s+/g, ' ')}" 
+                    <a href="${josmUrl + overpassDeUrl + getWayWithRelationsOverpassQuery(osm.id).replace(/\s+/g, ' ')}" 
                        target="_blank"
                        onclick=${handleJosmLinkClick}>Josm</a>,
                     <a href="${idUrl + '&way=' + osm.id}" 

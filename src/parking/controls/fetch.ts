@@ -22,7 +22,7 @@ export default L.Control.extend({
                 </div>
             </div>
             <div id="data-source-select" class="fetch-control_items">
-                <div data-value="${OsmDataSource.OverpassTurbo}" 
+                <div data-value="${OsmDataSource.OverpassDe}" 
                      class="fetch-control_item"
                      onclick="${handleDataSourceChange}">
                     From overpass-turbo
@@ -31,6 +31,11 @@ export default L.Control.extend({
                      class="fetch-control_item"
                      onclick="${handleDataSourceChange}">
                     From osm.org
+                </div>
+                <div data-value="${OsmDataSource.OverpassVk}"
+                     class="fetch-control_item"
+                     onclick="${handleDataSourceChange}">
+                    From overpass-vk
                 </div>
             </div>
         </div>`,

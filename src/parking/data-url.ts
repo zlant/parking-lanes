@@ -1,18 +1,19 @@
 import L from 'leaflet'
-import { overpassUrl, osmProdUrl, osmDevUrl } from '../utils/links'
+import { overpassDeUrl, overpassVkUrl, osmProdUrl, osmDevUrl } from '../utils/links'
 import { OsmDataSource } from '../utils/types/osm-data'
 
 /**
  * Get the API request URL (eg. Overpass Turbo query URL *./
  */
 export function getUrl(bounds: L.LatLngBounds, editorMode: boolean, useDevServer: boolean, source: OsmDataSource): string {
-    if (useDevServer || source === OsmDataSource.OsmOrg) {
+    if (editorMode || useDevServer || source === OsmDataSource.OsmOrg) {
         const bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()].join(',')
         return (useDevServer ? osmDevUrl : osmProdUrl) + '/api/0.6/map?bbox=' + bbox
     } else {
-        const overpassQuery = editorMode ?
-            getOverpassEditorQuery(bounds).replace(/\s+/g, ' ') :
-            getOverpassViewerQuery(bounds).replace(/\s+/g, ' ')
+        const overpassUrl = source === OsmDataSource.OverpassDe ?
+            overpassDeUrl :
+            overpassVkUrl
+        const overpassQuery = getOverpassViewerQuery(bounds).replace(/\s+/g, ' ')
         return overpassUrl + encodeURIComponent(overpassQuery)
     }
 }

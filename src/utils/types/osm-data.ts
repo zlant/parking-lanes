@@ -36,6 +36,7 @@ export interface RawOsmData {
 }
 
 export enum OsmDataSource {
-    OverpassTurbo,
+    OverpassDe,
     OsmOrg,
+    OverpassVk,
 }

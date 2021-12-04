@@ -6,7 +6,7 @@ import { laneStyleByZoom as laneStyle } from './lane-styles'
 import { ConditionColor, ConditionsInterface } from '../utils/types/conditions'
 import { OsmWay, OsmTags } from '../utils/types/osm-data'
 import { ParkingLanes, Side } from '../utils/types/parking'
-import { MyPolylineOptions } from '../utils/types/leaflet'
+import { ParkingPolylineOptions } from '../utils/types/leaflet'
 
 const highwayRegex = /^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street/
 const majorHighwayRegex = /^motorway|trunk|primary|secondary|tertiary|unclassified|residential/
@@ -104,7 +104,7 @@ function generateLaneId(osm: OsmWay, side?: 'left' | 'right', conditions?: Condi
 }
 
 function createPolyline(line: L.LatLngLiteral[], conditions: ConditionsInterface | undefined, side: string, osm: OsmWay, offset: number, isMajor: boolean, zoom: number) {
-    const polylineOptions: MyPolylineOptions = {
+    const polylineOptions: ParkingPolylineOptions = {
         color: getColor(conditions?.default),
         weight: isMajor ? laneStyle[zoom].weightMajor : laneStyle[zoom].weightMinor,
         offset: side === 'right' ? offset : -offset,
@@ -238,19 +238,21 @@ export function getBacklights(polyline: L.LatLngExpression[], zoom: number): { r
 
     return {
         right: L.polyline(polyline,
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
             {
                 color: 'fuchsia',
                 weight: (laneStyle[zoom].offsetMajor ?? 1) * n - 4,
                 offset: (laneStyle[zoom].offsetMajor ?? 1) * n,
                 opacity: 0.4,
-            } as MyPolylineOptions),
+            } as ParkingPolylineOptions),
 
         left: L.polyline(polyline,
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
             {
                 color: 'cyan',
                 weight: (laneStyle[zoom].offsetMajor ?? 0.5) * n - 4,
                 offset: -(laneStyle[zoom].offsetMajor ?? 0.5) * n,
                 opacity: 0.4,
-            } as MyPolylineOptions),
+            } as ParkingPolylineOptions),
     }
 }

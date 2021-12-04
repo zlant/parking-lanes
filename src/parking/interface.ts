@@ -171,7 +171,7 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
 function addNewLanes(newLanes: ParkingLanes, map: L.Map): void {
     updateLaneColorsByDate(newLanes, datetime)
     Object.assign(lanes, newLanes)
-    for (const newLane of Object.values(newLanes)) {
+    for (const newLane of Object.values<L.Polyline>(newLanes)) {
         newLane.on('click', handleLaneClick)
         newLane.addTo(map)
         // L.path is added by plugin, types don't exist.
@@ -346,7 +346,7 @@ let newWayId = -1
 
 function cutWay(arg: any) {
     const oldWay = osmData.ways[arg.target.options.wayId]
-    const newWay = JSON.parse(JSON.stringify(oldWay))
+    const newWay: OsmWay = JSON.parse(JSON.stringify(oldWay))
 
     const ndIndex = oldWay.nodes.findIndex(e => e === arg.target.options.ndId)
 

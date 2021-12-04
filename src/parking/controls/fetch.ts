@@ -6,6 +6,8 @@ export default L.Control.extend({
     onAdd: (map: L.Map) => hyper`
         <div id="fetch-control"
              class="fetch-control"
+             tabindex="-1"
+             onblur="${handleBlur}"
              onmousedown=${L.DomEvent.stopPropagation}
              ondblclick=${L.DomEvent.stopPropagation}
              onpointerdown=${L.DomEvent.stopPropagation}
@@ -69,6 +71,10 @@ function setOpenedState(newState: boolean) {
 
 function handleToggleClick(e: MouseEvent) {
     setOpenedState(!opened)
+}
+
+function handleBlur(e: MouseEvent) {
+    setOpenedState(false)
 }
 
 // data source change handlers

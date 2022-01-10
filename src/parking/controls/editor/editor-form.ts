@@ -27,6 +27,7 @@ export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cut
                 ${getSideGroup(osm, 'both')}
                 ${getSideGroup(osm, 'right')}
                 ${getSideGroup(osm, 'left')}
+                ${getAllTagsBlock(osm.tags)}
             </dl>
         </form>` as HTMLFormElement
 
@@ -81,7 +82,6 @@ function getSideGroup(osm: OsmWay, side: 'both'|'left'|'right') {
             <table>
                 ${getTagInputs(osm, side)}
             </table>
-            ${getAllTagsBlock(osm.tags, side)}
         </div>`
 }
 

@@ -292,6 +292,7 @@ async function handleEditorModeCheckboxChange(e: Event | any) {
 function handleOsmChange(newOsm: OsmWay) {
     const { map } = (window as OurWindow)
     const newLanes = parseChangedParkingLane(newOsm, lanes, datetime, map.getZoom())
+    updateLaneColorsByDate(newLanes, datetime)
     for (const newLane of newLanes) {
         newLane.on('click', handleLaneClick)
         newLane.addTo(map)

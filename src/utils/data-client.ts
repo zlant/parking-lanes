@@ -30,8 +30,14 @@ export async function downloadBbox(bounds: L.LatLngBounds, url: string): Promise
 
     if (newData) {
         Object.assign(osmData.nodes, newData.nodes)
-        Object.assign(osmData.ways, newData.ways)
         Object.assign(osmData.waysInRelation, newData.waysInRelation)
+
+        for (const wayId in newData.ways) {
+            if (osmData.ways[wayId]?.version >= newData.ways[wayId].version)
+                continue
+            else
+                osmData.ways[wayId] = newData.ways[wayId]
+        }
     }
 
     return newData

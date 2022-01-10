@@ -175,6 +175,16 @@ input[type=text] {
     display: flex;
 }
 
+.fetch-control_button {
+    padding: 4px 7px;
+    cursor: pointer;
+}
+
+.fetch-control_button:hover {
+    border-radius: 5px 0 0 5px;
+    background-color: #f4f4f4;
+}
+
 .fetch-control_items {
     display: none;
     position: absolute;
@@ -201,8 +211,13 @@ input[type=text] {
 }
 
 .fetch-control_toggle {
-    width: 20px;
-    text-align: right;
+    padding: 4px 7px;
+    cursor: pointer;
+}
+
+.fetch-control_toggle:hover {
+    border-radius: 0 5px 5px 0;
+    background-color: #f4f4f4;
 }
 
 .fetch-control_toggle::after {

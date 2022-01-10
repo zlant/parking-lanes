@@ -12,7 +12,7 @@ export default L.Control.extend({
              ondblclick=${L.DomEvent.stopPropagation}
              onpointerdown=${L.DomEvent.stopPropagation}
              onclick=${L.DomEvent.stopPropagation}>
-            <div class="leaflet-control-layers control-padding control-bigfont control-button">
+            <div class="leaflet-control-layers control-bigfont control-button">
                 <div class="fetch-control_wrapper">
                     <div id="download-btn" class="fetch-control_button">
                         Fetch parking data
@@ -63,7 +63,7 @@ export default L.Control.extend({
 
 // data source select list opened state
 
-let opened: boolean = true
+let opened: boolean = false
 
 function setOpenedState(newState: boolean) {
     if (newState)

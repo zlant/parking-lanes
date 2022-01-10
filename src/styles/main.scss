@@ -86,20 +86,24 @@ input[type=text] {
     margin: 0;
 }
 
-.tags-block__all-tags {
+.all-tags {
     padding-top: 5px;
-    color: #606060; // some gray
+    color: #606060;
 }
 
-.tags-block__all-tags--highlight {
+.all-tags__summary {
+    cursor: pointer;
+}
+
+.all-tags__tag--highlight {
     font-weight: 600;
 }
 
-.tags-block__all-tags table tr:hover {
+.all-tags table tr:hover {
     background-color: rgba(0, 0, 0, 0.05);
 }
 
-.tags-block__all-tags table td {
+.all-tags table td {
     max-width: 250px;
     word-break: break-word;
 }

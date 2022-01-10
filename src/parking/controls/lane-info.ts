@@ -84,13 +84,13 @@ function getLaneInfo(osm: OsmWay) {
         <div>
             ${getSideBlock(osm.tags, 'right')}
             ${getSideBlock(osm.tags, 'left')}
+            ${getAllTagsBlock(osm.tags)}
         </div>`
 
     function getSideBlock(tags: OsmTags, side: string) {
         return hyper`
             <div class="tags-block ${'tags-block_' + side}">
                 ${getParkingTagsBlock(osm.tags, side)}
-                ${getAllTagsBlock(osm.tags, side)}
             </div>`
     }
 
@@ -105,13 +105,13 @@ function getLaneInfo(osm: OsmWay) {
     }
 }
 
-export function getAllTagsBlock(tags: OsmTags, side: string) {
+export function getAllTagsBlock(tags: OsmTags) {
     return hyper`
-        <details class="tags-block__all-tags">
-            <summary>All tags</summary>
+        <details class="all-tags">
+            <summary class="all-tags__summary">All tags</summary>
             <table>
                 ${Object.keys(tags).map(tag => hyper`
-                    <tr class="${tag.startsWith('parking:') ? 'tags-block__all-tags--highlight' : ''}">
+                    <tr class="${tag.startsWith('parking:') ? 'all-tags__tag--highlight' : ''}">
                         <td>${tag}</td>
                         <td>${tags[tag]}</td>
                     </tr>

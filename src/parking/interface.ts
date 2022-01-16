@@ -59,12 +59,18 @@ const tileLayers = {
         maxZoom: 19,
         maxNativeZoom: 19,
     }),
+    maxar: L.tileLayer('https://services.digitalglobe.com/earthservice/tmsaccess/tms/1.0.0/DigitalGlobe:ImageryTileService@EPSG:3857@jpg/{z}/{x}/{-y}.jpg?connectId=fa014fbc-6cbe-4b6f-b0ca-fbfb8d1e5b7d', {
+        attribution: "<a href='https://wiki.openstreetmap.org/wiki/DigitalGlobe'>Terms & Feedback</a>",
+        maxZoom: 22,
+        maxNativeZoom: 22,
+    }),
 }
 
 const layersControl = L.control.layers(
     {
         Mapnik: tileLayers.mapnik,
         'Esri Clarity': tileLayers.esri,
+        'Maxar Premium Imagery': tileLayers.maxar,
     },
     undefined,
     { position: 'bottomright' })

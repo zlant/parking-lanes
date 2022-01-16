@@ -15,6 +15,7 @@ import DatetimeControl from './controls/datetime'
 import GithubControl from './controls/github'
 import LegendControl from './controls/legend'
 import LaneInfoControl from './controls/lane-info'
+import AreaInfoControl from './controls/area-info'
 import FetchControl from './controls/fetch'
 
 import {
@@ -34,10 +35,11 @@ import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-clie
 import { OurWindow } from '../utils/types/interfaces'
 import { OsmDataSource, OsmWay } from '../utils/types/osm-data'
 import { ParsedOsmData } from '../utils/types/osm-data-storage'
-import { ParkingLanes } from '../utils/types/parking'
+import { ParkingAreas, ParkingLanes } from '../utils/types/parking'
+import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
 
 const editorName = 'PLanes'
-const version = '0.5.3'
+const version = '0.6.0'
 
 let editorMode = false
 const useDevServer = false
@@ -46,6 +48,7 @@ const viewMinZoom = 15
 let dataSource = OsmDataSource.OverpassVk
 
 const laneInfoControl = new LaneInfoControl({ position: 'topright' })
+const areaInfoControl = new AreaInfoControl({ position: 'topright' })
 const fetchControl = new FetchControl({ position: 'topright' })
 
 const tileLayers = {
@@ -104,9 +107,11 @@ export function initMap(): L.Map {
     new SaveControl({ position: 'topright' }).addTo(map)
     laneInfoControl.addTo(map)
         .setOsmChangeListener(handleOsmChange)
+    areaInfoControl.addTo(map)
 
     map.on('moveend', handleMapMoveEnd)
     map.on('click', closeLaneInfo)
+    map.on('click', areaInfoControl.closeAreaInfo)
 
     // @ts-expect-error
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -136,6 +141,7 @@ export const SaveControl = L.Control.extend({
 function handleDatetimeChange(newDatetime: Date) {
     datetime = newDatetime
     updateLaneColorsByDate(lanes, newDatetime)
+    updateAreaColorsByDate(areas, datetime)
 }
 
 function handleDataSourceChange(newDataSource: OsmDataSource) {
@@ -143,6 +149,7 @@ function handleDataSourceChange(newDataSource: OsmDataSource) {
 }
 
 const lanes: ParkingLanes = {}
+const areas: ParkingAreas = {}
 const markers: { [key: string]: L.Marker<any>} = {}
 
 async function downloadParkingLanes(map: L.Map): Promise<void> {
@@ -164,13 +171,22 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
     if (!newData)
         return
 
-    for (const way of Object.values(newData.ways).filter(x => x.tags?.highway)) {
-        if (lanes['right' + way.id] || lanes['left' + way.id] || lanes['empty' + way.id])
-            continue
+    for (const way of Object.values(newData.ways)) {
+        if (way.tags?.highway) {
+            if (lanes['right' + way.id] || lanes['left' + way.id] || lanes['empty' + way.id])
+                continue
 
-        const newLanes = parseParkingLane(way, newData.nodes, map.getZoom(), editorMode)
-        if (newLanes !== undefined)
-            addNewLanes(newLanes, map)
+            const newLanes = parseParkingLane(way, newData.nodes, map.getZoom(), editorMode)
+            if (newLanes !== undefined)
+                addNewLanes(newLanes, map)
+        } else if (way.tags?.amenity === 'parking') {
+            if (areas[way.id])
+                continue
+
+            const newAreas = parseParkingArea(way, newData.nodes, map.getZoom(), editorMode)
+            if (newAreas !== undefined)
+                addNewAreas(newAreas, map)
+        }
     }
 }
 
@@ -212,6 +228,7 @@ function handleLaneClick(e: Event | any) {
 
 function closeLaneInfo() {
     laneInfoControl.closeLaneInfo()
+    areaInfoControl.closeAreaInfo()
 
     for (const marker in markers) {
         markers[marker].remove()
@@ -220,6 +237,26 @@ function closeLaneInfo() {
 
     lanes.right?.remove()
     lanes.left?.remove()
+}
+
+function addNewAreas(newAreas: ParkingAreas, map: L.Map): void {
+    updateAreaColorsByDate(newAreas, datetime)
+    Object.assign(areas, newAreas)
+    for (const newArea of Object.values<L.Polyline>(newAreas)) {
+        newArea.on('click', handleAreaClick)
+        newArea.addTo(map)
+        // L.path is added by plugin, types don't exist.
+        // @ts-expect-error
+        L.path.touchHelper(newArea).addTo(map)
+    }
+}
+
+function handleAreaClick(e: Event | any) {
+    areaInfoControl.closeAreaInfo()
+    closeLaneInfo()
+    const osm: OsmWay = e.target.options.osm
+    areaInfoControl.showAreaInfo(osm)
+    L.DomEvent.stopPropagation(e)
 }
 
 // Map move handler

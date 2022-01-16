@@ -37,6 +37,7 @@ function getOverpassViewerQuery(bounds: L.LatLngBounds) {
         [out:json];
         (
             way[highway][~"^parking:.*"~"."](${convertBoundsToOverpassBbox(bounds)});
+            way[amenity=parking](${convertBoundsToOverpassBbox(bounds)});
         )->.a;
         (
             .a;

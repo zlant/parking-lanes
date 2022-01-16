@@ -11,3 +11,7 @@ export interface StyleMapInterface {
 export interface ParkingLanes {
     [key: string]: L.Polyline | any
 }
+
+export interface ParkingAreas {
+    [key: string]: L.Polyline | any
+}

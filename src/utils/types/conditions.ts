@@ -1,7 +1,13 @@
+import OpeningHours from 'opening_hours'
 
 export interface ConditionsInterface {
-    intervals?: any[]
+    intervals?: ConditionInterface[]
     default?: null | string // TODO add type: Can be free, no_parking, no_stopping and likely others
+}
+
+export interface ConditionInterface {
+    interval: OpeningHours | 'even' | 'odd' | null
+    condition: string
 }
 
 export type ConditionName = 'disc' | 'no_parking' | 'no_stopping' | 'free' | 'ticket'

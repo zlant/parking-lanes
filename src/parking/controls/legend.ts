@@ -3,7 +3,7 @@ import { hyper } from 'hyperhtml/esm'
 import { legend } from '../legend'
 
 export default L.Control.extend({
-    onAdd: (map: L.Map) => hyper`
+    onAdd: () => hyper`
         <div id="legend"
              class="leaflet-control-layers control-padding control-bigfont"
              onmouseenter=${handleLegendMouseEnter}

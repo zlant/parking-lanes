@@ -1,44 +1,51 @@
+/* eslint-disable multiline-ternary */
 import L from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
 import { OsmDataSource } from '../../utils/types/osm-data'
+import { editorMode } from '../interface'
 
 export default L.Control.extend({
-        <div id="fetch-control"
-             class="fetch-control"
-             tabindex="-1"
-             onblur="${handleBlur}"
-             onmousedown=${L.DomEvent.stopPropagation}
-             ondblclick=${L.DomEvent.stopPropagation}
-             onpointerdown=${L.DomEvent.stopPropagation}
-             onclick=${L.DomEvent.stopPropagation}>
-            <div class="leaflet-control-layers control-bigfont control-button">
-                <div class="fetch-control_wrapper">
-                    <div id="download-btn" class="fetch-control_button">
-                        Fetch parking data
-                    </div>
-                    <div class="fetch-control_toggle"
-                         onclick=${handleToggleClick} />
     onAdd: (_map: L.Map) => hyper`
+    <div id="fetch-control"
+         class="fetch-control"
+         tabindex="-1"
+         onblur="${handleBlur}"
+         onmousedown=${L.DomEvent.stopPropagation}
+         ondblclick=${L.DomEvent.stopPropagation}
+         onpointerdown=${L.DomEvent.stopPropagation}
+         onclick=${L.DomEvent.stopPropagation}>
+        <div class="leaflet-control-layers control-bigfont control-button">
+            <div class="fetch-control_wrapper">
+                <div id="download-btn" class="fetch-control_button">
+                    Fetch parking data
                 </div>
+                ${editorMode ? '' : hyper`
+                    <div class="fetch-control_toggle"
+                        onclick=${handleToggleClick}>
+                    </div>
+                `}
             </div>
+        </div>
+        ${editorMode ? '' : hyper`
             <div id="data-source-select" class="fetch-control_items">
-                <div data-value="${OsmDataSource.OverpassDe}" 
-                     class="fetch-control_item"
-                     onclick="${handleDataSourceChange}">
+                <div data-value="${OsmDataSource.OverpassDe}"
+                    class="fetch-control_item"
+                    onclick="${handleDataSourceChange}">
                     From overpass-turbo
                 </div>
                 <div data-value="${OsmDataSource.OsmOrg}"
-                     class="fetch-control_item"
-                     onclick="${handleDataSourceChange}">
+                    class="fetch-control_item"
+                    onclick="${handleDataSourceChange}">
                     From osm.org
                 </div>
                 <div data-value="${OsmDataSource.OverpassVk}"
-                     class="fetch-control_item"
-                     onclick="${handleDataSourceChange}">
+                    class="fetch-control_item"
+                    onclick="${handleDataSourceChange}">
                     From overpass-vk
                 </div>
             </div>
-        </div>`,
+        `}
+    </div>`,
 
     setFetchDataBtnClickListener(listener: (e?: MouseEvent) => any) {
         document.getElementById('download-btn')!.onclick = listener

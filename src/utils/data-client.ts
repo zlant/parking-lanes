@@ -66,6 +66,15 @@ async function downloadContent(url: string): Promise<RawOsmData> {
     return resp.data
 }
 
+function includeOsmWay(tags) {
+    // Filter should never apply to non-highway ways
+    if (!tags?.highway) return true
+    const unwantedAccess = tags?.access === 'no' || tags?.access === 'private'
+    const unwantedService = ['emergency_access', 'parking_aisle', 'driveway'].includes(tags?.service)
+
+    return !(unwantedAccess || unwantedService)
+}
+
 function parseOsmResp(osmResp: RawOsmData): ParsedOsmData {
     const newData: ParsedOsmData = {
         ways: {},
@@ -80,7 +89,8 @@ function parseOsmResp(osmResp: RawOsmData): ParsedOsmData {
                 break
 
             case 'way':
-                newData.ways[el.id] = el
+                if (includeOsmWay(el.tags))
+                    newData.ways[el.id] = el
                 break
 
             case 'relation':

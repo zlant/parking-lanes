@@ -41,7 +41,7 @@ import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
 const editorName = 'PLanes'
 const version = '0.6.0'
 
-let editorMode = false
+export let editorMode = false
 const useDevServer = false
 let datetime = new Date()
 const viewMinZoom = 15
@@ -291,6 +291,16 @@ function getHighwaysOverpassQuery() {
 
 // Editor
 
+function setEditorMode(newEditorMode: boolean, map: L.Map) {
+    editorMode = newEditorMode
+
+    fetchControl.remove()
+    fetchControl.addTo(map)
+        .setFetchDataBtnClickListener(async() => await downloadParkingLanes(map))
+        .setDataSource(dataSource)
+        .setDataSourceChangeListener(handleDataSourceChange)
+}
+
 async function handleEditorModeCheckboxChange(e: Event | any) {
     const { map } = (window as OurWindow)
     if (e.currentTarget.checked) {
@@ -302,7 +312,7 @@ async function handleEditorModeCheckboxChange(e: Event | any) {
                 logout()
                 await authenticate(useDevServer)
             }
-            editorMode = true
+            setEditorMode(true, map)
             layersControl.addTo(map);
             (document.getElementById('ghc-editor-mode-label') as HTMLLabelElement).style.color = 'green'
             resetLastBounds()
@@ -312,7 +322,7 @@ async function handleEditorModeCheckboxChange(e: Event | any) {
             alert(err)
         }
     } else {
-        editorMode = false
+        setEditorMode(false, map)
         // @ts-expect-error
         layersControl.remove(map)
         if (map.hasLayer(tileLayers.esri)) {

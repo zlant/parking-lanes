@@ -3,7 +3,7 @@ import { overpassDeUrl, overpassVkUrl, osmProdUrl, osmDevUrl } from '../utils/li
 import { OsmDataSource } from '../utils/types/osm-data'
 
 /**
- * Get the API request URL (eg. Overpass Turbo query URL *./
+ * Get the API request URL
  */
 export function getUrl(bounds: L.LatLngBounds, editorMode: boolean, useDevServer: boolean, source: OsmDataSource): string {
     if (editorMode || useDevServer || source === OsmDataSource.OsmOrg) {
@@ -16,20 +16,6 @@ export function getUrl(bounds: L.LatLngBounds, editorMode: boolean, useDevServer
         const overpassQuery = getOverpassViewerQuery(bounds).replace(/\s+/g, ' ')
         return overpassUrl + encodeURIComponent(overpassQuery)
     }
-}
-
-function getOverpassEditorQuery(bounds: L.LatLngBounds) {
-    return `
-        [out:json];
-        (
-            way[highway~"^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street"][service!=parking_aisle](${convertBoundsToOverpassBbox(bounds)});
-        )->.a;
-        (
-            .a;
-            .a >;
-            .a <;
-        );
-        out meta;`
 }
 
 function getOverpassViewerQuery(bounds: L.LatLngBounds) {

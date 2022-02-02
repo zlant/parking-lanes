@@ -6,7 +6,7 @@ import { getLaneEditForm, setOsmChangeListener } from './editor/editor-form'
 import { OsmTags, OsmWay } from '../../utils/types/osm-data'
 
 export default L.Control.extend({
-    onAdd: (_map: L.Map) => hyper`
+    onAdd: () => hyper`
         <div id="lane-control"
              class="leaflet-control-layers control-padding"
              style="display: none"

@@ -133,7 +133,7 @@ export const InfoControl = L.Control.extend({
 })
 
 export const SaveControl = L.Control.extend({
-    onAdd: (map: L.Map) => hyper`
+    onAdd: () => hyper`
         <button id="save-btn"
                 class="leaflet-control-layers control-padding control-bigfont control-button save-control"
                 style="display: none"

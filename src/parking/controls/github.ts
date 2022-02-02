@@ -3,7 +3,7 @@ import { hyper } from 'hyperhtml/esm'
 import { handleJosmLinkClick } from '../../utils/josm'
 
 export default L.Control.extend({
-    onAdd: (map: L.Map) => hyper`
+    onAdd: () => hyper`
         <div class="leaflet-control-layers control-padding control-bigfont"
              onmouseenter=${showExternalEditorLinks}
              onmouseleave=${hideExternalEditorLinks}>

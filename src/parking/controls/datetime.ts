@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 // If `parking:condition` tags are present,
 // changing the date/time will pick the fitting color getColorByDate().
 export default L.Control.extend({
-    onAdd: (map: L.Map) => hyper`
+    onAdd: () => hyper`
         <input id="datetime-input"
                class="leaflet-control-layers control-padding control-bigfont"
                style="width: 150px"

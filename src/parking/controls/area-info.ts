@@ -4,7 +4,7 @@ import { idUrl } from '../../utils/links'
 import { OsmWay } from '../../utils/types/osm-data'
 
 export default L.Control.extend({
-    onAdd: (map: L.Map) => hyper`
+    onAdd: () => hyper`
         <div id="area-control"
              class="leaflet-control-layers control-padding"
              style="display: none"
@@ -39,7 +39,7 @@ function getPanel(osm: OsmWay, body: any) {
                 <a href="https://openstreetmap.org/way/${osm.id}" target="_blank">View in OSM</a>
                 <span style="float:right">
                     Edit:
-                    <a href="${idUrl + '&way=' + osm.id}" 
+                    <a href="${idUrl + '&way=' + osm.id}"
                        target="_blank">iD</a>
                 </span>
             </div>

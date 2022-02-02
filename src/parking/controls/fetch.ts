@@ -3,7 +3,6 @@ import { hyper } from 'hyperhtml/esm'
 import { OsmDataSource } from '../../utils/types/osm-data'
 
 export default L.Control.extend({
-    onAdd: (map: L.Map) => hyper`
         <div id="fetch-control"
              class="fetch-control"
              tabindex="-1"
@@ -19,6 +18,7 @@ export default L.Control.extend({
                     </div>
                     <div class="fetch-control_toggle"
                          onclick=${handleToggleClick} />
+    onAdd: (_map: L.Map) => hyper`
                 </div>
             </div>
             <div id="data-source-select" class="fetch-control_items">

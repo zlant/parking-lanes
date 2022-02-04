@@ -11,7 +11,7 @@ export const presets: Preset[] = [
             { k: 'parking:condition:{side}:maxstay', v: '' },
         ],
         img: {
-            src: 'https://upload.wikimedia.org/wikipedia/commons/9/98/3.27_Russian_road_sign.svg',
+            src: '/assets/no_stopping/no_stopping.svg',
             height: 20,
             width: 20,
             alt: 'No Stopping Sign',
@@ -28,7 +28,7 @@ export const presets: Preset[] = [
             { k: 'parking:condition:{side}:maxstay', v: '' },
         ],
         img: {
-            src: 'https://upload.wikimedia.org/wikipedia/commons/8/81/3.28_Russian_road_sign.svg',
+            src: '/assets/no_parking/no_parking.svg',
             height: 20,
             width: 20,
             alt: 'No Parking Sign',
@@ -45,7 +45,7 @@ export const presets: Preset[] = [
             { k: 'parking:condition:{side}:maxstay', v: '' },
         ],
         img: {
-            src: 'https://upload.wikimedia.org/wikipedia/commons/f/f4/3.29_Russian_road_sign.svg',
+            src: '/assets/no_parking/no_parking_on_odd_days.svg',
             height: 20,
             width: 20,
             alt: 'No Parking on Odd Days Sign',
@@ -62,7 +62,7 @@ export const presets: Preset[] = [
             { k: 'parking:condition:{side}:maxstay', v: '' },
         ],
         img: {
-            src: 'https://upload.wikimedia.org/wikipedia/commons/7/76/3.30_Russian_road_sign.svg',
+            src: '/assets/no_parking/no_parking_on_even_days.svg',
             height: 20,
             width: 20,
             alt: 'No Parking on Even Days Sign',
@@ -79,7 +79,7 @@ export const presets: Preset[] = [
             { k: 'parking:condition:{side}:maxstay', v: '' },
         ],
         img: {
-            src: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/6.4_Russian_road_sign.svg',
+            src: '/assets/free_parking/free_parking_russia.svg',
             height: 20,
             width: 20,
             alt: 'Free Parking Sign',
@@ -96,7 +96,7 @@ export const presets: Preset[] = [
             { k: 'parking:condition:{side}:maxstay', v: '' },
         ],
         img: {
-            src: 'https://upload.wikimedia.org/wikipedia/commons/f/f3/8.8_Russian_road_sign.svg',
+            src: '/assets/paid_parking/paid_parking_russia.svg',
             height: 20,
             width: 40,
             alt: 'Paid Parking Sign',

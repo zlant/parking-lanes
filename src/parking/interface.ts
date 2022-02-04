@@ -293,6 +293,8 @@ function getHighwaysOverpassQuery() {
 
 async function handleEditorModeCheckboxChange(e: Event | any) {
     const { map } = (window as OurWindow)
+    const editorModeLabel = document.getElementById('ghc-editor-mode-label') as HTMLLabelElement
+
     if (e.currentTarget.checked) {
         try {
             await authenticate(useDevServer)
@@ -303,12 +305,12 @@ async function handleEditorModeCheckboxChange(e: Event | any) {
                 await authenticate(useDevServer)
             }
             editorMode = true
-            layersControl.addTo(map);
-            (document.getElementById('ghc-editor-mode-label') as HTMLLabelElement).style.color = 'green'
+            layersControl.addTo(map)
+            editorModeLabel.style.color = 'green'
             resetLastBounds()
             handleMapMoveEnd()
         } catch (err) {
-            (document.getElementById('ghc-editor-mode-label') as HTMLLabelElement).style.color = 'red'
+            editorModeLabel.style.color = 'red'
             alert(err)
         }
     } else {
@@ -321,7 +323,7 @@ async function handleEditorModeCheckboxChange(e: Event | any) {
             tileLayers.mapnik.addTo(map)
         }
 
-        (document.getElementById('ghc-editor-mode-label') as HTMLLabelElement).style.color = 'black'
+        editorModeLabel.style.color = 'black'
 
         for (const lane in lanes) {
             if (lane.startsWith('empty')) {

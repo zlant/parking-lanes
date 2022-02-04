@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="600"
+   height="300"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="8.4.2.svg">
+  <title
+     id="title3006">8.8 Платные услуги</title>
+  <defs
+     id="defs4">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath5877">
+      <path
+         inkscape:connector-curvature="0"
+         d="m 56.525,325.175 192.75,0 0,-102.15 -192.75,0 0,102.15 z"
+         id="path5879" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath5885">
+      <path
+         inkscape:connector-curvature="0"
+         d="m 56.52499,223.02499 192.75,0 0,102.15001 -192.75,0 0,-102.15001 z"
+         id="path5887" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath5893">
+      <path
+         inkscape:connector-curvature="0"
+         d="m 56.525,325.175 192.75,0 0,-102.15 -192.75,0 0,102.15 z"
+         id="path5895" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath5903">
+      <path
+         inkscape:connector-curvature="0"
+         d="m -0.293,-2.183 3.08701,0 0,8.24201 -3.08701,0 0,-8.24201 z"
+         id="path5905" />
+    </clipPath>
+    <mask
+       maskUnits="userSpaceOnUse"
+       x="0"
+       y="0"
+       width="1"
+       height="1"
+       id="mask5909">
+      <image
+         width="1"
+         height="1"
+         xlink:href="data:image/png;base64,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"
+         id="image5911" />
+    </mask>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="400.83275"
+     inkscape:cy="291.30004"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1024"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
+     inkscape:window-maximized="1"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-paths="true"
+     inkscape:bbox-nodes="true"
+     inkscape:snap-bbox-edge-midpoints="true"
+     inkscape:snap-bbox-midpoints="true"
+     inkscape:object-paths="true"
+     inkscape:snap-intersection-paths="true"
+     inkscape:object-nodes="true"
+     inkscape:snap-smooth-nodes="true"
+     inkscape:snap-midpoints="true"
+     inkscape:snap-object-midpoints="true"
+     showguides="true"
+     inkscape:guide-bbox="true" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>8.8 Платные услуги</dc:title>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by-sa/3.0/" />
+        <dc:description>ГОСТ Р 52290-2004
+Размеры и пропорции по типоразмеру I</dc:description>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by-sa/3.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#ShareAlike" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-752.36218)">
+    <rect
+       style="color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.54299998;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect8328"
+       width="600"
+       height="300"
+       x="0"
+       y="752.36218"
+       rx="45"
+       ry="45" />
+    <rect
+       ry="35"
+       rx="35"
+       y="762.36224"
+       x="10"
+       height="280"
+       width="580"
+       id="rect8330"
+       style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.54299998;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    <g
+       style="font-size:122.21093750000001000px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:-9.84375000000000000px;word-spacing:0px;opacity:1;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       id="text9818">
+      <path
+         d="m 76.815586,884.30971 4.032909,5.25501 9.165702,-5.74384 0,53.03886 11.976513,0 0,-68.43724 -10.265582,0 z"
+         style="fill:#000000;font-family:Russian Road Sign;-inkscape-font-specification:Russian Road Sign"
+         id="path10830" />
+      <path
+         d="m 135.80868,867.56703 c -6.95069,0.17829 -12.51121,3.45757 -16.68158,9.83785 -4.17041,6.3804 -6.30907,14.79247 -6.41599,25.23624 0.10692,10.44383 2.24558,18.8559 6.41599,25.23623 4.17037,6.38035 9.73089,9.65963 16.68158,9.83786 6.95062,-0.17822 12.51114,-3.45751 16.68157,-9.83786 4.17035,-6.38033 6.30901,-14.7924 6.416,-25.23623 -0.10699,-9.96257 -2.24565,-18.23715 -6.416,-24.82378 -4.17043,-6.58651 -9.73095,-10.00328 -16.68157,-10.25031 z m 0,10.63222 c 3.35054,-0.0509 6.02895,1.88411 8.03526,5.80494 2.00623,3.92093 3.03483,10.13323 3.08579,18.63693 -0.051,8.50376 -1.07956,14.71606 -3.08579,18.63693 -2.00631,3.92089 -4.68472,5.85587 -8.03526,5.80494 -3.35061,0.0509 -6.02903,-1.88405 -8.03527,-5.80494 -2.00629,-3.92087 -3.03489,-10.13317 -3.08579,-18.63693 0.0509,-8.50369 1.0795,-14.716 3.08579,-18.63693 2.00625,-3.92083 4.68467,-5.85581 8.03527,-5.80494 z"
+         style="fill:#000000;font-family:Russian Road Sign;-inkscape-font-specification:Russian Road Sign"
+         id="path10832" />
+    </g>
+    <g
+       style="font-size:164.06391907000000000px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:-15.65625095000000000px;word-spacing:0px;opacity:1;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       id="text9828">
+      <path
+         d="m 199.33874,877.75304 5.41404,7.05466 12.30463,-7.7109 0,71.20282 16.07806,0 0,-91.87461 -13.78119,0 z"
+         style="fill:#000000;font-family:Russian Road Sign;-inkscape-font-specification:Russian Road Sign"
+         id="path10835" />
+      <path
+         d="m 295.6169,871.35463 4.59373,-14.92962 -52.8279,0 0,44.78887 10.33589,5.74217 c 1.14841,-0.78951 2.87105,-2.0815 5.16795,-3.87597 2.29683,-1.79438 5.16791,-2.79925 8.61324,-3.01463 5.19183,0.21538 9.16349,2.08158 11.91499,5.59861 2.7514,3.51711 4.13909,7.39307 4.16307,11.62788 -0.28716,5.74219 -2.58402,10.04881 -6.89059,12.91987 -4.30667,2.87109 -8.9004,4.30663 -13.7812,4.30662 -3.86231,0.0444 -7.74511,-0.2495 -11.64838,-0.88183 -3.90332,-0.63231 -7.29393,-1.86961 -10.17184,-3.7119 l 2.29687,14.92962 c 0.26317,0.19141 2.60789,0.95703 7.03415,2.29687 4.42623,1.33984 9.35491,2.10546 14.78607,2.29686 11.02969,-0.23925 19.69077,-3.49314 25.98328,-9.76168 6.29239,-6.26851 9.49843,-14.11613 9.61813,-23.54286 -0.35895,-9.23527 -3.37359,-16.31727 -9.04391,-21.24601 -5.67044,-4.92863 -11.84326,-7.4169 -18.51847,-7.46481 -2.70364,-0.0478 -5.4175,0.33502 -8.14157,1.14843 -2.72414,0.81354 -4.98683,2.34478 -6.78806,4.59373 l 0,-21.82022 z"
+         style="fill:#000000;font-family:Russian Road Sign;-inkscape-font-specification:Russian Road Sign"
+         id="path10837" />
+    </g>
+    <g
+       style="font-size:200.89471436000002000px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:-11.71875000000000000px;word-spacing:0px;opacity:1;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       id="text9836">
+      <path
+         d="m 355.47657,861.58122 11.24996,12.65621 c 3.48629,-3.68712 7.06049,-7.01021 10.72262,-9.96928 3.66206,-2.95888 7.58782,-4.52416 11.7773,-4.69585 4.98458,0.1717 8.92709,1.73698 11.82752,4.69585 2.90032,2.95907 4.3819,6.28216 4.44474,9.96928 -0.067,5.45765 -1.18867,10.0112 -3.36494,13.66066 -2.17639,3.64961 -5.00562,7.39959 -8.48769,11.24996 -6.27793,7.48747 -12.75669,14.71121 -19.43632,21.67124 -6.67969,6.96011 -13.86158,13.93273 -21.54568,20.91789 l 0,16.87494 67.49976,0 c 1.40616,-3.5742 2.46085,-6.97263 3.16405,-10.19528 0.70304,-3.22263 1.0546,-5.91793 1.05468,-8.0859 l -46.40608,0 c 7.29904,-7.59202 14.09588,-14.55628 20.39055,-20.89278 6.29455,-6.33643 11.68515,-12.29623 16.17182,-17.8794 3.57413,-4.1266 6.11876,-8.02725 7.6339,-11.70197 1.51498,-3.67458 2.25158,-8.88103 2.20981,-15.61936 -0.38094,-8.61316 -3.83795,-15.64437 -10.37106,-21.09368 -6.53324,-5.44909 -13.85743,-8.26157 -21.97257,-8.43746 -8.37892,0.10056 -15.52732,1.70769 -21.44523,4.82141 -5.91798,3.11393 -10.95702,7.13177 -15.11714,12.05352 z"
+         style="fill:#000000;font-family:Russian Road Sign;-inkscape-font-specification:Russian Road Sign"
+         id="path10840" />
+      <path
+         d="m 478.80569,844.70629 c -11.42578,0.29307 -20.56637,5.68367 -27.42178,16.17181 -6.85546,10.48833 -10.37107,24.31639 -10.54684,41.48423 0.17577,17.16794 3.69138,30.996 10.54684,41.48422 6.85541,10.48824 15.996,15.87885 27.42178,16.17182 11.42567,-0.29297 20.56625,-5.68357 27.42177,-16.17182 6.85536,-10.48822 10.37097,-24.31628 10.54684,-41.48422 -0.17587,-16.37683 -3.69148,-29.97888 -10.54684,-40.80622 -6.85552,-10.82714 -15.9961,-16.44374 -27.42177,-16.84982 z m 0,17.47761 c 5.50773,-0.0836 9.91061,3.09718 13.20865,9.54237 3.29792,6.44537 4.98876,16.65738 5.07253,30.63606 -0.0838,13.97878 -1.77462,24.19079 -5.07253,30.63604 -3.29804,6.44531 -7.70092,9.6261 -13.20865,9.54238 -5.50784,0.0837 -9.91073,-3.09707 -13.20866,-9.54238 -3.29802,-6.44526 -4.98886,-16.65726 -5.07253,-30.63604 0.0837,-13.97868 1.77451,-24.19069 5.07253,-30.63606 3.29794,-6.44519 7.70082,-9.62598 13.20866,-9.54237 z"
+         style="fill:#000000;font-family:Russian Road Sign;-inkscape-font-specification:Russian Road Sign"
+         id="path10842" />
+    </g>
+    <path
+       style="opacity:1;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;stroke-opacity:1"
+       d="M 432.375 37.5 C 385.04927 37.5 344.45629 66.20568 327.0625 107.1875 C 311.54941 80.101446 282.35732 61.875 248.90625 61.875 C 218.15529 61.875 191.0153 77.311791 174.78125 100.84375 C 160.87489 85.272556 140.64479 75.46875 118.125 75.46875 C 76.185877 75.46875 42.1875 109.46713 42.1875 151.40625 C 42.1875 193.34537 76.185877 227.34375 118.125 227.34375 C 140.44548 227.34375 160.51233 217.70687 174.40625 202.375 C 190.59603 226.20992 217.92132 241.875 248.90625 241.875 C 282.35732 241.875 311.54941 223.64855 327.0625 196.5625 C 344.45629 237.54432 385.04927 266.25 432.375 266.25 C 495.54257 266.25 546.75 215.04257 546.75 151.875 C 546.75 88.707431 495.54257 37.5 432.375 37.5 z M 431.25 41.25 C 491.31097 41.25 540 89.939034 540 150 C 540 210.06097 491.31097 258.75 431.25 258.75 C 385.48859 258.75 346.30272 230.4615 330.25 190.4375 C 330.24644 190.42862 330.25356 190.41513 330.25 190.40625 C 335.79178 178.72585 338.90625 165.66288 338.90625 151.875 C 338.90625 137.41928 335.49404 123.76029 329.4375 111.65625 C 344.93915 70.510434 384.68219 41.25 431.25 41.25 z M 245.65625 64.9375 C 246.38696 64.91899 247.10857 64.9375 247.84375 64.9375 C 294.89503 64.9375 333.03125 103.07372 333.03125 150.125 C 333.03125 197.17628 294.89503 235.3125 247.84375 235.3125 C 218.74144 235.3125 193.05395 220.76505 177.6875 198.5 C 187.93302 185.55666 194.0625 169.19573 194.0625 151.40625 C 194.0625 133.08247 187.55684 116.27504 176.75 103.15625 C 191.62253 80.67985 216.86908 65.666828 245.65625 64.9375 z M 116.25 78.75 C 155.60029 78.75 187.5 110.64971 187.5 150 C 187.5 189.35029 155.60029 221.25 116.25 221.25 C 76.899713 221.25 45 189.35029 45 150 C 45 110.64971 76.899713 78.75 116.25 78.75 z "
+       transform="translate(0,752.36218)"
+       id="path10054" />
+  </g>
+</svg>

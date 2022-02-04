@@ -56,11 +56,11 @@ function getPanel(osm: OsmWay, body: any, mapCenter: LatLngLiteral) {
                 <a href="https://openstreetmap.org/way/${osm.id}" target="_blank">OSM</a>,${' '}
                 <a href="${mapillaryUrl(mapCenter)}" target="_blank">Mapillary</a>
                 <span style="float:right">
-                    Edit: 
-                    <a href="${josmUrl + overpassDeUrl + getWayWithRelationsOverpassQuery(osm.id).replace(/\s+/g, ' ')}" 
+                    Edit:${' '}
+                    <a href="${josmUrl + overpassDeUrl + getWayWithRelationsOverpassQuery(osm.id).replace(/\s+/g, ' ')}"
                        target="_blank"
-                       onclick=${handleJosmLinkClick}>Josm</a>,
-                    <a href="${idUrl + '&way=' + osm.id}" 
+                       onclick=${handleJosmLinkClick}>Josm</a>,${' '}
+                    <a href="${idUrl + '&way=' + osm.id}"
                        target="_blank">iD</a>
                 </span>
             </div>

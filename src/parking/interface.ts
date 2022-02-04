@@ -54,18 +54,19 @@ const fetchControl = new FetchControl({ position: 'topright' })
 const tileLayers = {
     mapnik: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 18,
+        maxZoom: 21,
+        maxNativeZoom: 19,
         className: 'mapnik_gray',
     }),
     esri: L.tileLayer('https://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         attribution: "<a href='https://wiki.openstreetmap.org/wiki/Esri'>Terms & Feedback</a>",
-        maxZoom: 19,
+        maxZoom: 21,
         maxNativeZoom: 19,
     }),
     maxar: L.tileLayer('https://services.digitalglobe.com/earthservice/tmsaccess/tms/1.0.0/DigitalGlobe:ImageryTileService@EPSG:3857@jpg/{z}/{x}/{-y}.jpg?connectId=fa014fbc-6cbe-4b6f-b0ca-fbfb8d1e5b7d', {
         attribution: "<a href='https://wiki.openstreetmap.org/wiki/DigitalGlobe'>Terms & Feedback</a>",
-        maxZoom: 22,
-        maxNativeZoom: 22,
+        maxZoom: 21,
+        maxNativeZoom: 20,
     }),
 }
 

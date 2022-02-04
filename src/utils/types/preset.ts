@@ -4,6 +4,10 @@ export interface OsmKeyValue {
     v: string
 }
 
+export interface Presets {
+    [key: string]: Preset[]
+}
+
 export interface Preset {
     /** Name of this preset */
     key: string

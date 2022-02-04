@@ -51,6 +51,7 @@ const laneInfoControl = new LaneInfoControl({ position: 'topright' })
 const areaInfoControl = new AreaInfoControl({ position: 'topright' })
 const fetchControl = new FetchControl({ position: 'topright' })
 
+// Reminder: Check `maxMaxZoomFromTileLayers` in `generateStyleMapByZoom()`
 const tileLayers = {
     mapnik: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',

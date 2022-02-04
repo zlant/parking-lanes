@@ -3,7 +3,10 @@ import { StyleMapInterface } from '../utils/types/parking'
 function generateStyleMapByZoom(): { [key: number]: StyleMapInterface } {
     const map: { [key: number]: StyleMapInterface } = {}
 
-    for (const zoom of [...Array(20).keys()]) {
+    // Needs to be kept in sync with the max maxZoom from interface.js tileLayers.
+    const maxMaxZoomFromTileLayers = 22 + 1
+
+    for (const zoom of [...Array(maxMaxZoomFromTileLayers).keys()]) {
         map[zoom] = {}
         if (zoom <= 12) {
             map[zoom].offsetMajor = 1
@@ -30,7 +33,7 @@ function generateStyleMapByZoom(): { [key: number]: StyleMapInterface } {
             map[zoom].weightMajor = 3
             map[zoom].offsetMinor = 3
             map[zoom].weightMinor = 1.5
-        } else if (zoom >= 18) {
+        } else {
             map[zoom].offsetMajor = 8
             map[zoom].weightMajor = 3
             map[zoom].offsetMinor = 3

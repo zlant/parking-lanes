@@ -1,12 +1,12 @@
-import L from 'leaflet'
+import L, { LatLngLiteral } from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
 import { handleJosmLinkClick } from '../..//utils/josm'
-import { idUrl, josmUrl, overpassDeUrl } from '../../utils/links'
+import { idUrl, josmUrl, mapillaryUrl, overpassDeUrl } from '../../utils/links'
 import { getLaneEditForm, setOsmChangeListener } from './editor/editor-form'
 import { OsmTags, OsmWay } from '../../utils/types/osm-data'
 
 export default L.Control.extend({
-    onAdd: (map: L.Map) => hyper`
+    onAdd: (_map: L.Map) => hyper`
         <div id="lane-control"
              class="leaflet-control-layers control-padding"
              style="display: none"
@@ -15,21 +15,21 @@ export default L.Control.extend({
              onpointerdown=${L.DomEvent.stopPropagation}
              onclick=${L.DomEvent.stopPropagation} />`,
 
-    showLaneInfo(osm: OsmWay) {
+    showLaneInfo(osm: OsmWay, mapCenter: LatLngLiteral) {
         const laneinfo = document.getElementById('lane-control')
         if (laneinfo === null)
             return
 
-        laneinfo.appendChild(getPanel(osm, getLaneInfo(osm)))
+        laneinfo.appendChild(getPanel(osm, getLaneInfo(osm), mapCenter))
         laneinfo.style.display = 'block'
     },
 
-    showEditForm(osm: OsmWay, waysInRelation: any, cutLaneListener: any) {
+    showEditForm(osm: OsmWay, waysInRelation: any, cutLaneListener: any, mapCenter: LatLngLiteral) {
         const laneinfo = document.getElementById('lane-control')
         if (laneinfo === null)
             return
 
-        laneinfo.appendChild(getPanel(osm, getLaneEditForm(osm, waysInRelation, cutLaneListener)))
+        laneinfo.appendChild(getPanel(osm, getLaneEditForm(osm, waysInRelation, cutLaneListener), mapCenter))
         laneinfo.style.display = 'block'
     },
 
@@ -48,11 +48,13 @@ export default L.Control.extend({
     },
 })
 
-function getPanel(osm: OsmWay, body: any) {
+function getPanel(osm: OsmWay, body: any, mapCenter: LatLngLiteral) {
     return hyper`
         <div>
             <div style="min-width:250px">
-                <a href="https://openstreetmap.org/way/${osm.id}" target="_blank">View in OSM</a>
+                View:${' '}
+                <a href="https://openstreetmap.org/way/${osm.id}" target="_blank">OSM</a>,${' '}
+                <a href="${mapillaryUrl(mapCenter)}" target="_blank">Mapillary</a>
                 <span style="float:right">
                     Edit: 
                     <a href="${josmUrl + overpassDeUrl + getWayWithRelationsOverpassQuery(osm.id).replace(/\s+/g, ' ')}" 

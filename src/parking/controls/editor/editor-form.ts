@@ -2,7 +2,7 @@ import { hyper } from 'hyperhtml/esm'
 import { OsmWay } from '../../../utils/types/osm-data'
 import { WaysInRelation } from '../../../utils/types/osm-data-storage'
 import { OsmKeyValue } from '../../../utils/types/preset'
-import { presets } from './presets'
+import { presetCountryNames, presets } from './presets'
 import { getAllTagsBlock } from '../lane-info'
 
 export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cutLaneListener: (way: OsmWay) => void): HTMLFormElement {
@@ -197,8 +197,18 @@ function getTextInput(tag: string, value: string): HTMLInputElement {
                value="${value ?? ''}">`
 }
 
+function getPresetScope() {
+    const params = new URLSearchParams(document.location.search)
+    const scopeFromUrl = params.get('presetCountry') ?? 'default'
+    if (presetCountryNames().includes(scopeFromUrl))
+        return scopeFromUrl
+    else
+        return 'default'
+}
+
 function getPresetSigns(osm: OsmWay, side: 'both'|'left'|'right') {
-    return presets.map(x => hyper`
+    const presetScope = getPresetScope()
+    return presets[presetScope].map(x => hyper`
         <img src=${x.img.src}
              class="sign-preset"
              height=${x.img.height}

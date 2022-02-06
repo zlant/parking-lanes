@@ -240,7 +240,7 @@ export function getBacklights(polyline: L.LatLngExpression[], zoom: number): { r
         right: L.polyline(polyline,
             // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
             {
-                color: 'fuchsia',
+                color: '#e66101',
                 weight: (laneStyle[zoom].offsetMajor ?? 1) * n - 4,
                 offset: (laneStyle[zoom].offsetMajor ?? 1) * n,
                 opacity: 0.4,
@@ -249,7 +249,7 @@ export function getBacklights(polyline: L.LatLngExpression[], zoom: number): { r
         left: L.polyline(polyline,
             // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
             {
-                color: 'cyan',
+                color: '#5e3c99',
                 weight: (laneStyle[zoom].offsetMajor ?? 0.5) * n - 4,
                 offset: -(laneStyle[zoom].offsetMajor ?? 0.5) * n,
                 opacity: 0.4,

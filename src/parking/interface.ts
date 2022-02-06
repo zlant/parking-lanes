@@ -213,6 +213,7 @@ function handleLaneClick(e: Event | any) {
     const osmId = osm.id
     const lane = lanes['right' + osmId] || lanes['left' + osmId] || lanes['empty' + osmId]
     const backligntPolylines = getBacklights(lane.getLatLngs(), map.getZoom())
+    const mapCenter = map.getCenter()
     lanes.right = backligntPolylines.right.addTo(map)
     lanes.left = backligntPolylines.left.addTo(map)
 
@@ -220,9 +221,10 @@ function handleLaneClick(e: Event | any) {
         laneInfoControl.showEditForm(
             osm,
             osmData.waysInRelation,
-            handleCutLaneClick)
+            handleCutLaneClick,
+            mapCenter)
     } else {
-        laneInfoControl.showLaneInfo(osm)
+        laneInfoControl.showLaneInfo(osm, mapCenter)
     }
 
     L.DomEvent.stopPropagation(e)

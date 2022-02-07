@@ -3,7 +3,7 @@ import { parseOpeningHourse, getOpeningHourseState } from '../utils/opening-hour
 import { legend } from './legend'
 import { laneStyleByZoom as laneStyle } from './lane-styles'
 
-import { ConditionColor, ConditionsInterface } from '../utils/types/conditions'
+import { ConditionColor, ConditionInterface, ConditionsInterface } from '../utils/types/conditions'
 import { OsmWay, OsmTags } from '../utils/types/osm-data'
 import { ParkingLanes, Side } from '../utils/types/parking'
 import { ParkingPolylineOptions } from '../utils/types/leaflet'
@@ -129,22 +129,33 @@ function wayIsMajor(tags: OsmTags) {
     return tags.highway.search(majorHighwayRegex) >= 0
 }
 
-function getConditions(side: 'left' | 'right', tags: { [key: string]: string }): ConditionsInterface {
+function getConditions(side: 'left' | 'right', tags: OsmTags): ConditionsInterface {
     const conditions: ConditionsInterface = { intervals: [], default: null }
-    const sides = ['both', side]
 
-    const defaultTags = sides.map(side => 'parking:condition:' + side + ':default')
+    conditions.intervals = parseConditionsByOldScheme(side, tags)
+    conditions.default = parseDefaultCondition(side, tags, conditions.intervals.length)
+
+    return conditions
+}
+
+function parseDefaultCondition(side: string, tags: OsmTags, findedIntervalsCount: number) {
+    const sides = [side, 'both']
+    const defaultConditionTags = (findedIntervalsCount === 0 ? sides.map(side => 'parking:condition:' + side) : [])
+        .concat(sides.map(side => 'parking:condition:' + side + ':default'))
         .concat(sides.map(side => 'parking:lane:' + side))
 
-    let findResult: string
-    for (const tag of defaultTags) {
-        findResult = tags[tag]
-        if (findResult)
-            conditions.default = findResult
+    let defaultConditionTag = defaultConditionTags.find(tag => tags[tag]) ?? null
 
-        if (conditions.default)
-            break
-    }
+    if (defaultConditionTag != null &&
+        !legend.find(x => x.condition === tags[defaultConditionTag!]))
+        defaultConditionTag = null
+
+    return defaultConditionTag ? tags[defaultConditionTag] : null
+}
+
+function parseConditionsByOldScheme(side: string, tags: OsmTags) {
+    const intervals: ConditionInterface[] = []
+    const sides = ['both', side]
 
     for (let i = 1; i < 10; i++) {
         const index = i > 1 ? ':' + i : ''
@@ -153,40 +164,32 @@ function getConditions(side: 'left' | 'right', tags: { [key: string]: string }):
         const conditionTags = sides.map(side => 'parking:condition:' + side + index)
         const intervalTags = sides.map(side => 'parking:condition:' + side + index + ':time_interval')
 
-        const cond: any = {}
+        const cond: ConditionInterface = { condition: null, interval: null }
 
         for (let j = 0; j < sides.length; j++) {
-            findResult = tags[laneTags[j]]
-            if (findResult && legend.findIndex(x => x.condition === findResult) >= 0)
-                cond.condition = findResult
+            let tagValue = tags[laneTags[j]]
+            if (tagValue && legend.findIndex(x => x.condition === tagValue) >= 0)
+                cond.condition = tagValue
 
-            findResult = tags[conditionTags[j]]
-            if (findResult)
-                cond.condition = findResult
+            tagValue = tags[conditionTags[j]]
+            if (tagValue)
+                cond.condition = tagValue
 
-            findResult = tags[intervalTags[j]]
-            if (findResult)
-                cond.interval = parseOpeningHourse(findResult)
+            tagValue = tags[intervalTags[j]]
+            if (tagValue)
+                cond.interval = parseOpeningHourse(tagValue)
         }
 
-        if (i === 1 && cond.interval == null) {
-            if ('condition' in cond)
-                conditions.default = cond.condition
-
+        if (i === 1 && cond.interval == null)
             break
-        }
 
-        if ('condition' in cond)
-            // @ts-expect-error
-            conditions.intervals[i - 1] = cond
+        if (cond.condition)
+            intervals?.push(cond)
         else
             break
     }
 
-    if (legend.findIndex(x => x.condition === conditions.default) === -1)
-        conditions.default = null
-
-    return conditions
+    return intervals
 }
 
 /** The time effects the current parking restrictions. Update colors based on this. */

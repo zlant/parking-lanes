@@ -7,7 +7,7 @@ export interface ConditionsInterface {
 
 export interface ConditionInterface {
     interval: OpeningHours | 'even' | 'odd' | null
-    condition: string
+    condition: string | null
 }
 
 export type ConditionName = 'disc' | 'no_parking' | 'no_stopping' | 'free' | 'ticket'

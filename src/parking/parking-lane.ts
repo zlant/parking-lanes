@@ -140,17 +140,24 @@ function getConditions(side: 'left' | 'right', tags: OsmTags): ConditionsInterfa
 
 function parseDefaultCondition(side: string, tags: OsmTags, findedIntervalsCount: number) {
     const sides = [side, 'both']
-    const defaultConditionTags = (findedIntervalsCount === 0 ? sides.map(side => 'parking:condition:' + side) : [])
-        .concat(sides.map(side => 'parking:condition:' + side + ':default'))
-        .concat(sides.map(side => 'parking:lane:' + side))
 
-    let defaultConditionTag = defaultConditionTags.find(tag => tags[tag]) ?? null
+    const laneTag = sides.map(side => 'parking:lane:' + side).find(tag => tags[tag])
+    const conditionTag = sides.map(side => 'parking:condition:' + side).find(tag => tags[tag])
+    const defalutConditionTag = sides.map(side => 'parking:condition:' + side + ':default').find(tag => tags[tag])
 
-    if (defaultConditionTag != null &&
-        !legend.find(x => x.condition === tags[defaultConditionTag!]))
-        defaultConditionTag = null
+    const tag = findedIntervalsCount === 0 ?
+        conditionTag ?? (laneTag && legend.some(x => x.condition === tags[laneTag]) ? laneTag : null) ?? defalutConditionTag :
+        defalutConditionTag ?? laneTag
+    const condition = tag ? tags[tag] : null
+    const conditionInLegend = condition ? legend.some(x => x.condition === condition) : false
 
-    return defaultConditionTag ? tags[defaultConditionTag] : null
+    if (conditionInLegend)
+        return condition
+
+    if (!conditionInLegend && laneTag)
+        return 'free'
+
+    return null
 }
 
 function parseConditionsByOldScheme(side: string, tags: OsmTags) {

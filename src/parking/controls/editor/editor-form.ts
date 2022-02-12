@@ -93,6 +93,7 @@ const parkingLaneTagTemplates = [
     'parking:condition:{side}:default',
     'parking:condition:{side}:maxstay',
     'parking:lane:{side}:capacity',
+    'parking:lane:{side}:surface',
 ]
 
 function getTagInputs(osm: OsmWay, side: 'both'|'left'|'right') {
@@ -154,6 +155,10 @@ function getTagInput(osm: OsmWay, side: string, parkingType: string, tagTemplate
             hide = osm.tags[conditionTag] !== 'disc'
             break
         }
+        case 'parking:condition:{side}:surface':
+            input = getTextInput(tag, value)
+            break
+
         default:
             input = getTextInput(tag, value)
             break

@@ -1,0 +1,5 @@
+// Extension recommendations for VS Code
+// See also docs: https://code.visualstudio.com/updates/v1_6#_workspace-extension-recommendations
+{
+    "recommendations": ["dbaeumer.vscode-eslint"]
+}

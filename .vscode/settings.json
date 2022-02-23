@@ -1,0 +1,11 @@
+// https://www.roboleary.net/vscode/2020/09/17/vscode-workspace-settings.html
+// All settings https://code.visualstudio.com/docs/getstarted/settings#_default-settings
+{
+    "editor.formatOnSave": true,
+    "[typescript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    }
+}

@@ -300,6 +300,7 @@ const laneValues = [
     'marked',
     'fire_lane',
     'no',
+    'separate',
 ]
 
 const typeValues = [

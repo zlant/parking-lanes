@@ -1,7 +1,7 @@
 export function parseConditionalTag(tag: string) {
     const bracketStack: number[] = []
     let prevConditionEndPosition: number | null = null
-    const conditions: string[][] = []
+    const parsedConditionalTag: ConditionalValue[] = []
 
     for (let i = 0; i < tag.length; i++) {
         const char = tag.charAt(i)
@@ -18,29 +18,39 @@ export function parseConditionalTag(tag: string) {
             case ';': {
                 if (bracketStack.length === 0) {
                     const startPosition = prevConditionEndPosition ? prevConditionEndPosition + 1 : 0
-                    conditions.push(getConditionalTagPart(tag, startPosition, i))
+                    parsedConditionalTag.push(parseConditionalValue(tag.substring(startPosition, i - 1)))
                     prevConditionEndPosition = i
                 }
             }
         }
     }
 
-    if (prevConditionEndPosition == null || prevConditionEndPosition < tag.length - 2) {
+    if (prevConditionEndPosition == null || prevConditionEndPosition < tag.length - (tag.endsWith(')') ? 2 : 1)) {
         const startPosition = prevConditionEndPosition ? prevConditionEndPosition + 1 : 0
-        conditions.push(getConditionalTagPart(tag, startPosition, tag.length))
+        parsedConditionalTag.push(parseConditionalValue(tag.substring(startPosition, tag.length - (tag.endsWith(')') ? 1 : 0))))
     }
 
-    return conditions
+    return parsedConditionalTag
 }
 
-function getConditionalTagPart(tag: string, start: number, end: number) {
-    const condition = tag.substring(start, end).split('@', 2)
-    condition[0] = condition[0].trim()
-    if (condition.length > 1) {
-        condition[1] = condition[1].trim()
-        condition[1] = condition[1].substring(1, condition[1].length - 1)
-    } else {
-        condition.push('')
+function parseConditionalValue(rawConditionalValue: string) {
+    const tokens = rawConditionalValue.split('@', 2)
+
+    const conditionalValue: ConditionalValue = {
+        value: tokens[0].trim(),
+        condition: null,
     }
-    return condition
+
+    if (tokens.length > 1) {
+        conditionalValue.condition = tokens[1]
+            .trim()
+            .substring(1, tokens[1].length - 1)
+    }
+
+    return conditionalValue
+}
+
+export interface ConditionalValue {
+    value: string
+    condition: string | null
 }

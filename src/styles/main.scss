@@ -46,12 +46,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     margin: 0;
 }
 
-select,
-input[type=text] {
-    width: 100%;
-    box-sizing: border-box;
-}
-
 .leaflet-marker-icon.cut-icon {
     background: #fffc7e;
     color: black;
@@ -135,9 +129,21 @@ input[type=text] {
     background: #f4f4f4;
 }
 
+.editor-form__select-input {
+    width: 100%;
+}
+
 .sign-preset {
     margin: 2px;
     cursor: pointer;
+}
+
+.conditional-tag > td {
+    padding: 0;
+}
+
+.conditional-tag table {
+    border-spacing: 0;
 }
 
 // github control

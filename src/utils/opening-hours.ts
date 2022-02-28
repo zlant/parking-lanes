@@ -1,6 +1,9 @@
 import OpeningHours from 'opening_hours'
 
-export function parseOpeningHourse(value: string): OpeningHours | 'even' | 'odd' | null {
+export function parseOpeningHourse(value: string | null): OpeningHours | 'even' | 'odd' | null {
+    if (value == null)
+        return null
+
     if (/\d+-\d+\/\d+$/.test(value)) {
         // @ts-expect-error
         return parseInt(value.match(/\d+/g)[0]) % 2 === 0 ?

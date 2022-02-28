@@ -39,7 +39,7 @@ import { ParkingAreas, ParkingLanes } from '../utils/types/parking'
 import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
 
 const editorName = 'PLanes'
-const version = '0.6.1'
+const version = '0.7.0'
 
 let editorMode = false
 const useDevServer = false

@@ -1,10 +1,10 @@
 import L, { PolylineOptions } from 'leaflet'
-import { ConditionsInterface } from './conditions'
+import { ParkingConditions } from './conditions'
 import { OsmWay } from './osm-data'
 
 export interface ParkingPolylineOptions extends PolylineOptions {
     offset?: number | undefined
-    conditions?: ConditionsInterface
+    conditions?: ParkingConditions
     osm: OsmWay
     isMajor: boolean
 }

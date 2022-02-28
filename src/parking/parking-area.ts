@@ -1,6 +1,6 @@
 import L from 'leaflet'
 import { getOpeningHourseState, parseOpeningHourse } from '../utils/opening-hours'
-import { ConditionColor, ConditionsInterface } from '../utils/types/conditions'
+import { ConditionColor, ParkingConditions } from '../utils/types/conditions'
 import { ParkingPolylineOptions } from '../utils/types/leaflet'
 import { OsmTags, OsmWay } from '../utils/types/osm-data'
 import { ParkingAreas } from '../utils/types/parking'
@@ -24,30 +24,30 @@ export function parseParkingArea(
 }
 
 export function getConditions(tags: OsmTags) {
-    const conditions: ConditionsInterface = {
-        intervals: [],
+    const conditions: ParkingConditions = {
+        conditionalValues: [],
         default: getDefaultCondition(tags),
     }
 
     if (tags.opening_hours) {
-        conditions.intervals!.push({
-            interval: parseOpeningHourse(tags.opening_hours),
-            condition: conditions.default!,
+        conditions.conditionalValues!.push({
+            condition: parseOpeningHourse(tags.opening_hours),
+            parkingCondition: conditions.default!,
         })
         conditions.default = 'no_stopping'
     }
     if (tags.fee && tags.fee !== 'yes' && tags.fee !== 'no') {
-        conditions.intervals?.push({
-            interval: parseOpeningHourse(tags.fee),
-            condition: 'ticket',
+        conditions.conditionalValues?.push({
+            condition: parseOpeningHourse(tags.fee),
+            parkingCondition: 'ticket',
         })
     }
     if (tags['fee:conditional']) {
         const match = tags['fee:conditional'].match(/(?<value>.*?) *@ *\((?<interval>.*?)\)/)
         if (match?.groups?.interval) {
-            conditions.intervals?.push({
-                interval: parseOpeningHourse(match?.groups?.interval),
-                condition: match?.groups?.value === 'yes' ? 'ticket' : 'free',
+            conditions.conditionalValues?.push({
+                condition: parseOpeningHourse(match?.groups?.interval),
+                parkingCondition: match?.groups?.value === 'yes' ? 'ticket' : 'free',
             })
         }
     }
@@ -89,7 +89,7 @@ function getDefaultCondition(tags: OsmTags): 'yes' | 'ticket' | 'free' | 'custom
     }
 }
 
-function createPolygon(line: L.LatLngLiteral[], conditions: ConditionsInterface | undefined, osm: OsmWay, zoom: number) {
+function createPolygon(line: L.LatLngLiteral[], conditions: ParkingConditions | undefined, osm: OsmWay, zoom: number) {
     const polylineOptions: ParkingPolylineOptions = {
         color: getColor(conditions?.default),
         fillOpacity: 0.6,
@@ -118,14 +118,14 @@ export function updateAreaColorsByDate(areas: ParkingAreas, datetime: Date): voi
     }
 }
 
-function getColorByDate(conditions: ConditionsInterface, datetime: Date): ConditionColor | undefined {
+function getColorByDate(conditions: ParkingConditions, datetime: Date): ConditionColor | undefined {
     if (!conditions)
         return 'black'
 
     // If conditions.intervals not defined, return the default color
-    for (const interval of conditions.intervals ?? []) {
-        if (interval.interval && getOpeningHourseState(interval.interval, datetime))
-            return getColor(interval.condition)
+    for (const interval of conditions.conditionalValues ?? []) {
+        if (interval.condition && getOpeningHourseState(interval.condition, datetime))
+            return getColor(interval.parkingCondition)
     }
     return getColor(conditions.default)
 }

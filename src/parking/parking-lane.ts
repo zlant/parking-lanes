@@ -154,7 +154,8 @@ function parseDefaultCondition(side: string, tags: OsmTags, findedIntervalsCount
     if (conditionInLegend)
         return condition
 
-    if (!conditionInLegend && laneTag)
+    if (!conditionInLegend && laneTag &&
+        ['parallel', 'diagonal', 'perpendicular', 'marked', 'yes'].includes(tags[laneTag]))
         return 'free'
 
     return null

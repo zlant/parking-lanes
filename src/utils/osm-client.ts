@@ -95,6 +95,7 @@ function createChangeset(editorName: string, editorVersion: string): Promise<str
                 tag: [
                     { $k: 'created_by', $v: `${editorName} ${editorVersion}` },
                     { $k: 'comment', $v: 'Parking lanes' },
+                    { $k: 'host', $v: `${window.location.origin}${window.location.pathname}` },
                 ],
             },
         },

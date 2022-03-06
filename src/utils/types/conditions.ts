@@ -19,5 +19,4 @@ export interface ConditionColorDefinition {
     color: ConditionColor
     /** Text describing the condition */
     text: string
-    subline?: string
 }

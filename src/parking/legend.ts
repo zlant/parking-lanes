@@ -11,6 +11,6 @@ export const legend: ConditionColorDefinition[] = [
     { condition: 'customers',    color: 'greenyellow',  text: 'For customers' },
     { condition: 'residents',    color: 'hotpink',      text: 'For residents' },
     { condition: 'disabled',     color: 'turquoise',    text: 'Disabled' },
-    { condition: 'separate',     color: 'gray',         text: 'Parking street site mapped separately' },
+    { condition: 'separate',     color: 'gray',         text: 'Parking mapped separately' },
     /* eslint-enable no-multi-spaces */
 ]

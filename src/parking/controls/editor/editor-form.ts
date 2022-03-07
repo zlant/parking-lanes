@@ -155,10 +155,14 @@ function getTagInput(osm: OsmWay, side: string, parkingType: string, tagTemplate
             hide = osm.tags[conditionTag] !== 'disc'
             break
         }
-        case 'parking:condition:{side}:surface':
+        case 'parking:lane:{side}:surface': {
             input = getTextInput(tag, value)
+            const laneTag = 'parking:lane:{side}'
+                .replace('{side}', side)
+            hide = !['parallel', 'diagonal', 'perpendicular', 'marked', 'yes']
+                .includes(osm.tags[laneTag])
             break
-
+        }
         default:
             input = getTextInput(tag, value)
             break
@@ -257,6 +261,12 @@ function handleLaneTagInput(e: Event) {
         document.querySelector<HTMLElement>(`[id^="parking:lane:${side}:"]`)!.style.display = 'none'
         document.querySelector<HTMLInputElement>(`[name^="parking:lane:${side}:"]`)!.value = ''
     }
+
+    const surfaceTr = document.getElementById(`parking:lane:${side}:surface`)
+    if (['parallel', 'diagonal', 'perpendicular', 'marked', 'yes'].includes(el.value))
+        showElement(surfaceTr!.id)
+    else
+        hideElement(surfaceTr!.id)
 }
 
 function handleConditionTagInput(e: Event) {

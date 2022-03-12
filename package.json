@@ -10,8 +10,8 @@
     "analyze": "cross-env NODE_ENV='production' cross-env ANALYZE=true webpack",
     "deploy": "cross-env NODE_DEBUG=gh-pages gh-pages -d dist",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix",
+    "lint": "eslint src/**/*.ts src/*.ts",
+    "lint:fix": "eslint src/**/*.ts src/*.ts --fix",
     "prepare": "husky install"
   },
   "keywords": [],

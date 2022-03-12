@@ -115,7 +115,7 @@ export function initMap(): L.Map {
     map.on('click', closeLaneInfo)
     map.on('click', areaInfoControl.closeAreaInfo)
 
-    layersControl.addTo(map);
+    layersControl.addTo(map)
 
     // @ts-expect-error
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

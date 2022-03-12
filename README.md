@@ -12,3 +12,15 @@ Viewer:
 Editor:
 
 <img src="https://i.imgur.com/e0vsqUQ.png" alt="Editor UI">
+
+
+# Using correct Node version
+The correct Node version is specified in `.nvmrc`.
+
+For an easy way to automatically use this Node version just for your current shell:
+
+- Install `nvm`
+  - Using the [install script]https://github.com/nvm-sh/nvm#install--update-script)
+  - Or using [Homebrew](https://formulae.brew.sh/formula/nvm)
+- Run `nvm use` to automatically use the Node version specified in the `.nvmrc`. You may need to
+  `nvm install`.

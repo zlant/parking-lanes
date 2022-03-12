@@ -9,7 +9,9 @@
     "build": "cross-env NODE_ENV='production' webpack",
     "analyze": "cross-env NODE_ENV='production' cross-env ANALYZE=true webpack",
     "deploy": "cross-env NODE_DEBUG=gh-pages gh-pages -d dist",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/parking/*.ts src/utils/*.ts src/utils/types/*.ts",
+    "lint:fix": "eslint src/parking/*.ts src/utils/*.ts src/utils/types/*.ts --fix"
   },
   "keywords": [],
   "author": "Zlant",

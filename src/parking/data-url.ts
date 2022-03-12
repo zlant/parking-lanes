@@ -18,6 +18,7 @@ export function getUrl(bounds: L.LatLngBounds, editorMode: boolean, useDevServer
     }
 }
 
+// eslint-disable-next-line
 function getOverpassEditorQuery(bounds: L.LatLngBounds) {
     return `
         [out:json];

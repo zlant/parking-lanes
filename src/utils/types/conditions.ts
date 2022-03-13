@@ -10,7 +10,7 @@ export interface ConditionInterface {
     condition: string | null
 }
 
-export type ConditionName = 'disc' | 'no_parking' | 'no_stopping' | 'free' | 'ticket' |'customers' | 'residents' | 'disabled' | 'disc' | 'no' | 'separate'
+export type ConditionName = 'disc' | 'no_parking' | 'no_stopping' | 'free' | 'ticket' |'customers' | 'residents' | 'disabled' | 'disc' | 'no' | 'separate' | 'unsupported'
 
 export type ConditionColor = string
 

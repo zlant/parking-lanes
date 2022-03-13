@@ -24,3 +24,9 @@ For an easy way to automatically use this Node version just for your current she
   - Or using [Homebrew](https://formulae.brew.sh/formula/nvm)
 - Run `nvm use` to automatically use the Node version specified in the `.nvmrc`. You may need to
   `nvm install`.
+
+## Install git hook
+
+Run `npm run prepare`. This will install [Husky](https://github.com/typicode/husky), which will automatically run the command in `.husky/pre-commit` before commiting.
+
+This prevents commits that fail typecheck or the linter being committed (you can always add a type or linter ignore though).

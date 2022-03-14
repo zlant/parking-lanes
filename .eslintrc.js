@@ -3,6 +3,10 @@ module.exports = {
     parserOptions: {
         project: './tsconfig.json',
     },
+    env: {
+        node: true,
+        jest: true
+    },
     ignorePatterns: ['dist'],
     rules: {
         'curly': ['error', 'multi-or-nest', 'consistent'],

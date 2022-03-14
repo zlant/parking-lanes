@@ -23,7 +23,7 @@ export function parseParkingArea(
     return areas
 }
 
-function getConditions(tags: OsmTags) {
+export function getConditions(tags: OsmTags) {
     const conditions: ConditionsInterface = {
         intervals: [],
         default: getDefaultCondition(tags),

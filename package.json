@@ -10,10 +10,10 @@
     "analyze": "cross-env NODE_ENV='production' cross-env ANALYZE=true webpack",
     "deploy": "cross-env NODE_DEBUG=gh-pages gh-pages -d dist",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/**/*.ts src/*.ts",
-    "lint:fix": "eslint src/**/*.ts src/*.ts --fix",
+    "lint": "eslint src/**/*.ts src/*.ts src/test/*.test.ts",
+    "lint:fix": "eslint src/**/*.ts src/*.ts src/test/*.test.ts --fix",
     "prepare": "husky install",
-    "test": "npx jest test/*"
+    "test": "npx jest src/test/*"
   },
   "keywords": [],
   "author": "Zlant",
@@ -54,6 +54,7 @@
     "postcss-preset-env": "^6.7.0",
     "sass-loader": "^11.1.0",
     "style-loader": "^2.0.0",
+    "ts-jest": "^27.1.3",
     "ts-loader": "^9.2.5",
     "typescript": "^4.4.3",
     "webpack": "^5.37.0",

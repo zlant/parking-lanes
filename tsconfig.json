@@ -15,5 +15,5 @@
     "skipLibCheck": true,
     "types": ["node", "jest"]
   },
-  "include": ["src/index.ts", "src/parking/*.ts", "src/utils/*.ts","src/utils/types/*.ts",  "src/utils/types/*.ts", "test/*.test.ts"]
+  "include": ["src/index.ts", "src/parking/*.ts", "src/utils/*.ts","src/utils/types/*.ts",  "src/utils/types/*.ts" ]
 }

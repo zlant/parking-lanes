@@ -55,7 +55,12 @@ export function getConditions(tags: OsmTags) {
     return conditions
 }
 
-function getDefaultCondition(tags: OsmTags) {
+/**
+ * Get default parking condition for a way given a set of tags based on the access key
+ * @param tags A set of tags on the way
+ * @returns The default parking condition
+ */
+function getDefaultCondition(tags: OsmTags): 'yes' | 'ticket' | 'free' | 'customers' | 'no_stopping' | 'residents' | 'disabled' | 'no_parking' {
     switch (tags.access) {
         case undefined:
         case 'yes':

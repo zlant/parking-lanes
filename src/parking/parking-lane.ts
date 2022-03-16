@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import { parseOpeningHourse, getOpeningHourseState } from '../utils/opening-hours'
+import { parseOpeningHours, getOpeningHourseState } from '../utils/opening-hours'
 import { legend } from './legend'
 import { laneStyleByZoom as laneStyle } from './lane-styles'
 
@@ -180,7 +180,7 @@ function parseConditionsByNewScheme(side: string, tags: OsmTags) {
     const intervals: ConditionalParkingCondition[] = parseConditionalTag(tags[conditionalTag])
         .map(x => ({
             parkingCondition: x.value,
-            condition: parseOpeningHourse(x.condition),
+            condition: parseOpeningHours(x.condition),
         }))
 
     return intervals
@@ -210,7 +210,7 @@ function parseConditionsByOldScheme(side: string, tags: OsmTags) {
 
             tagValue = tags[intervalTags[j]]
             if (tagValue)
-                conditionalParkingCondition.condition = parseOpeningHourse(tagValue)
+                conditionalParkingCondition.condition = parseOpeningHours(tagValue)
         }
 
         if (i === 1 && conditionalParkingCondition.condition == null)

@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import { getOpeningHourseState, parseOpeningHourse } from '../utils/opening-hours'
+import { getOpeningHourseState, parseOpeningHours } from '../utils/opening-hours'
 import { ConditionColor, ParkingConditions } from '../utils/types/conditions'
 import { ParkingPolylineOptions } from '../utils/types/leaflet'
 import { OsmTags, OsmWay } from '../utils/types/osm-data'
@@ -31,14 +31,14 @@ export function getConditions(tags: OsmTags) {
 
     if (tags.opening_hours) {
         conditions.conditionalValues!.push({
-            condition: parseOpeningHourse(tags.opening_hours),
+            condition: parseOpeningHours(tags.opening_hours),
             parkingCondition: conditions.default!,
         })
         conditions.default = 'no_stopping'
     }
     if (tags.fee && tags.fee !== 'yes' && tags.fee !== 'no') {
         conditions.conditionalValues?.push({
-            condition: parseOpeningHourse(tags.fee),
+            condition: parseOpeningHours(tags.fee),
             parkingCondition: 'ticket',
         })
     }
@@ -46,7 +46,7 @@ export function getConditions(tags: OsmTags) {
         const match = tags['fee:conditional'].match(/(?<value>.*?) *@ *\((?<interval>.*?)\)/)
         if (match?.groups?.interval) {
             conditions.conditionalValues?.push({
-                condition: parseOpeningHourse(match?.groups?.interval),
+                condition: parseOpeningHours(match?.groups?.interval),
                 parkingCondition: match?.groups?.value === 'yes' ? 'ticket' : 'free',
             })
         }

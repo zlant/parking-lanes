@@ -1,6 +1,6 @@
 import OpeningHours from 'opening_hours'
 
-export function parseOpeningHourse(value: string | null): OpeningHours | 'even' | 'odd' | null {
+export function parseOpeningHours(value: string | null): OpeningHours | 'even' | 'odd' | null {
     if (value == null)
         return null
 

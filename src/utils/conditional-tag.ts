@@ -18,7 +18,7 @@ export function parseConditionalTag(tag: string) {
             case ';': {
                 if (bracketStack.length === 0) {
                     const startPosition = prevConditionEndPosition ? prevConditionEndPosition + 1 : 0
-                    parsedConditionalTag.push(parseConditionalValue(tag.substring(startPosition, i - 1)))
+                    parsedConditionalTag.push(parseConditionalValue(tag.substring(startPosition, i)))
                     prevConditionEndPosition = i
                 }
             }
@@ -42,9 +42,10 @@ function parseConditionalValue(rawConditionalValue: string) {
     }
 
     if (tokens.length > 1) {
-        conditionalValue.condition = tokens[1]
-            .trim()
-            .substring(1, tokens[1].length - 1)
+        const condition = tokens[1].trim()
+        conditionalValue.condition = condition.substring(
+            condition.startsWith('(') ? 1 : 0,
+            condition.endsWith(')') ? condition.length - 1 : condition.length)
     }
 
     return conditionalValue

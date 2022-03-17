@@ -49,6 +49,8 @@ export function getConditions(tags: OsmTags) {
                 condition: parseOpeningHours(match?.groups?.interval),
                 parkingCondition: match?.groups?.value === 'yes' ? 'ticket' : 'free',
             })
+            if (match?.groups?.value === 'no' && tags.access === undefined)
+                conditions.default = 'ticket'
         }
     }
 

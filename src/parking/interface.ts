@@ -97,7 +97,7 @@ export function initMap(): L.Map {
 
     new GithubControl({ position: 'bottomright' }).addTo(map)
         .setEditorModeCheckboxListener(handleEditorModeCheckboxChange)
-    new LegendControl({ position: 'bottomright' }).addTo(map)
+    new LegendControl({ position: 'bottomleft' }).addTo(map)
     new DatetimeControl({ position: 'topright' }).addTo(map)
         .setDatetime(datetime)
         .setDatetimeChangeListener(handleDatetimeChange)

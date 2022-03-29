@@ -165,6 +165,14 @@ function getTagInput(osm: OsmWay, side: string, parkingType: string, tagTemplate
             hide = osm.tags[conditionTag] !== 'disc'
             break
         }
+        case 'parking:lane:{side}:capacity': {
+            input = getTextInput(tag, value)
+            input.placeholder = 'eg. 10'
+            const capacityTags = 'parking:lane:{side}:capacity'
+                .replace('{side}', side)
+            hide = !!capacityTags
+            break
+        }
         case 'parking:lane:{side}:surface': {
             input = getTextInput(tag, value)
             input.placeholder = osm.tags.surface ?? input.placeholder

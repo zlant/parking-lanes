@@ -167,7 +167,7 @@ function getTagInput(osm: OsmWay, side: string, parkingType: string, tagTemplate
         }
         case 'parking:lane:{side}:surface': {
             input = getTextInput(tag, value)
-            input.placeholder = osm.tags.surface ?? input.placeholder
+            input.placeholder = `eg. ${osm.tags.surface ?? input.placeholder}`
             const laneTag = 'parking:lane:{side}'
                 .replace('{side}', side)
             hide = !['parallel', 'diagonal', 'perpendicular', 'marked', 'yes']

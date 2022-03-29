@@ -1,7 +1,7 @@
 import L, { LatLngLiteral } from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
 import { handleJosmLinkClick } from '../..//utils/josm'
-import { idUrl, josmUrl, mapillaryUrl, overpassDeUrl } from '../../utils/links'
+import { idEditorUrl, josmUrl, mapillaryUrl, overpassDeUrl } from '../../utils/links'
 import { getLaneEditForm, setOsmChangeListener } from './editor/editor-form'
 import { OsmTags, OsmWay } from '../../utils/types/osm-data'
 
@@ -60,7 +60,7 @@ function getPanel(osm: OsmWay, body: any, mapCenter: LatLngLiteral) {
                     <a href="${josmUrl + overpassDeUrl + getWayWithRelationsOverpassQuery(osm.id).replace(/\s+/g, ' ')}"
                        target="_blank"
                        onclick=${handleJosmLinkClick}>Josm</a>,${' '}
-                    <a href="${idUrl + '&way=' + osm.id}"
+                    <a href="${idEditorUrl({ osmObjectType: 'way', osmObjectId: osm.id })}"
                        target="_blank">iD</a>
                 </span>
             </div>

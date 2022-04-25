@@ -250,13 +250,14 @@ function getConditionalPartInput(osm: OsmWay, tag: string, part: ConditionalValu
                 ${selectInput}
             </td>
             <td>
-                <input type="text"
+                @
+                (<input type="text"
                        placeholder="time interval"
                        name="${tag}"
                        value="${part.condition}"
                        data-partindex="${partindex}"
                        data-tokenname="time_interval"
-                       oninput=${(e) => handleInputChange(e, osm)}>
+                       oninput=${(e) => handleInputChange(e, osm)}>)
             </td>
         </tr>`
 }

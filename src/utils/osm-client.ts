@@ -3,7 +3,7 @@ import osmAuth from 'osm-auth'
 import { osmProdUrl, osmDevUrl } from './links'
 
 import { OsmWay } from './types/osm-data'
-import { ChangesStore, JxonOsmWay } from './types/changes-store'
+import { ChangedIdMap, ChangesStore, JxonOsmWay } from './types/changes-store'
 
 let auth: OSMAuth.OSMAuthInstance | null = null
 
@@ -69,17 +69,35 @@ export function userInfo(): Promise<any> {
     })
 }
 
-export async function uploadChanges(editorName: string, editorVersion: string, changesStore: ChangesStore): Promise<void> {
+export async function uploadChanges(editorName: string, editorVersion: string, changesStore: ChangesStore): Promise<ChangedIdMap> {
     try {
         const changesetId = await createChangeset(editorName, editorVersion)
-        await saveChangesets(changesStore, changesetId, editorName)
+        const diffResult = await saveChangesets(changesStore, changesetId, editorName)
         await closeChangeset(changesetId)
 
-        for (const way of changesStore.modify.way)
-            way.version = way.version + 1
+        const diffResultJxon: any = JXON.xmlToJs(diffResult)
+
+        const diffWays = Array.isArray(diffResultJxon.diffResult.way) ?
+            diffResultJxon.diffResult.way :
+            [diffResultJxon.diffResult.way]
+
+        const changedIdMap: ChangedIdMap = {}
+
+        for (const diffWay of diffWays) {
+            const oldId = parseInt(diffWay.$old_id)
+            const way = changesStore.modify.way.find(x => x.id === oldId) ??
+                        changesStore.create.way.find(x => x.id === oldId)
+            way!.id = parseInt(diffWay.$new_id)
+            way!.version = parseInt(diffWay.$new_version)
+
+            if (diffWay.$old_id !== diffWay.$new_id)
+                changedIdMap[diffWay.$old_id] = diffWay.$new_id
+        }
 
         changesStore.modify.way = []
         changesStore.create.way = []
+
+        return changedIdMap
     } catch (err) {
         console.error(err)
         throw err

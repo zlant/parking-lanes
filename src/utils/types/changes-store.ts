@@ -24,3 +24,7 @@ interface JxonOsmObject {
 export interface JxonOsmWay extends JxonOsmObject {
     nd: Array<{$ref: number}>
 }
+
+export interface ChangedIdMap {
+    [oldId: string]: string
+}

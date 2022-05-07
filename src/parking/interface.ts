@@ -39,7 +39,7 @@ import { ParkingAreas, ParkingLanes } from '../utils/types/parking'
 import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
 
 const editorName = 'PLanes'
-const version = '0.7.0'
+const version = '0.7.1'
 
 let editorMode = false
 const useDevServer = false
@@ -357,7 +357,15 @@ function handleOsmChange(newOsm: OsmWay) {
 
 async function handleSaveClick() {
     try {
-        await uploadChanges(editorName, version, changesStore);
+        const changedIdMap = await uploadChanges(editorName, version, changesStore)
+        for (const oldId in changedIdMap) {
+            for (const side of ['right', 'left', 'empty']) {
+                if (lanes[side + oldId]) {
+                    lanes[side + changedIdMap[oldId]] = lanes[side + oldId]
+                    delete lanes[side + oldId]
+                }
+            }
+        }
         (document.getElementById('save-btn') as HTMLButtonElement).style.display = 'none'
     } catch (err) {
         if (err instanceof XMLHttpRequest)

@@ -5,6 +5,7 @@ import { ParsedOsmData } from './types/osm-data-storage'
 export const osmData: ParsedOsmData = {
     ways: {},
     nodes: {},
+    nodeCoords: {},
     waysInRelation: {},
 }
 
@@ -30,6 +31,7 @@ export async function downloadBbox(bounds: L.LatLngBounds, url: string): Promise
 
     if (newData) {
         Object.assign(osmData.nodes, newData.nodes)
+        Object.assign(osmData.nodeCoords, newData.nodeCoords)
         Object.assign(osmData.waysInRelation, newData.waysInRelation)
 
         for (const wayId in newData.ways) {
@@ -70,13 +72,18 @@ function parseOsmResp(osmResp: RawOsmData): ParsedOsmData {
     const newData: ParsedOsmData = {
         ways: {},
         nodes: {},
+        nodeCoords: {},
         waysInRelation: {},
     }
 
     for (const el of osmResp.elements) {
         switch (el.type) {
             case 'node':
-                newData.nodes[el.id] = [el.lat, el.lon]
+                newData.nodeCoords[el.id] = [el.lat, el.lon]
+
+                if (el.tags)
+                    newData.nodes[el.id] = el
+
                 break
 
             case 'way':

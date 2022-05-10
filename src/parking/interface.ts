@@ -35,11 +35,12 @@ import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-clie
 import { OurWindow } from '../utils/types/interfaces'
 import { OsmDataSource, OsmWay } from '../utils/types/osm-data'
 import { ParsedOsmData } from '../utils/types/osm-data-storage'
-import { ParkingAreas, ParkingLanes } from '../utils/types/parking'
+import { ParkingAreas, ParkingEntrances, ParkingLanes } from '../utils/types/parking'
 import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
+import { parseParkingEntrnace, updateEntranceStylesByZoom } from './parking-entrance'
 
 const editorName = 'PLanes'
-const version = '0.7.1'
+const version = '0.7.2'
 
 let editorMode = false
 const useDevServer = false
@@ -154,6 +155,7 @@ function handleDataSourceChange(newDataSource: OsmDataSource) {
 
 const lanes: ParkingLanes = {}
 const areas: ParkingAreas = {}
+const entrances: ParkingEntrances = {}
 const markers: { [key: string]: L.Marker<any>} = {}
 
 async function downloadParkingLanes(map: L.Map): Promise<void> {
@@ -180,16 +182,27 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
             if (lanes['right' + way.id] || lanes['left' + way.id] || lanes['empty' + way.id])
                 continue
 
-            const newLanes = parseParkingLane(way, newData.nodes, map.getZoom(), editorMode)
+            const newLanes = parseParkingLane(way, newData.nodeCoords, map.getZoom(), editorMode)
             if (newLanes !== undefined)
                 addNewLanes(newLanes, map)
         } else if (way.tags?.amenity === 'parking') {
             if (areas[way.id])
                 continue
 
-            const newAreas = parseParkingArea(way, newData.nodes, map.getZoom(), editorMode)
+            const newAreas = parseParkingArea(way, newData.nodeCoords, map.getZoom(), editorMode)
             if (newAreas !== undefined)
                 addNewAreas(newAreas, map)
+        }
+    }
+
+    for (const node of Object.values(newData.nodes)) {
+        if (node.tags?.amenity === 'parking_entrance') {
+            if (entrances[node.id])
+                continue
+
+            const newEntrances = parseParkingEntrnace(node, map.getZoom(), editorMode)
+            if (newEntrances !== undefined)
+                addNewEntrance(newEntrances, map)
         }
     }
 }
@@ -265,6 +278,17 @@ function handleAreaClick(e: Event | any) {
     L.DomEvent.stopPropagation(e)
 }
 
+function addNewEntrance(newEntrnaces: ParkingEntrances, map: L.Map): void {
+    // updateAreaColorsByDate(newEntrnace, datetime)
+    Object.assign(entrances, newEntrnaces)
+    for (const newEntrnace of Object.values<L.Marker>(newEntrnaces)) {
+        newEntrnace.on('click', handleAreaClick)
+        newEntrnace.addTo(map)
+        // L.path is added by plugin, types don't exist.
+        // L.path.touchHelper(newArea).addTo(map)
+    }
+}
+
 // Map move handler
 
 function handleMapMoveEnd() {
@@ -276,7 +300,8 @@ function handleMapMoveEnd() {
     const zoom = map.getZoom()
     setLocationToCookie(map.getCenter(), zoom)
 
-    updateLaneStylesByZoom(lanes, zoom);
+    updateLaneStylesByZoom(lanes, zoom)
+    updateEntranceStylesByZoom(entrances, zoom);
 
     (document.getElementById('min-zoom-btn') as HTMLButtonElement).style.display =
         zoom < viewMinZoom ? 'block' : 'none'
@@ -388,7 +413,7 @@ function handleCutLaneClick(osm: OsmWay) {
     const { map } = (window as OurWindow)
     for (const nd of osm.nodes.slice(1, osm.nodes.length - 1)) {
         markers[nd] = L.marker(
-            osmData.nodes[nd],
+            osmData.nodeCoords[nd],
             {
                 icon: cutIcon,
                 // @ts-expect-error
@@ -416,12 +441,12 @@ function cutWay(arg: any) {
     delete newWay.uid
     delete newWay.timestamp
 
-    lanes['right' + oldWay.id]?.setLatLngs(oldWay.nodes.map(x => osmData.nodes[x]))
-    lanes['left' + oldWay.id]?.setLatLngs(oldWay.nodes.map(x => osmData.nodes[x]))
-    lanes['empty' + oldWay.id]?.setLatLngs(oldWay.nodes.map(x => osmData.nodes[x]))
+    lanes['right' + oldWay.id]?.setLatLngs(oldWay.nodes.map(x => osmData.nodeCoords[x]))
+    lanes['left' + oldWay.id]?.setLatLngs(oldWay.nodes.map(x => osmData.nodeCoords[x]))
+    lanes['empty' + oldWay.id]?.setLatLngs(oldWay.nodes.map(x => osmData.nodeCoords[x]))
 
-    lanes.left?.setLatLngs(oldWay.nodes.map(x => osmData.nodes[x]))
-    lanes.right?.setLatLngs(oldWay.nodes.map(x => osmData.nodes[x]))
+    lanes.left?.setLatLngs(oldWay.nodes.map(x => osmData.nodeCoords[x]))
+    lanes.right?.setLatLngs(oldWay.nodes.map(x => osmData.nodeCoords[x]))
 
     for (const marker in markers) {
         markers[marker].remove()
@@ -430,7 +455,7 @@ function cutWay(arg: any) {
 
     osmData.ways[newWay.id] = newWay
     const { map } = (window as OurWindow)
-    const newLanes = parseParkingLane(newWay, osmData.nodes, map.getZoom(), editorMode)
+    const newLanes = parseParkingLane(newWay, osmData.nodeCoords, map.getZoom(), editorMode)
     if (newLanes !== undefined)
         addNewLanes(newLanes, map)
 

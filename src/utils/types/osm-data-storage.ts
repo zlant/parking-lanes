@@ -1,15 +1,12 @@
-import { OsmWay } from './osm-data'
+import { OsmNode, OsmWay } from './osm-data'
 
 export interface WaysInRelation {
     [wayId: number]: boolean
 }
 
-export interface OsmWays {
-    [wayId: number]: OsmWay
-}
-
 export interface ParsedOsmData {
-    ways: OsmWays
-    nodes: { [nodeId: number]: L.LatLngTuple }
+    ways: { [wayId: number]: OsmWay }
+    nodes: { [nodeId: number]: OsmNode }
+    nodeCoords: { [nodeId: number]: L.LatLngTuple }
     waysInRelation: WaysInRelation
 }

@@ -1,4 +1,4 @@
-import { getConditions } from '../parking/parking-area'
+import { getConditions } from '../parking/access-condition'
 import { ParkingConditions } from '../utils/types/conditions'
 import { OsmTags } from '../utils/types/osm-data'
 

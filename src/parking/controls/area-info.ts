@@ -1,7 +1,7 @@
 import L from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
 import { idUrl } from '../../utils/links'
-import { OsmWay } from '../../utils/types/osm-data'
+import { OsmNode, OsmRelation, OsmWay } from '../../utils/types/osm-data'
 
 export default L.Control.extend({
     onAdd: () => hyper`
@@ -13,7 +13,7 @@ export default L.Control.extend({
              onpointerdown=${L.DomEvent.stopPropagation}
              onclick=${L.DomEvent.stopPropagation} />`,
 
-    showAreaInfo(osm: OsmWay) {
+    showAreaInfo(osm: OsmNode | OsmWay | OsmRelation) {
         const areainfo = document.getElementById('area-control')
         if (areainfo === null)
             return
@@ -32,11 +32,11 @@ export default L.Control.extend({
     },
 })
 
-function getPanel(osm: OsmWay, body: any) {
+function getPanel(osm: OsmNode | OsmWay | OsmRelation, body: any) {
     return hyper`
         <div>
             <div style="min-width:250px">
-                <a href="https://openstreetmap.org/way/${osm.id}" target="_blank">View in OSM</a>
+                <a href="https://openstreetmap.org/${osm.type}/${osm.id}" target="_blank">View in OSM</a>
                 <span style="float:right">
                     Edit:
                     <a href="${idUrl + '&way=' + osm.id}"
@@ -48,7 +48,7 @@ function getPanel(osm: OsmWay, body: any) {
         </div>`
 }
 
-export function getAreaInfo(osm: OsmWay) {
+export function getAreaInfo(osm: OsmNode | OsmWay | OsmRelation) {
     return hyper`
         <table>
             ${Object.keys(osm.tags).map(tag => hyper`

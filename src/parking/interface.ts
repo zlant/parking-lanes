@@ -37,7 +37,7 @@ import { OsmDataSource, OsmWay } from '../utils/types/osm-data'
 import { ParsedOsmData } from '../utils/types/osm-data-storage'
 import { ParkingAreas, ParkingEntrances, ParkingLanes } from '../utils/types/parking'
 import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
-import { parseParkingEntrnace, updateEntranceStylesByZoom } from './parking-entrance'
+import { parseParkingEntrance, updateEntranceStylesByZoom } from './parking-entrance'
 
 const editorName = 'PLanes'
 const version = '0.7.2'
@@ -200,7 +200,7 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
             if (entrances[node.id])
                 continue
 
-            const newEntrances = parseParkingEntrnace(node, map.getZoom(), editorMode)
+            const newEntrances = parseParkingEntrance(node, map.getZoom(), editorMode)
             if (newEntrances !== undefined)
                 addNewEntrance(newEntrances, map)
         }

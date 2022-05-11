@@ -6,7 +6,7 @@ import { ParkingEntrances } from '../utils/types/parking'
 import { getConditions } from './access-condition'
 import { getColor, getColorByDate } from './condition-color'
 
-export function parseParkingEntrnace(
+export function parseParkingEntrance(
     node: OsmNode,
     zoom: number,
     editorMode: boolean): ParkingEntrances | undefined {

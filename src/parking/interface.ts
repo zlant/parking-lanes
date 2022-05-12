@@ -35,9 +35,9 @@ import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-clie
 import { OurWindow } from '../utils/types/interfaces'
 import { OsmDataSource, OsmWay } from '../utils/types/osm-data'
 import { ParsedOsmData } from '../utils/types/osm-data-storage'
-import { ParkingAreas, ParkingEntrances, ParkingLanes } from '../utils/types/parking'
+import { ParkingAreas, ParkingPoint, ParkingLanes } from '../utils/types/parking'
 import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
-import { parseParkingEntrnace, updateEntranceStylesByZoom } from './parking-entrance'
+import { parseParkingPoint, updatePointStylesByZoom } from './parking-point'
 
 const editorName = 'PLanes'
 const version = '0.7.2'
@@ -155,7 +155,7 @@ function handleDataSourceChange(newDataSource: OsmDataSource) {
 
 const lanes: ParkingLanes = {}
 const areas: ParkingAreas = {}
-const entrances: ParkingEntrances = {}
+const points: ParkingPoint = {}
 const markers: { [key: string]: L.Marker<any>} = {}
 
 async function downloadParkingLanes(map: L.Map): Promise<void> {
@@ -197,12 +197,12 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
 
     for (const node of Object.values(newData.nodes)) {
         if (node.tags?.amenity === 'parking_entrance' || node.tags?.amenity === 'parking') {
-            if (entrances[node.id])
+            if (points[node.id])
                 continue
 
-            const newEntrances = parseParkingEntrnace(node, map.getZoom(), editorMode)
-            if (newEntrances !== undefined)
-                addNewEntrance(newEntrances, map)
+            const newPoints = parseParkingPoint(node, map.getZoom(), editorMode)
+            if (newPoints !== undefined)
+                addNewPoint(newPoints, map)
         }
     }
 }
@@ -278,12 +278,12 @@ function handleAreaClick(e: Event | any) {
     L.DomEvent.stopPropagation(e)
 }
 
-function addNewEntrance(newEntrnaces: ParkingEntrances, map: L.Map): void {
+function addNewPoint(newPoints: ParkingPoint, map: L.Map): void {
     // updateAreaColorsByDate(newEntrnace, datetime)
-    Object.assign(entrances, newEntrnaces)
-    for (const newEntrnace of Object.values<L.Marker>(newEntrnaces)) {
-        newEntrnace.on('click', handleAreaClick)
-        newEntrnace.addTo(map)
+    Object.assign(points, newPoints)
+    for (const newPoint of Object.values<L.Marker>(newPoints)) {
+        newPoint.on('click', handleAreaClick)
+        newPoint.addTo(map)
         // L.path is added by plugin, types don't exist.
         // L.path.touchHelper(newArea).addTo(map)
     }
@@ -301,7 +301,7 @@ function handleMapMoveEnd() {
     setLocationToCookie(map.getCenter(), zoom)
 
     updateLaneStylesByZoom(lanes, zoom)
-    updateEntranceStylesByZoom(entrances, zoom);
+    updatePointStylesByZoom(points, zoom);
 
     (document.getElementById('min-zoom-btn') as HTMLButtonElement).style.display =
         zoom < viewMinZoom ? 'block' : 'none'

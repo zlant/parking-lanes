@@ -9,7 +9,7 @@ export interface ParkingPolylineOptions extends PolylineOptions {
     isMajor: boolean
 }
 
-export interface ParkingEntranceOptions extends CircleMarkerOptions {
+export interface ParkingPointOptions extends CircleMarkerOptions {
     conditions?: ParkingConditions
     osm: OsmNode
 }

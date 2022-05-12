@@ -16,6 +16,6 @@ export interface ParkingAreas {
     [key: string]: L.Polyline | any
 }
 
-export interface ParkingEntrances {
+export interface ParkingPoint {
     [key: string]: L.Marker | any
 }

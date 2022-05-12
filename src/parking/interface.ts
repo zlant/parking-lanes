@@ -196,7 +196,7 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
     }
 
     for (const node of Object.values(newData.nodes)) {
-        if (node.tags?.amenity === 'parking_entrance') {
+        if (node.tags?.amenity === 'parking_entrance' || node.tags?.amenity === 'parking') {
             if (entrances[node.id])
                 continue
 

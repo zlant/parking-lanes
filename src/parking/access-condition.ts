@@ -13,7 +13,7 @@ export function getConditions(tags: OsmTags) {
             condition: parseOpeningHours(tags.opening_hours),
             parkingCondition: conditions.default!,
         })
-        conditions.default = 'no_stopping'
+        conditions.default = 'no'
     }
     if (tags.fee && tags.fee !== 'yes' && tags.fee !== 'no') {
         conditions.conditionalValues?.push({

@@ -31,6 +31,8 @@ export function getConditions(tags: OsmTags) {
             })
             if (conditionalValue.value === 'no' && tags.access === undefined)
                 conditions.default = 'ticket'
+            if (conditionalValue.value === 'yes' && conditionalValue.condition?.includes('stay'))
+                conditions.default = 'disc'
         }
     }
 

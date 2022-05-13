@@ -57,4 +57,16 @@ describe('#getConditions()', () => {
         }
         expect(expectedConditions).toStrictEqual(receivedConditions)
     })
+    test('fee:conditional=no @ ({time_interval})', async() => {
+        const tags: OsmTags = { 'fee:conditional': 'yes @ (stay > 2h)' }
+        const receivedConditions = getConditions(tags)
+        const expectedConditions: ParkingConditions = {
+            default: 'disc',
+            conditionalValues: [{
+                parkingCondition: 'ticket',
+                condition: null,
+            }],
+        }
+        expect(expectedConditions).toStrictEqual(receivedConditions)
+    })
 })

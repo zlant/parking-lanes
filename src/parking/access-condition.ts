@@ -1,3 +1,4 @@
+import { parseConditionalTag } from '../utils/conditional-tag'
 import { parseOpeningHours } from '../utils/opening-hours'
 import { ParkingConditions } from '../utils/types/conditions'
 import { OsmTags } from '../utils/types/osm-data'
@@ -22,13 +23,13 @@ export function getConditions(tags: OsmTags) {
         })
     }
     if (tags['fee:conditional']) {
-        const match = tags['fee:conditional'].match(/(?<value>.*?) *@ *\((?<interval>.*?)\)/)
-        if (match?.groups?.interval) {
+        const conditionalFee = parseConditionalTag(tags['fee:conditional'])
+        for (const conditionalValue of conditionalFee) {
             conditions.conditionalValues?.push({
-                condition: parseOpeningHours(match?.groups?.interval),
-                parkingCondition: match?.groups?.value === 'yes' ? 'ticket' : 'free',
+                condition: parseOpeningHours(conditionalValue.condition),
+                parkingCondition: conditionalValue.value === 'yes' ? 'ticket' : 'free',
             })
-            if (match?.groups?.value === 'no' && tags.access === undefined)
+            if (conditionalValue.value === 'no' && tags.access === undefined)
                 conditions.default = 'ticket'
         }
     }

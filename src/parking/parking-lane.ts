@@ -143,7 +143,11 @@ function parseDefaultConditionBySchemeV3(side: string, tags: OsmTags) {
     const sides = [side, 'both']
 
     const laneTag = sides.map(side => 'parking:' + side).find(tag => tags[tag])
+    const feeTag = sides.map(side => `parking:${side}:fee`).find(tag => tags[tag])
     const restrictionTag = sides.map(side => 'parking:' + side + ':restriction').find(tag => tags[tag])
+
+    if (feeTag && tags[feeTag] === 'yes')
+        return 'ticket'
 
     if (!restrictionTag && laneTag &&
         ['lane', 'street_side', 'on_kerb', 'half_on_kerb', 'shoulder', 'yes'].includes(tags[laneTag]))

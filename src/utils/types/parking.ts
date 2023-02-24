@@ -1,3 +1,5 @@
+import { OsmTags } from './osm-data'
+
 export type Side = 'left' | 'right'
 
 export interface StyleMapInterface {
@@ -18,4 +20,11 @@ export interface ParkingAreas {
 
 export interface ParkingPoint {
     [key: string]: L.Marker | any
+}
+
+export interface ParkingTagInfo {
+    template: string
+    values?: string[]
+    dependentTags?: string[]
+    checkForNeedShowing: (tags: OsmTags, side: string) => boolean
 }

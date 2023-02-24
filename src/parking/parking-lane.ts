@@ -124,24 +124,47 @@ function wayIsMajor(tags: OsmTags) {
 function getConditions(side: 'left' | 'right', tags: OsmTags): ParkingConditions {
     const conditions: ParkingConditions = { conditionalValues: [], default: null }
 
-    conditions.conditionalValues = parseConditionsByNewScheme(side, tags)
+    conditions.conditionalValues = parseConditionsBySchemeV3(side, tags)
+    conditions.default = parseDefaultConditionBySchemeV3(side, tags)
+    if (conditions.default)
+        return conditions
+
+    conditions.conditionalValues = parseConditionsBySchemeV2(side, tags)
     if (conditions.conditionalValues.length > 0) {
         conditions.default = parseDefaultCondition(side, tags, 0)
     } else {
-        conditions.conditionalValues = parseConditionsByOldScheme(side, tags)
+        conditions.conditionalValues = parseConditionsBySchemeV1(side, tags)
         conditions.default = parseDefaultCondition(side, tags, conditions.conditionalValues.length)
     }
     return conditions
 }
 
-function parseDefaultCondition(side: string, tags: OsmTags, findedByOldSchemeIntervalsCount: number) {
+function parseDefaultConditionBySchemeV3(side: string, tags: OsmTags) {
+    const sides = [side, 'both']
+
+    const laneTag = sides.map(side => 'parking:' + side).find(tag => tags[tag])
+    const feeTag = sides.map(side => `parking:${side}:fee`).find(tag => tags[tag])
+    const restrictionTag = sides.map(side => 'parking:' + side + ':restriction').find(tag => tags[tag])
+
+    if (feeTag && tags[feeTag] === 'yes')
+        return 'ticket'
+
+    if (!restrictionTag && laneTag &&
+        ['lane', 'street_side', 'on_kerb', 'half_on_kerb', 'shoulder', 'yes'].includes(tags[laneTag]))
+        return 'free'
+
+    if (restrictionTag)
+        return tags[restrictionTag]
+}
+
+function parseDefaultCondition(side: string, tags: OsmTags, findedBySchemeV1IntervalsCount: number) {
     const sides = [side, 'both']
 
     const laneTag = sides.map(side => 'parking:lane:' + side).find(tag => tags[tag])
     const conditionTag = sides.map(side => 'parking:condition:' + side).find(tag => tags[tag])
     const defalutConditionTag = sides.map(side => 'parking:condition:' + side + ':default').find(tag => tags[tag])
 
-    const tag = findedByOldSchemeIntervalsCount === 0 ?
+    const tag = findedBySchemeV1IntervalsCount === 0 ?
         conditionTag ?? (laneTag && legend.some(x => x.condition === tags[laneTag]) ? laneTag : null) ?? defalutConditionTag :
         defalutConditionTag ?? laneTag
     const condition = tag ? tags[tag] : null
@@ -160,7 +183,69 @@ function parseDefaultCondition(side: string, tags: OsmTags, findedByOldSchemeInt
     return null
 }
 
-function parseConditionsByNewScheme(side: string, tags: OsmTags) {
+function parseConditionsBySchemeV3(side: string, tags: OsmTags) {
+    const restrictionTag = [side, 'both']
+        .map(side => 'parking:' + side + ':restriction:conditional')
+        .find(tag => tags[tag])
+    const accessTag = [side, 'both']
+        .map(side => 'parking:' + side + ':access:conditional')
+        .find(tag => tags[tag])
+    const feeTag = [side, 'both']
+        .map(side => 'parking:' + side + ':fee:conditional')
+        .find(tag => tags[tag])
+    const maxstayTag = [side, 'both']
+        .map(side => 'parking:' + side + ':maxstay:conditional')
+        .find(tag => tags[tag])
+
+    if (!restrictionTag && !accessTag && !feeTag && !maxstayTag)
+        return []
+
+    const intervals: ConditionalParkingCondition[] = []
+
+    if (maxstayTag) {
+        intervals.push(
+            ...parseConditionalTag(tags[maxstayTag])
+                .map(x => ({
+                    parkingCondition: 'disc',
+                    condition: parseOpeningHours(x.condition),
+                })),
+        )
+    }
+
+    if (feeTag) {
+        intervals.push(
+            ...parseConditionalTag(tags[feeTag])
+                .map(x => ({
+                    parkingCondition: x.value === 'yes' ? 'ticket' : 'free',
+                    condition: parseOpeningHours(x.condition),
+                })),
+        )
+    }
+
+    if (accessTag) {
+        intervals.push(
+            ...parseConditionalTag(tags[accessTag])
+                .map(x => ({
+                    parkingCondition: x.value,
+                    condition: parseOpeningHours(x.condition),
+                })),
+        )
+    }
+
+    if (restrictionTag) {
+        intervals.push(
+            ...parseConditionalTag(tags[restrictionTag])
+                .map(x => ({
+                    parkingCondition: x.value,
+                    condition: parseOpeningHours(x.condition),
+                })),
+        )
+    }
+
+    return intervals
+}
+
+function parseConditionsBySchemeV2(side: string, tags: OsmTags) {
     const conditionalTag = [side, 'both']
         .map(side => 'parking:condition:' + side + ':conditional')
         .find(tag => tags[tag])
@@ -177,7 +262,7 @@ function parseConditionsByNewScheme(side: string, tags: OsmTags) {
     return intervals
 }
 
-function parseConditionsByOldScheme(side: string, tags: OsmTags) {
+function parseConditionsBySchemeV1(side: string, tags: OsmTags) {
     const conditionalParkingConditions: ConditionalParkingCondition[] = []
     const sides = ['both', side]
 

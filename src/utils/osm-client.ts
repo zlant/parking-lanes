@@ -2,8 +2,8 @@ import * as JXON from 'jxon'
 import osmAuth from 'osm-auth'
 import { osmProdUrl, osmDevUrl } from './links'
 
-import { OsmWay } from './types/osm-data'
-import { ChangedIdMap, ChangesStore, JxonOsmWay } from './types/changes-store'
+import { type OsmWay } from './types/osm-data'
+import { type ChangedIdMap, type ChangesStore, type JxonOsmWay } from './types/changes-store'
 
 let auth: OSMAuth.OSMAuthInstance | null = null
 
@@ -50,7 +50,9 @@ export function authenticate(useDevServer: boolean): Promise<any> {
         if (auth === null)
             return
 
-        return auth.authenticate((err, oauth) => err ? reject(err) : resolve(oauth))
+        return auth.authenticate((err, oauth) => {
+            err ? reject(err) : resolve(oauth)
+        })
     })
 }
 

@@ -32,10 +32,10 @@ import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
 import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '../utils/changes-store'
 import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-client'
-import { OurWindow } from '../utils/types/interfaces'
-import { OsmDataSource, OsmWay } from '../utils/types/osm-data'
-import { ParsedOsmData } from '../utils/types/osm-data-storage'
-import { ParkingAreas, ParkingPoint, ParkingLanes } from '../utils/types/parking'
+import { type OurWindow } from '../utils/types/interfaces'
+import { OsmDataSource, type OsmWay } from '../utils/types/osm-data'
+import { type ParsedOsmData } from '../utils/types/osm-data-storage'
+import { type ParkingAreas, type ParkingPoint, type ParkingLanes } from '../utils/types/parking'
 import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
 import { parseParkingPoint, updatePointColorsByDate, updatePointStylesByZoom } from './parking-point'
 
@@ -103,7 +103,9 @@ export function initMap(): L.Map {
         .setDatetime(datetime)
         .setDatetimeChangeListener(handleDatetimeChange)
     fetchControl.addTo(map)
-        .setFetchDataBtnClickListener(async() => await downloadParkingLanes(map))
+        .setFetchDataBtnClickListener(async() => {
+            await downloadParkingLanes(map)
+        })
         .setDataSource(dataSource)
         .setDataSourceChangeListener(handleDataSourceChange)
     new InfoControl({ position: 'topright' }).addTo(map)
@@ -157,7 +159,7 @@ function handleDataSourceChange(newDataSource: OsmDataSource) {
 const lanes: ParkingLanes = {}
 const areas: ParkingAreas = {}
 const points: ParkingPoint = {}
-const markers: { [key: string]: L.Marker<any>} = {}
+const markers: Record<string, L.Marker<any>> = {}
 
 async function downloadParkingLanes(map: L.Map): Promise<void> {
     fetchControl.setFetchDataBtnText('Fetching data...')

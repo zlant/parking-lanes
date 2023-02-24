@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import { LocationAndZoom } from './types/leaflet'
+import { type LocationAndZoom } from './types/leaflet'
 
 export function setLocationToCookie(center: L.LatLng, zoom: number): void {
     const date = new Date(new Date().getTime() + 10 * 365 * 24 * 60 * 60 * 1000)

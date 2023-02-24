@@ -1,7 +1,7 @@
-import { StyleMapInterface } from '../utils/types/parking'
+import { type StyleMapInterface } from '../utils/types/parking'
 
-function generateStyleMapByZoom(): { [key: number]: StyleMapInterface } {
-    const map: { [key: number]: StyleMapInterface } = {}
+function generateStyleMapByZoom(): Record<number, StyleMapInterface> {
+    const map: Record<number, StyleMapInterface> = {}
 
     // Needs to be kept in sync with the max maxZoom from interface.js tileLayers.
     const maxMaxZoomFromTileLayers = 22 + 1

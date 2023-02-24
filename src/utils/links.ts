@@ -1,5 +1,5 @@
-import { LatLng, LatLngLiteral } from 'leaflet'
-import { OsmNode, OsmRelation, OsmWay } from './types/osm-data'
+import { type LatLng, type LatLngLiteral } from 'leaflet'
+import { type OsmNode, type OsmRelation, type OsmWay } from './types/osm-data'
 
 export const overpassDeUrl = 'https://overpass-api.de/api/interpreter?data='
 export const overpassVkUrl = 'https://maps.mail.ru/osm/tools/overpass/api/interpreter?data='
@@ -20,7 +20,7 @@ interface idEditorUrlProps {
     osmObjectId?: number | string
 }
 export function idEditorUrl({ center, zoom, background, osmObjectType, osmObjectId }: idEditorUrlProps) {
-    const params: { [key: string]: string } = {
+    const params: Record<string, string> = {
         disable_features: 'boundaries',
         photo_overlay: 'streetside,mapillary,kartaview',
     }

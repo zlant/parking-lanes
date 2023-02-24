@@ -3,10 +3,10 @@ import { parseOpeningHours } from '../utils/opening-hours'
 import { legend } from './legend'
 import { laneStyleByZoom as laneStyle } from './lane-styles'
 
-import { ConditionalParkingCondition, ParkingConditions } from '../utils/types/conditions'
-import { OsmWay, OsmTags } from '../utils/types/osm-data'
-import { ParkingLanes, Side } from '../utils/types/parking'
-import { ParkingPolylineOptions } from '../utils/types/leaflet'
+import { type ConditionalParkingCondition, type ParkingConditions } from '../utils/types/conditions'
+import { type OsmWay, type OsmTags } from '../utils/types/osm-data'
+import { type ParkingLanes, type Side } from '../utils/types/parking'
+import { type ParkingPolylineOptions } from '../utils/types/leaflet'
 import { parseConditionalTag } from '../utils/conditional-tag'
 import { getColor, getColorByDate } from './condition-color'
 import { getConditions as getParkingsConditions } from './access-condition'
@@ -16,7 +16,7 @@ const majorHighwayRegex = /^motorway|trunk|primary|secondary|tertiary|unclassifi
 
 export function parseParkingLane(
     way: OsmWay,
-    nodes: { [key: number]: number[] },
+    nodes: Record<number, number[]>,
     zoom: number,
     editorMode: boolean): ParkingLanes | undefined {
     const isMajor = wayIsMajor(way.tags)

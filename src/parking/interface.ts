@@ -27,7 +27,7 @@ import {
 } from './parking-lane'
 
 import { getLocationFromCookie, setLocationToCookie } from '../utils/location-cookie'
-import { idUrl, josmUrl, overpassDeUrl } from '../utils/links'
+import { idEditorUrl, josmUrl, overpassDeUrl } from '../utils/links'
 import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
 import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '../utils/changes-store'
@@ -292,13 +292,14 @@ function addNewPoint(newPoints: ParkingPoint, map: L.Map): void {
 // Map move handler
 
 function handleMapMoveEnd() {
-    const { map } = (window as OurWindow);
-    (document.getElementById('ghc-josm') as HTMLLinkElement).href = josmUrl + overpassDeUrl + getHighwaysOverpassQuery();
-    (document.getElementById('ghc-id') as HTMLLinkElement).href = idUrl + '#map=' +
-    document.location.href.substring(document.location.href.indexOf('#') + 1)
-
+    const { map } = (window as OurWindow)
     const zoom = map.getZoom()
-    setLocationToCookie(map.getCenter(), zoom)
+    const center = map.getCenter();
+
+    (document.getElementById('ghc-josm') as HTMLLinkElement).href = josmUrl + overpassDeUrl + getHighwaysOverpassQuery();
+    (document.getElementById('ghc-id') as HTMLLinkElement).href = idEditorUrl({ zoom, center })
+
+    setLocationToCookie(center, zoom)
 
     updateLaneStylesByZoom(lanes, zoom)
     updatePointStylesByZoom(points, zoom);

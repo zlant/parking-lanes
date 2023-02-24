@@ -1,6 +1,6 @@
 import L from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
-import { idUrl } from '../../utils/links'
+import { idEditorUrl } from '../../utils/links'
 import { OsmNode, OsmRelation, OsmWay } from '../../utils/types/osm-data'
 
 export default L.Control.extend({
@@ -39,7 +39,7 @@ function getPanel(osm: OsmNode | OsmWay | OsmRelation, body: any) {
                 <a href="https://openstreetmap.org/${osm.type}/${osm.id}" target="_blank">View in OSM</a>
                 <span style="float:right">
                     Edit:
-                    <a href="${idUrl + '&way=' + osm.id}"
+                    <a href="${idEditorUrl({ osmObjectType: 'way', osmObjectId: osm.id })}"
                        target="_blank">iD</a>
                 </span>
             </div>

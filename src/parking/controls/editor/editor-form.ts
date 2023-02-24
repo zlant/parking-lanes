@@ -280,7 +280,7 @@ function getConditionalInput(osm: OsmWay, tag: string, label: string, hide: bool
     return hyper`
         <tr id="${tag}" 
             class="conditional-tag"
-            style=${{ display: hide ? 'none' : null }}>
+            style=${{ display: hide && !osm.tags[tag] ? 'none' : null }}>
             <td colspan="2">
                 <table>
                     <tr><td><label title="${tag}">${label}</label></td></tr>

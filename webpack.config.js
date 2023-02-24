@@ -32,6 +32,7 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             title: 'Parking lanes viewer',
+            buildDate: new Date().toISOString(),
             template: path.resolve(__dirname, './src/template.html'),
             filename: 'index.html',
         }),

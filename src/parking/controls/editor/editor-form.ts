@@ -1,11 +1,11 @@
 import { hyper } from 'hyperhtml/esm'
-import { OsmTags, OsmWay } from '../../../utils/types/osm-data'
-import { WaysInRelation } from '../../../utils/types/osm-data-storage'
-import { OsmKeyValue } from '../../../utils/types/preset'
+import { type OsmTags, type OsmWay } from '../../../utils/types/osm-data'
+import { type WaysInRelation } from '../../../utils/types/osm-data-storage'
+import { type OsmKeyValue } from '../../../utils/types/preset'
 import { presets } from './presets'
 import { getAllTagsBlock } from '../lane-info'
-import { parseConditionalTag, ConditionalValue } from '../../../utils/conditional-tag'
-import { ParkingTagInfo } from '../../../utils/types/parking'
+import { parseConditionalTag, type ConditionalValue } from '../../../utils/conditional-tag'
+import { type ParkingTagInfo } from '../../../utils/types/parking'
 
 export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cutLaneListener: (way: OsmWay) => void): HTMLFormElement {
     const form = hyper`
@@ -22,7 +22,9 @@ export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cut
                     type="button"
                     class="editor-form__cut-button"
                     style="${waysInRelation[osm.id] ? displayNone : null}"
-                    onclick=${() => cutLaneListener(osm)}>
+                    onclick=${() => {
+        cutLaneListener(osm)
+    }}>
                 ✂
             </button>
             <dl>
@@ -76,7 +78,7 @@ function handleSideSwitcherChange(e: Event) {
     }
 }
 
-function getSideGroup(osm: OsmWay, side: 'both'|'left'|'right') {
+function getSideGroup(osm: OsmWay, side: 'both' | 'left' | 'right') {
     return hyper`
         <div id=${side}
              class="tags-block tags-block_${side}">
@@ -214,7 +216,7 @@ const parkingLaneTags: ParkingTagInfo[] = [
     },
 ]
 
-function getTagInputs(osm: OsmWay, side: 'both'|'left'|'right') {
+function getTagInputs(osm: OsmWay, side: 'both' | 'left' | 'right') {
     const inputs: HTMLElement[] = []
 
     const unsupportedTags = Object.keys(osm.tags)
@@ -268,7 +270,9 @@ function getTextInput(tag: string, value: string): HTMLInputElement {
 function getSimpleTagInput(osm: OsmWay, tag: string, label: string, hide: boolean, values?: string[]) {
     const value = osm.tags[tag]
     const input = values ? getSelectInput(tag, value, values) : getTextInput(tag, value)
-    input.onchange = (e) => handleInputChange(e, osm)
+    input.onchange = (e) => {
+        handleInputChange(e, osm)
+    }
 
     return hyper`
         <tr id="${tag}"
@@ -285,7 +289,7 @@ function getConditionalInput(osm: OsmWay, tag: string, label: string, hide: bool
     parsedConditionalTag.push({ value: '', condition: null })
 
     return hyper`
-        <tr id="${tag}" 
+        <tr id="${tag}"
             class="conditional-tag"
             style=${{ display: hide ? 'none' : null }}>
             <td style="vertical-align: top;">
@@ -303,7 +307,9 @@ function getConditionalPartInput(osm: OsmWay, tag: string, part: ConditionalValu
     const input = values ?
         getSelectInput(tag, part.value, values) :
         getTextInput(tag, part.value)
-    input.onchange = (e) => handleInputChange(e, osm)
+    input.onchange = (e) => {
+        handleInputChange(e, osm)
+    }
     input.dataset.partindex = partindex.toString()
     input.dataset.tokenname = 'condition'
 
@@ -320,7 +326,9 @@ function getConditionalPartInput(osm: OsmWay, tag: string, part: ConditionalValu
                        value="${part.condition}"
                        data-partindex="${partindex}"
                        data-tokenname="time_interval"
-                       oninput=${(e) => handleInputChange(e, osm)}>)
+                       oninput=${(e) => {
+        handleInputChange(e, osm)
+    }}>)
             </td>
         </tr>`
 }
@@ -349,7 +357,7 @@ function handleInputChange(e: Event, osm: OsmWay) {
     }
 }
 
-function getPresetSigns(osm: OsmWay, side: 'both'|'left'|'right') {
+function getPresetSigns(osm: OsmWay, side: 'both' | 'left' | 'right') {
     return presets.map(x => hyper`
         <img src=${x.img.src}
              class="sign-preset"
@@ -357,7 +365,9 @@ function getPresetSigns(osm: OsmWay, side: 'both'|'left'|'right') {
              width=${x.img.width}
              alt=${x.img.alt}
              title=${x.img.title}
-             onclick=${() => handlePresetClick(x.tags, osm, side)}>`)
+             onclick=${() => {
+        handlePresetClick(x.tags, osm, side)
+    }}>`)
 }
 
 /**
@@ -409,7 +419,7 @@ function formToOsmWay(osm: OsmWay, form: HTMLFormElement) {
     for (const tagKey of Object.keys(osm.tags).filter(x => x.startsWith('parking:')))
         delete osm.tags[tagKey]
 
-    const conditionals: {[tag: string]: string[][]} = {}
+    const conditionals: Record<string, string[][]> = {}
 
     for (const input of Array.from(form.elements)) {
         if (input instanceof HTMLInputElement || input instanceof HTMLSelectElement) {

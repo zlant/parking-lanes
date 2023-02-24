@@ -209,14 +209,28 @@ const parkingLaneTags: ParkingTagInfo[] = [
 
 function getTagInputs(osm: OsmWay, side: 'both'|'left'|'right') {
     const inputs: HTMLElement[] = []
-    for (const tagInfo of parkingLaneTags)
+
+    const unsupportedTags = Object.keys(osm.tags)
+        .filter(x => x.startsWith('parking:'))
+        .filter(x => x.includes(side))
+        /* eslint-disable @typescript-eslint/indent */
+        .map<ParkingTagInfo>(x => ({
+            template: x.replace(side, '{side}'),
+            checkForNeedShowing: (tags, side) => true,
+        }))
+        /* eslint-enable @typescript-eslint/indent */
+        .filter(x => !parkingLaneTags.find(t => t.template === x.template))
+
+    for (const tagInfo of parkingLaneTags.concat(unsupportedTags))
         inputs.push(getTagInput(osm, side, tagInfo))
     return inputs
 }
 
 function getTagInput(osm: OsmWay, side: string, tagInfo: ParkingTagInfo) {
     const tag = tagInfo.template.replace('{side}', side)
-    const label = tagInfo.template.replace('parking:{side}', '').slice(1) || side
+    const label = tagInfo.template.startsWith('parking:{side}') ?
+        tagInfo.template.replace('parking:{side}', '').slice(1) || side :
+        tag
     const hide = !tagInfo.checkForNeedShowing(osm.tags, side)
     return tag.endsWith(':conditional') ?
         getConditionalInput(osm, tag, label, hide, tagInfo.values) :

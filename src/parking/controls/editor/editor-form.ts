@@ -6,6 +6,7 @@ import { presets } from './presets'
 import { getAllTagsBlock } from '../lane-info'
 import { parseConditionalTag, type ConditionalValue } from '../../../utils/conditional-tag'
 import { type ParkingTagInfo } from '../../../utils/types/parking'
+import { transpose } from 'osm-parking-tag-updater/src/components/Tool/transpose/transpose'
 
 export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cutLaneListener: (way: OsmWay) => void): HTMLFormElement {
     const form = hyper`
@@ -18,6 +19,12 @@ export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cut
                        onchange=${handleSideSwitcherChange}>
                 Both
             </label>
+            <button title="Update tags"
+                    type="button"
+                    class="editor-form__cut-button"
+                    onclick=${() => handleUpdateTagsClick(osm)}>
+                U
+            </button>
             <button title="Cut lane"
                     type="button"
                     class="editor-form__cut-button"
@@ -386,6 +393,11 @@ function handlePresetClick(
     const inputSelector = `form[id='${osm.id}'] [name='${`parking:${side}`}']`
     const element = document.querySelector(inputSelector) as HTMLInputElement | HTMLSelectElement
     element.dispatchEvent(new Event('change'))
+}
+
+function handleUpdateTagsClick(way: OsmWay) {
+    const result = transpose(Object.entries(way.tags).map(x=>`${x[0]}=${x[1]}`))
+    console.warn(result)
 }
 
 function showElement(id: string) {

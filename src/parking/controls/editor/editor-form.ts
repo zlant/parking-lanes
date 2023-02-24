@@ -373,7 +373,7 @@ function handlePresetClick(
         currentInput.value = tag.v
     }
 
-    const inputSelector = `form[id='${osm.id}'] [name='${`parking:lane:${side}`}']`
+    const inputSelector = `form[id='${osm.id}'] [name='${`parking:${side}`}']`
     const element = document.querySelector(inputSelector) as HTMLInputElement | HTMLSelectElement
     element.dispatchEvent(new Event('change'))
 }

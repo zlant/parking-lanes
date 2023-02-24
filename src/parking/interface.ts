@@ -40,7 +40,7 @@ import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
 import { parseParkingPoint, updatePointStylesByZoom } from './parking-point'
 
 const editorName = 'PLanes'
-const version = '0.8.0'
+const version = '0.8.1'
 
 let editorMode = false
 const useDevServer = false

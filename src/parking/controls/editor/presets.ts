@@ -4,8 +4,8 @@ export const presets: Preset[] = [
     {
         key: 'noStopping',
         tags: [
+            { k: 'parking:{side}', v: 'no' },
             { k: 'parking:{side}:restriction', v: 'no_stopping' },
-            { k: 'parking:{side}', v: '' },
             { k: 'parking:{side}:reason', v: '' },
             { k: 'parking:{side}:orientation', v: '' },
             { k: 'parking:{side}:fee', v: '' },
@@ -28,8 +28,8 @@ export const presets: Preset[] = [
     {
         key: 'noParking',
         tags: [
+            { k: 'parking:{side}', v: 'no' },
             { k: 'parking:{side}:restriction', v: 'no_parking' },
-            { k: 'parking:{side}', v: '' },
             { k: 'parking:{side}:reason', v: '' },
             { k: 'parking:{side}:orientation', v: '' },
             { k: 'parking:{side}:fee', v: '' },

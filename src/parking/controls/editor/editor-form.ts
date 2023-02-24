@@ -32,6 +32,7 @@ export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cut
                     <button title="Update tags"
                             type="button"
                             class="editor-form__cut-button"
+                            style="${canUpdateTags(osm) ? null : displayNone }"
                             onclick=${() => handleOpenTagsUpdatingModalClick(osm)}>
                         🔄
                     </button>
@@ -438,6 +439,11 @@ function handlePresetClick(
     const inputSelector = `form[id='${osm.id}'] [name='${`parking:${side}`}']`
     const element = document.querySelector(inputSelector) as HTMLInputElement | HTMLSelectElement
     element.dispatchEvent(new Event('change'))
+}
+
+function canUpdateTags(way: OsmWay) {
+    const updateInfo = transpose(Object.entries(way.tags).map(x=>`${x[0]}=${x[1]}`))
+    return Object.keys(updateInfo.newTagObjects).length > 0
 }
 
 function handleOpenTagsUpdatingModalClick(way: OsmWay) {

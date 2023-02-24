@@ -140,6 +140,7 @@ const parkingLaneTags: ParkingTagInfo[] = [
         dependentTags: [
             'parking:{side}:reason',
             'parking:{side}:orientation',
+            'parking:{side}:surface',
         ],
     },
     {
@@ -152,6 +153,11 @@ const parkingLaneTags: ParkingTagInfo[] = [
         values: orientationValues,
         checkForNeedShowing: (tags: OsmTags, side: string) =>
             ['lane', 'street_side', 'on_kerb', 'half_on_kerb', 'shoulder'].includes(tags[`parking:${side}`]),
+    },
+    {
+        template: 'parking:{side}:surface',
+        checkForNeedShowing: (tags: OsmTags, side: string) =>
+            ['lane', 'street_side', 'on_kerb', 'half_on_kerb', 'shoulder', 'yes'].includes(tags[`parking:${side}`]),
     },
     {
         template: 'parking:{side}:fee',

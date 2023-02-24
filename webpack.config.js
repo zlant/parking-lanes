@@ -11,7 +11,7 @@ module.exports = {
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
     devServer: {
         historyApiFallback: true,
-        contentBase: path.resolve(__dirname, './dist'),
+        static: path.resolve(__dirname, './dist'),
         compress: true,
         hot: true,
         host: '0.0.0.0',

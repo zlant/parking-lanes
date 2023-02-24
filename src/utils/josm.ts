@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-export function handleJosmLinkClick(e: Event): void {
+export async function handleJosmLinkClick(e: Event) {
     // @ts-expect-error
-    axios.get(e.target.href)
+    await axios.get(e.target.href)
     e.preventDefault()
 }

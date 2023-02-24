@@ -155,6 +155,9 @@ function parseDefaultConditionBySchemeV3(side: string, tags: OsmTags) {
 
     if (restrictionTag)
         return tags[restrictionTag]
+
+    if (laneTag && tags[laneTag] === 'no')
+        return 'no'
 }
 
 function parseDefaultCondition(side: string, tags: OsmTags, findedBySchemeV1IntervalsCount: number) {

@@ -403,17 +403,8 @@ export function setOsmChangeListener(listener: (way: OsmWay) => void) {
 function formToOsmWay(osm: OsmWay, form: HTMLFormElement) {
     const regex = /^parking:(?!.*conditional$)/
 
-    const supprtedTags = parkingLaneTags
-        .map(x => {
-            const tagRegexPart = x.template
-                .replace('{side}', '(both|right|left)')
-            return new RegExp('^' + tagRegexPart + '$')
-        })
-
-    for (const tagKey of Object.keys(osm.tags)) {
-        if (supprtedTags.some(regex => regex.test(tagKey)))
-            delete osm.tags[tagKey]
-    }
+    for (const tagKey of Object.keys(osm.tags).filter(x => x.startsWith('parking:')))
+        delete osm.tags[tagKey]
 
     const conditionals: {[tag: string]: string[][]} = {}
 

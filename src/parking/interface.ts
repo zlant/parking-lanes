@@ -314,6 +314,8 @@ function handleMapMoveEnd() {
     if (zoom < viewMinZoom)
         return
 
+    // Eslint: This worked before, so lets keep it; adding await will create new TS issues.
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     downloadParkingLanes(map)
 }
 

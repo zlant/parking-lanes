@@ -416,8 +416,10 @@ export function setOsmChangeListener(listener: (way: OsmWay) => void) {
 function formToOsmWay(osm: OsmWay, form: HTMLFormElement) {
     const regex = /^parking:(?!.*conditional$)/
 
-    for (const tagKey of Object.keys(osm.tags).filter(x => x.startsWith('parking:')))
+    for (const tagKey of Object.keys(osm.tags).filter(x => x.startsWith('parking:'))) {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete osm.tags[tagKey]
+    }
 
     const conditionals: Record<string, string[][]> = {}
 

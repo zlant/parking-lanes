@@ -254,6 +254,7 @@ function closeLaneInfo() {
 
     for (const marker in markers) {
         markers[marker].remove()
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete markers[marker]
     }
 
@@ -361,6 +362,7 @@ async function handleEditorModeCheckboxChange(e: Event | any) {
         for (const lane in lanes) {
             if (lane.startsWith('empty')) {
                 lanes[lane].remove()
+                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete lanes[lane]
             }
         }
@@ -391,6 +393,7 @@ async function handleSaveClick() {
             for (const side of ['right', 'left', 'empty']) {
                 if (lanes[side + oldId]) {
                     lanes[side + changedIdMap[oldId]] = lanes[side + oldId]
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete lanes[side + oldId]
                 }
             }
@@ -454,6 +457,7 @@ function cutWay(arg: any) {
 
     for (const marker in markers) {
         markers[marker].remove()
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete markers[marker]
     }
 

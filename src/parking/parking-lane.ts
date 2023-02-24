@@ -79,6 +79,7 @@ export function parseChangedParkingLane(newOsm: OsmWay, lanes: ParkingLanes, dat
             emptyway = false
         } else if (lanes[id]) {
             lanes[id].remove()
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
             delete lanes[id]
         }
     }
@@ -93,6 +94,7 @@ export function parseChangedParkingLane(newOsm: OsmWay, lanes: ParkingLanes, dat
         }
     } else if (lanes['empty' + newOsm.id]) {
         lanes['empty' + newOsm.id].remove()
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete lanes['empty' + newOsm.id]
     }
 

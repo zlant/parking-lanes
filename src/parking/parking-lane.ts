@@ -209,21 +209,21 @@ function parseConditionsBySchemeV3(side: string, tags: OsmTags) {
 
     const intervals: ConditionalParkingCondition[] = []
 
-    if (maxstayTag) {
-        intervals.push(
-            ...parseConditionalTag(tags[maxstayTag])
-                .map(x => ({
-                    parkingCondition: 'disc',
-                    condition: parseOpeningHours(x.condition),
-                })),
-        )
-    }
-
     if (feeTag) {
         intervals.push(
             ...parseConditionalTag(tags[feeTag])
                 .map(x => ({
                     parkingCondition: x.value === 'yes' ? 'ticket' : 'free',
+                    condition: parseOpeningHours(x.condition),
+                })),
+        )
+    }
+
+    if (maxstayTag) {
+        intervals.push(
+            ...parseConditionalTag(tags[maxstayTag])
+                .map(x => ({
+                    parkingCondition: 'disc',
                     condition: parseOpeningHours(x.condition),
                 })),
         )

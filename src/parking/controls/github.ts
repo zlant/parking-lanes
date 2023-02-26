@@ -8,7 +8,7 @@ export default L.Control.extend({
              onmouseenter=${showExternalEditorLinks}
              onmouseleave=${hideExternalEditorLinks}>
             <span id="ghc-editors" style="display: none;">
-                <a href="https://wiki.openstreetmap.org/wiki/Key:parking:lane" target="_blank">Tagging</a>
+                <a href="https://wiki.openstreetmap.org/wiki/Street_parking" target="_blank">Tagging</a>
                 |
                 <a id="ghc-id" target="_blank">iD</a>,
                 <a id="ghc-josm" target="_blank" onclick=${handleJosmLinkClick}>Josm</a>,

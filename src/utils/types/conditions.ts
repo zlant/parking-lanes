@@ -10,7 +10,7 @@ export interface ConditionalParkingCondition {
     condition: OpeningHours | 'even' | 'odd' | null
 }
 
-export type ConditionName = 'disc' | 'no_parking' | 'no_stopping' | 'free' | 'ticket' |'customers' | 'residents' | 'disabled' | 'disc' | 'no' | 'separate' | 'unsupported'
+export type ConditionName = 'disc' | 'no_parking' | 'no_stopping' | 'free' | 'ticket' |'customers' | 'residents' | 'disabled' | 'disc' | 'no' | 'separate' | 'unsupported' | 'loading_only'
 
 export type ConditionColor = string
 

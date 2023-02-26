@@ -10,6 +10,7 @@ export const legend: ConditionColorDefinition[] = [
     { condition: 'ticket',       color: 'dodgerblue',   text: 'Paid parking' },
     { condition: 'customers',    color: 'greenyellow',  text: 'For customers' },
     { condition: 'residents',    color: 'hotpink',      text: 'For residents' },
+    { condition: 'loading_only', color: '#ffe700',      text: 'Loading only' },
     { condition: 'disabled',     color: 'turquoise',    text: 'Disabled' },
     { condition: 'unsupported',  color: 'gray',         text: 'Unsupported condition' },
     { condition: 'separate',     color: 'darkgray',     text: 'Parking mapped separately' },

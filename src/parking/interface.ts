@@ -37,7 +37,7 @@ import { OsmDataSource, OsmWay } from '../utils/types/osm-data'
 import { ParsedOsmData } from '../utils/types/osm-data-storage'
 import { ParkingAreas, ParkingPoint, ParkingLanes } from '../utils/types/parking'
 import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
-import { parseParkingPoint, updatePointStylesByZoom } from './parking-point'
+import { parseParkingPoint, updatePointColorsByDate, updatePointStylesByZoom } from './parking-point'
 
 const editorName = 'PLanes'
 const version = '0.8.2'
@@ -146,7 +146,8 @@ export const SaveControl = L.Control.extend({
 function handleDatetimeChange(newDatetime: Date) {
     datetime = newDatetime
     updateLaneColorsByDate(lanes, newDatetime)
-    updateAreaColorsByDate(areas, datetime)
+    updateAreaColorsByDate(areas, newDatetime)
+    updatePointColorsByDate(points, newDatetime)
 }
 
 function handleDataSourceChange(newDataSource: OsmDataSource) {
@@ -279,7 +280,7 @@ function handleAreaClick(e: Event | any) {
 }
 
 function addNewPoint(newPoints: ParkingPoint, map: L.Map): void {
-    // updateAreaColorsByDate(newEntrnace, datetime)
+    updatePointColorsByDate(newPoints, datetime)
     Object.assign(points, newPoints)
     for (const newPoint of Object.values<L.Marker>(newPoints)) {
         newPoint.on('click', handleAreaClick)

@@ -19,7 +19,7 @@ export function getColorByDate(conditions: ParkingConditions, datetime: Date): C
     // If conditions.intervals not defined, return the default color
     for (const interval of conditions.conditionalValues ?? []) {
         if (interval.condition && getOpeningHourseState(interval.condition, datetime))
-            return getColor(interval.parkingCondition)
+            return getColor(interval.parkingCondition === 'default' ? conditions.default : interval.parkingCondition)
     }
     return getColor(conditions.default)
 }

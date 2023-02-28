@@ -3,53 +3,106 @@ import { parseOpeningHours } from '../utils/opening-hours'
 import { ParkingConditions } from '../utils/types/conditions'
 import { OsmTags } from '../utils/types/osm-data'
 
-export function getConditions(tags: OsmTags) {
+export function getConditions(tags: OsmTags, side?: string) {
     const conditions: ParkingConditions = {
         conditionalValues: [],
-        default: getDefaultCondition(tags),
+        default: side == null ? mapAccessValue(tags, getValue(tags, 'access')) : null,
     }
 
-    if (tags.opening_hours) {
+    const feeValue = getValue(tags, 'fee', side)
+    if (feeValue && feeValue !== 'yes' && feeValue !== 'no') {
         conditions.conditionalValues!.push({
-            condition: parseOpeningHours(tags.opening_hours),
-            parkingCondition: conditions.default!,
-        })
-        conditions.default = 'no'
-    }
-    if (tags.fee && tags.fee !== 'yes' && tags.fee !== 'no') {
-        conditions.conditionalValues?.push({
-            condition: parseOpeningHours(tags.fee),
+            condition: parseOpeningHours(feeValue),
             parkingCondition: 'ticket',
         })
     }
-    if (tags['fee:conditional']) {
-        const conditionalFee = parseConditionalTag(tags['fee:conditional'])
+
+    const accessValue = getValue(tags, 'access', side)
+    const feeConditionalValue = getValue(tags, 'fee:conditional', side)
+    if (feeConditionalValue) {
+        const conditionalFee = parseConditionalTag(feeConditionalValue)
         for (const conditionalValue of conditionalFee) {
             conditions.conditionalValues?.push({
                 condition: parseOpeningHours(conditionalValue.condition),
                 parkingCondition: conditionalValue.value === 'yes' ? 'ticket' : 'free',
             })
-            if (conditionalValue.value === 'no' && tags.access === undefined)
+            if (conditionalValue.value === 'no' && accessValue === undefined)
                 conditions.default = 'ticket'
             if (conditionalValue.value === 'yes' && conditionalValue.condition?.includes('stay'))
                 conditions.default = 'disc'
         }
     }
 
+    const maxstayConditionalValue = getValue(tags, 'maxstay:conditional', side)
+    if (maxstayConditionalValue) {
+        conditions.conditionalValues?.push(
+            ...parseConditionalTag(maxstayConditionalValue)
+                .map(x => ({
+                    condition: parseOpeningHours(x.condition),
+                    parkingCondition: 'disc',
+                })))
+    }
+
+    const accessConditionalValue = getValue(tags, 'access:conditional', side)
+    if (accessConditionalValue) {
+        conditions.conditionalValues?.push(
+            ...parseConditionalTag(accessConditionalValue)
+                .map(x => ({
+                    condition: parseOpeningHours(x.condition),
+                    parkingCondition: mapAccessValue(tags, side, x.value),
+                })))
+    }
+
+    const restrictionConditionalValue = getValue(tags, 'restriction:conditional', side)
+    if (restrictionConditionalValue) {
+        conditions.conditionalValues?.push(
+            ...parseConditionalTag(restrictionConditionalValue)
+                .map(x => ({
+                    condition: parseOpeningHours(x.condition),
+                    parkingCondition: x.value,
+                })))
+    }
+
+    const laneValue = getValue(tags, '', side)
+    const restrictionValue = getValue(tags, 'restriction', side)
+    if (!restrictionValue && laneValue &&
+        ['lane', 'street_side', 'on_kerb', 'half_on_kerb', 'shoulder', 'yes'].includes(laneValue))
+        conditions.default = 'free'
+
+    const maxstayValue = getValue(tags, 'maxstay', side)
+    if (maxstayValue)
+        conditions.default = 'disc'
+
+    if (feeValue === 'yes')
+        conditions.default = 'ticket'
+
+    if (laneValue === 'no')
+        conditions.default = 'no'
+
+    if (restrictionValue)
+        conditions.default = restrictionValue
+
+    if (accessValue)
+        conditions.default = mapAccessValue(tags, accessValue, side)
+
+    const openingHoursValue = getValue(tags, 'opening_hours', side)
+    if (openingHoursValue) {
+        conditions.conditionalValues!.push({
+            condition: parseOpeningHours(openingHoursValue),
+            parkingCondition: conditions.default!,
+        })
+        conditions.default = 'no'
+    }
+
     return conditions
 }
 
-/**
- * Get default parking condition for a way given a set of tags based on the access key
- * @param tags A set of tags on the way
- * @returns The default parking condition
- */
-function getDefaultCondition(tags: OsmTags): 'yes' | 'ticket' | 'free' | 'customers' | 'no_stopping' | 'residents' | 'disabled' | 'no_parking' {
-    switch (tags.access) {
+function mapAccessValue(tags: OsmTags, accessValue: string | undefined, side?: string): 'yes' | 'ticket' | 'free' | 'customers' | 'no_stopping' | 'residents' | 'disabled' | 'no_parking' {
+    switch (accessValue) {
         case undefined:
         case 'yes':
         case 'public':
-            return tags.fee === 'yes' ? 'ticket' : 'free'
+            return getValue(tags, 'fee', side) === 'yes' ? 'ticket' : 'free'
 
         case 'private':
         case 'no':
@@ -59,7 +112,7 @@ function getDefaultCondition(tags: OsmTags): 'yes' | 'ticket' | 'free' | 'custom
 
         case 'customers':
         case 'destination':
-            return tags.fee === 'yes' ? 'ticket' : 'customers'
+            return getValue(tags, 'fee', side) === 'yes' ? 'ticket' : 'customers'
 
         case 'residents':
         case 'employees':
@@ -71,4 +124,14 @@ function getDefaultCondition(tags: OsmTags): 'yes' | 'ticket' | 'free' | 'custom
         default:
             return 'no_parking'
     }
+}
+
+function getValue(tags: OsmTags, key: string, side?: string) {
+    if (side == null)
+        return tags[key]
+
+    return [side, 'both']
+        .map(side => [`parking:${side}`, key].filter(x => x).join(':'))
+        .map(x => tags[x])
+        .find(x => x)
 }

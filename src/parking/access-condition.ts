@@ -76,8 +76,8 @@ export function getConditions(tags: OsmTags, side?: string) {
     if (feeValue === 'yes')
         conditions.default = 'ticket'
 
-    if (laneValue === 'no')
-        conditions.default = 'no'
+    if (laneValue && ['no', 'separate'].includes(laneValue))
+        conditions.default = laneValue
 
     if (restrictionValue)
         conditions.default = restrictionValue

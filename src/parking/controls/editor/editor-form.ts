@@ -170,7 +170,7 @@ const parkingLaneTags: ParkingTagInfo[] = [
     {
         template: 'parking:{side}:fee:conditional',
         values: ['yes', 'no'],
-        checkForNeedShowing: (tags: OsmTags, side: string) => !!tags[`parking:${side}:fee`],
+        checkForNeedShowing: (tags: OsmTags, side: string) => true,
     },
     {
         template: 'parking:{side}:maxstay',
@@ -181,7 +181,7 @@ const parkingLaneTags: ParkingTagInfo[] = [
     },
     {
         template: 'parking:{side}:maxstay:conditional',
-        checkForNeedShowing: (tags: OsmTags, side: string) => !!tags[`parking:${side}:maxstay`],
+        checkForNeedShowing: (tags: OsmTags, side: string) => true,
     },
     {
         template: 'parking:{side}:access',
@@ -192,7 +192,7 @@ const parkingLaneTags: ParkingTagInfo[] = [
     },
     {
         template: 'parking:{side}:access:conditional',
-        checkForNeedShowing: (tags: OsmTags, side: string) => !!tags[`parking:${side}:access`],
+        checkForNeedShowing: (tags: OsmTags, side: string) => true,
     },
     {
         template: 'parking:{side}:restriction',
@@ -206,7 +206,7 @@ const parkingLaneTags: ParkingTagInfo[] = [
     {
         template: 'parking:{side}:restriction:conditional',
         values: restrictionValues,
-        checkForNeedShowing: (tags: OsmTags, side: string) => !!tags[`parking:${side}:restriction`],
+        checkForNeedShowing: (tags: OsmTags, side: string) => true,
     },
     {
         template: 'parking:{side}:restriction:reason',

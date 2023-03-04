@@ -169,6 +169,7 @@ const parkingLaneTags: ParkingTagInfo[] = [
     },
     {
         template: 'parking:{side}:fee:conditional',
+        values: ['yes', 'no'],
         checkForNeedShowing: (tags: OsmTags, side: string) => !!tags[`parking:${side}:fee`],
     },
     {
@@ -204,6 +205,7 @@ const parkingLaneTags: ParkingTagInfo[] = [
     },
     {
         template: 'parking:{side}:restriction:conditional',
+        values: restrictionValues,
         checkForNeedShowing: (tags: OsmTags, side: string) => !!tags[`parking:${side}:restriction`],
     },
     {

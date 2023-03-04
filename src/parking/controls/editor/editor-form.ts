@@ -80,7 +80,6 @@ function getSideGroup(osm: OsmWay, side: 'both'|'left'|'right') {
     return hyper`
         <div id=${side}
              class="tags-block tags-block_${side}">
-            ${getPresetSigns(osm, side)}
             <table>
                 ${getTagInputs(osm, side)}
             </table>

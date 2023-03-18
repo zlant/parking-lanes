@@ -64,6 +64,12 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 // lane-info
 
+#lane-control {
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 240px);
+    overflow: auto;
+}
+
 .tags-block {
     padding: 5px;
 }

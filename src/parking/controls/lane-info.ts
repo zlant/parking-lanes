@@ -10,6 +10,8 @@ export default L.Control.extend({
         <div id="lane-control"
              class="leaflet-control-layers control-padding"
              style="display: none"
+             onwheel=${L.DomEvent.stopPropagation}
+             ontouchstart=${L.DomEvent.stopPropagation}
              onmousedown=${L.DomEvent.stopPropagation}
              ondblclick=${L.DomEvent.stopPropagation}
              onpointerdown=${L.DomEvent.stopPropagation}

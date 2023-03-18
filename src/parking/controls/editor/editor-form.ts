@@ -22,9 +22,7 @@ export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cut
                     type="button"
                     class="editor-form__cut-button"
                     style="${waysInRelation[osm.id] ? displayNone : null}"
-                    onclick=${() => {
-        cutLaneListener(osm)
-    }}>
+                    onclick=${() => cutLaneListener(osm)}>
                 ✂
             </button>
             <dl>
@@ -270,9 +268,7 @@ function getTextInput(tag: string, value: string): HTMLInputElement {
 function getSimpleTagInput(osm: OsmWay, tag: string, label: string, hide: boolean, values?: string[]) {
     const value = osm.tags[tag]
     const input = values ? getSelectInput(tag, value, values) : getTextInput(tag, value)
-    input.onchange = (e) => {
-        handleInputChange(e, osm)
-    }
+    input.onchange = (e) => handleInputChange(e, osm)
 
     return hyper`
         <tr id="${tag}"
@@ -307,9 +303,7 @@ function getConditionalPartInput(osm: OsmWay, tag: string, part: ConditionalValu
     const input = values ?
         getSelectInput(tag, part.value, values) :
         getTextInput(tag, part.value)
-    input.onchange = (e) => {
-        handleInputChange(e, osm)
-    }
+    input.onchange = (e) => handleInputChange(e, osm)
     input.dataset.partindex = partindex.toString()
     input.dataset.tokenname = 'condition'
 
@@ -326,9 +320,7 @@ function getConditionalPartInput(osm: OsmWay, tag: string, part: ConditionalValu
                        value="${part.condition}"
                        data-partindex="${partindex}"
                        data-tokenname="time_interval"
-                       oninput=${(e) => {
-        handleInputChange(e, osm)
-    }}>)
+                       oninput=${(e) => handleInputChange(e, osm)}>)
             </td>
         </tr>`
 }
@@ -365,9 +357,7 @@ function getPresetSigns(osm: OsmWay, side: 'both' | 'left' | 'right') {
              width=${x.img.width}
              alt=${x.img.alt}
              title=${x.img.title}
-             onclick=${() => {
-        handlePresetClick(x.tags, osm, side)
-    }}>`)
+             onclick=${() => handlePresetClick(x.tags, osm, side)}>`)
 }
 
 /**

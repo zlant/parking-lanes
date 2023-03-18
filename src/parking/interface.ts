@@ -103,9 +103,7 @@ export function initMap(): L.Map {
         .setDatetime(datetime)
         .setDatetimeChangeListener(handleDatetimeChange)
     fetchControl.addTo(map)
-        .setFetchDataBtnClickListener(async() => {
-            await downloadParkingLanes(map)
-        })
+        .setFetchDataBtnClickListener(async() => await downloadParkingLanes(map))
         .setDataSource(dataSource)
         .setDataSourceChangeListener(handleDataSourceChange)
     new InfoControl({ position: 'topright' }).addTo(map)

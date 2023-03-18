@@ -50,9 +50,7 @@ export function authenticate(useDevServer: boolean): Promise<any> {
         if (auth === null)
             return
 
-        return auth.authenticate((err, oauth) => {
-            err ? reject(err) : resolve(oauth)
-        })
+        return auth.authenticate((err, oauth) => err ? reject(err) : resolve(oauth))
     })
 }
 

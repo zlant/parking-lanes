@@ -47,7 +47,8 @@ export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cut
             <div id="tag-updater-modal" class="modal">
                 <div class="modal__header">
                     <h2 class="modal__header">Update tags to new scheme</h2>
-                    <button class="modal_close"
+                    <button type="button"
+                            class="modal_close"
                             onclick=${() => hideElement('tag-updater-modal')}>
                     ✖
                     </button>

@@ -85,6 +85,10 @@ export function getConditions(tags: OsmTags, side?: string) {
     if (accessValue)
         conditions.default = mapAccessValue(tags, accessValue, side)
 
+    const zoneValue = getValue(tags, 'zone', side)
+    if (zoneValue)
+        conditions.default = 'residents'
+
     const openingHoursValue = getValue(tags, 'opening_hours', side)
     if (openingHoursValue) {
         conditions.conditionalValues!.push({

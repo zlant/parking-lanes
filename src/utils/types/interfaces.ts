@@ -1,4 +1,4 @@
-import L from 'leaflet'
+import type L from 'leaflet'
 
 interface GlobalState {
     map: L.Map

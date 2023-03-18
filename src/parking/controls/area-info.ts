@@ -1,7 +1,7 @@
 import L from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
 import { idEditorUrl } from '../../utils/links'
-import { OsmNode, OsmRelation, OsmWay } from '../../utils/types/osm-data'
+import { type OsmNode, type OsmRelation, type OsmWay } from '../../utils/types/osm-data'
 
 export default L.Control.extend({
     onAdd: () => hyper`

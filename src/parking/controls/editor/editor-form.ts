@@ -349,6 +349,7 @@ function handleInputChange(e: Event, osm: OsmWay) {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getPresetSigns(osm: OsmWay, side: 'both' | 'left' | 'right') {
     return presets.map(x => hyper`
         <img src=${x.img.src}

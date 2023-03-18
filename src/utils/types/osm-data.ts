@@ -1,6 +1,4 @@
-export interface OsmTags {
-    [key: string]: string
-}
+export type OsmTags = Record<string, string>
 
 interface OsmObject {
     id: number

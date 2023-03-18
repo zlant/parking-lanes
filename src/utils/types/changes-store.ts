@@ -1,4 +1,4 @@
-import { OsmWay } from './osm-data'
+import { type OsmWay } from './osm-data'
 
 interface EditTypeStore {
     way: OsmWay[]
@@ -22,9 +22,10 @@ interface JxonOsmObject {
 }
 
 export interface JxonOsmWay extends JxonOsmObject {
-    nd: Array<{$ref: number}>
+    nd: Array<{ $ref: number }>
 }
 
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
 export interface ChangedIdMap {
     [oldId: string]: string
 }

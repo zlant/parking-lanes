@@ -7,7 +7,6 @@ import { getAllTagsBlock } from '../lane-info'
 import { parseConditionalTag, type ConditionalValue } from '../../../utils/conditional-tag'
 import { type ParkingTagInfo } from '../../../utils/types/parking'
 import { transpose } from 'osm-parking-tag-updater/src/components/Tool/transpose/transpose'
-import { watch } from 'fs'
 
 export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cutLaneListener: (way: OsmWay) => void): HTMLFormElement {
     const form = hyper`
@@ -32,7 +31,7 @@ export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cut
                     <button title="Update tags"
                             type="button"
                             class="editor-form__cut-button"
-                            style="${canUpdateTags(osm) ? null : displayNone }"
+                            style="${canUpdateTags(osm) ? null : displayNone}"
                             onclick=${() => handleOpenTagsUpdatingModalClick(osm)}>
                         🔄
                     </button>
@@ -76,7 +75,6 @@ export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cut
 }
 
 function selectSideBlocks(form: HTMLFormElement) {
-
     const existsRightTags = existsSideTags(form, 'right')
     const existsLeftTags = existsSideTags(form, 'left')
     const existsBothTags = existsSideTags(form, 'both')
@@ -442,12 +440,12 @@ function handlePresetClick(
 }
 
 function canUpdateTags(way: OsmWay) {
-    const updateInfo = transpose(Object.entries(way.tags).map(x=>`${x[0]}=${x[1]}`))
+    const updateInfo = transpose(Object.entries(way.tags).map(x => `${x[0]}=${x[1]}`))
     return Object.keys(updateInfo.newTagObjects).length > 0
 }
 
 function handleOpenTagsUpdatingModalClick(way: OsmWay) {
-    const updateInfo = transpose(Object.entries(way.tags).map(x=>`${x[0]}=${x[1]}`))
+    const updateInfo = transpose(Object.entries(way.tags).map(x => `${x[0]}=${x[1]}`))
 
     document.getElementById('updated-tags')!.appendChild(hyper`
         <table class="updated-tags__table">
@@ -474,15 +472,17 @@ function handleOpenTagsUpdatingModalClick(way: OsmWay) {
 }
 
 function handleUpdateTagsClick(way: OsmWay) {
-    const updateInfo = transpose(Object.entries(way.tags).map(x=>`${x[0]}=${x[1]}`))
+    const updateInfo = transpose(Object.entries(way.tags).map(x => `${x[0]}=${x[1]}`))
 
     for (const tagMap of Object.entries(updateInfo.newTagObjects)) {
         const oldKey = tagMap[0].split('=')[0]
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete way.tags[oldKey]
-        for (const newTag of tagMap[1].newTags){
+        for (const newTag of tagMap[1].newTags) {
             const [newKey, newValue] = newTag.split('=')
             way.tags[newKey] = newValue
-    }}
+        }
+    }
 
     hideElement('tag-updater-modal')
     osmChangeListener?.(way)

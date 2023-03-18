@@ -6,33 +6,75 @@ import { presets } from './presets'
 import { getAllTagsBlock } from '../lane-info'
 import { parseConditionalTag, type ConditionalValue } from '../../../utils/conditional-tag'
 import { type ParkingTagInfo } from '../../../utils/types/parking'
+import { transpose } from 'osm-parking-tag-updater/src/components/Tool/transpose/transpose'
 
 export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cutLaneListener: (way: OsmWay) => void): HTMLFormElement {
     const form = hyper`
         <form id="${osm.id}"
               class="editor-form">
-            <label class="editor-form__side-switcher">
-                <input id="side-switcher"
-                       type="checkbox"
-                       class="editor-form__side-switcher-checkbox"
-                       onchange=${handleSideSwitcherChange}>
-                Both
-            </label>
-            <button title="Cut lane"
-                    type="button"
-                    class="editor-form__cut-button"
-                    style="${waysInRelation[osm.id] ? displayNone : null}"
-                    onclick=${() => cutLaneListener(osm)}>
-                ✂
-            </button>
-            <dl>
+            <div class="editor-form__header">
+                <label class="editor-form__side-switcher">
+                    <input id="side-switcher"
+                        type="checkbox"
+                        class="editor-form__side-switcher-checkbox"
+                        onchange=${handleSideSwitcherChange}>
+                    Both
+                </label>
+                <div class="editor-form__utils">
+                    <button title="Cut lane"
+                            type="button"
+                            class="editor-form__cut-button"
+                            style="${waysInRelation[osm.id] ? displayNone : null}"
+                            onclick=${() => cutLaneListener(osm)}>
+                        ✂
+                    </button>
+                    <button title="Update tags"
+                            type="button"
+                            class="editor-form__cut-button"
+                            style="${canUpdateTags(osm) ? null : displayNone}"
+                            onclick=${() => handleOpenTagsUpdatingModalClick(osm)}>
+                        🔄
+                    </button>
+                </div>
+            </div>
+            <div id="tags-block">
                 ${getSideGroup(osm, 'both')}
                 ${getSideGroup(osm, 'right')}
                 ${getSideGroup(osm, 'left')}
                 ${getAllTagsBlock(osm.tags)}
-            </dl>
+            </div>
+
+            <div id="tag-updater-modal" class="modal">
+                <div class="modal__header">
+                    <h2 class="modal__header">Update tags to new scheme</h2>
+                    <button class="modal_close"
+                            onclick=${() => hideElement('tag-updater-modal')}>
+                    ✖
+                    </button>
+                </div>
+                <div id="updated-tags">
+                    <h3 class="modal__subtitle">Updated tags</h3>
+                </div>
+                <div id="manual-updating-tags">
+                    <h3 class="modal__subtitle">Required manual updating</h3>
+                </div>
+
+                <div class="modal__footer">
+                    <button type="button"
+                            class="button"
+                            onclick=${() => handleUpdateTagsClick(osm)}>
+                        Update tags
+                    </button>
+                </div>
+            </div>
         </form>` as HTMLFormElement
 
+    selectSideBlocks(form)
+
+    return form
+}
+
+function selectSideBlocks(form: HTMLFormElement) {
     const existsRightTags = existsSideTags(form, 'right')
     const existsLeftTags = existsSideTags(form, 'left')
     const existsBothTags = existsSideTags(form, 'both')
@@ -45,8 +87,17 @@ export function getLaneEditForm(osm: OsmWay, waysInRelation: WaysInRelation, cut
     }
 
     form.querySelector<HTMLInputElement>('#side-switcher')!.checked = existsBothTags
+}
 
-    return form
+function redrawFormBlocks(way: OsmWay) {
+    document.getElementById('tags-block')!.innerText = ''
+    document.getElementById('tags-block')?.appendChild(getSideGroup(way, 'both'))
+    document.getElementById('tags-block')?.appendChild(getSideGroup(way, 'right'))
+    document.getElementById('tags-block')?.appendChild(getSideGroup(way, 'left'))
+    document.getElementById('tags-block')?.appendChild(getAllTagsBlock(way.tags))
+
+    const form = document.getElementById(way.id.toString()) as HTMLFormElement
+    selectSideBlocks(form)
 }
 
 function existsSideTags(form: HTMLFormElement, side: string) {
@@ -386,6 +437,56 @@ function handlePresetClick(
     const inputSelector = `form[id='${osm.id}'] [name='${`parking:${side}`}']`
     const element = document.querySelector(inputSelector) as HTMLInputElement | HTMLSelectElement
     element.dispatchEvent(new Event('change'))
+}
+
+function canUpdateTags(way: OsmWay) {
+    const updateInfo = transpose(Object.entries(way.tags).map(x => `${x[0]}=${x[1]}`))
+    return Object.keys(updateInfo.newTagObjects).length > 0
+}
+
+function handleOpenTagsUpdatingModalClick(way: OsmWay) {
+    const updateInfo = transpose(Object.entries(way.tags).map(x => `${x[0]}=${x[1]}`))
+
+    document.getElementById('updated-tags')!.appendChild(hyper`
+        <table class="updated-tags__table">
+            <thead>
+                <tr>
+                    <th>Old tag</th>
+                    <th>New tags</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${Object.keys(updateInfo.newTagObjects).map(k => hyper`
+                <tr>
+                    <td>${k}</td>
+                    <td>${updateInfo.newTagObjects[k].newTags.map(nt => hyper`<div>${nt}</div>`)}</td>
+                </tr>`)}
+            </tbody>
+        </table>`)
+
+    Object.keys(updateInfo.newTagsManualCandidates)
+        .map(k => hyper`<div>${k}</div>`)
+        .forEach(x => document.getElementById('manual-updating-tags')!.appendChild(x))
+
+    document.getElementById('tag-updater-modal')!.style.display = 'block'
+}
+
+function handleUpdateTagsClick(way: OsmWay) {
+    const updateInfo = transpose(Object.entries(way.tags).map(x => `${x[0]}=${x[1]}`))
+
+    for (const tagMap of Object.entries(updateInfo.newTagObjects)) {
+        const oldKey = tagMap[0].split('=')[0]
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete way.tags[oldKey]
+        for (const newTag of tagMap[1].newTags) {
+            const [newKey, newValue] = newTag.split('=')
+            way.tags[newKey] = newValue
+        }
+    }
+
+    hideElement('tag-updater-modal')
+    osmChangeListener?.(way)
+    redrawFormBlocks(way)
 }
 
 function showElement(id: string) {

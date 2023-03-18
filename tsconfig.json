@@ -1,19 +1,29 @@
 {
-  "lib": ["es2017"],
   "compilerOptions": {
     "sourceMap": true,
+    "module": "ESNext",
     "moduleResolution": "node",
-    "lib": ["dom", "es2017"],
-    "target": "es2017",
+    "lib": ["dom", "ESNext"],
+    "target": "ESNext",
     "noImplicitAny": false,
     "pretty": true,
     "sourceRoot": "./src/",
-    "rootDir": "./src/",
+    "rootDirs": ["./src/", "./node_modules/osm-parking-tag-updater/src/components/Tool/transpose/"],
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "strictNullChecks": true,
     "skipLibCheck": true,
     "types": ["node", "jest"]
   },
-  "include": ["src/index.ts", "src/parking/*.ts", "src/utils/*.ts","src/utils/types/*.ts",  "src/test/*.test.ts" ]
+  "include": [
+    "src/index.ts",
+    "src/parking/*.ts",
+    "src/utils/*.ts",
+    "src/utils/types/*.ts",
+    "src/test/*.test.ts",
+    "node_modules/osm-parking-tag-updater/src/components/Tool/transpose/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules/osm-parking-tag-updater/src/components/Tool/transpose/**/*.test.ts"
+  ]
 }

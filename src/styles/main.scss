@@ -104,8 +104,22 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 // editor-panel
 
+.editor-form__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: .5rem;
+}
+
+.editor-form__utils {
+    display: flex;
+    gap: 5px;
+}
+
 .leaflet-control-layers .editor-form__side-switcher {
-    display: inline;
+    display: flex;
+    align-items: center;
+    gap: 3px;
     cursor: pointer;
 }
 
@@ -144,6 +158,20 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .conditional-tag table {
     border-spacing: 0;
+}
+
+.updated-tags__table {
+    border-width: 0;
+    border-collapse: collapse;
+}
+
+.updated-tags__table tbody {
+    vertical-align: top;
+}
+
+.updated-tags__table thead tr,
+.updated-tags__table tr:nth-child(2n) {
+    background-color: #f4f4f4;
 }
 
 // github control
@@ -232,4 +260,42 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .fetch-control.opened .fetch-control_toggle::after {
     content: '△';
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 700px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 0 30px 30px rgb(0 20 36 / 10%);
+}
+
+.modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal_close {
+    cursor: pointer;
+}
+
+.modal__title {
+    font-size: 18px;
+}
+
+.modal__subtitle {
+    font-size: 14px;
+}
+
+.modal__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 1rem;
 }

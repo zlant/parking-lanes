@@ -1,9 +1,9 @@
-import L, { LatLngLiteral } from 'leaflet'
+import L, { type LatLngLiteral } from 'leaflet'
 import { hyper } from 'hyperhtml/esm'
 import { handleJosmLinkClick } from '../..//utils/josm'
 import { idEditorUrl, josmUrl, mapillaryUrl, overpassDeUrl } from '../../utils/links'
 import { getLaneEditForm, setOsmChangeListener } from './editor/editor-form'
-import { OsmTags, OsmWay } from '../../utils/types/osm-data'
+import { type OsmTags, type OsmWay } from '../../utils/types/osm-data'
 
 export default L.Control.extend({
     onAdd: () => hyper`

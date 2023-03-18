@@ -1,5 +1,5 @@
 import { getOpeningHourseState } from '../utils/opening-hours'
-import { ConditionColor, ParkingConditions } from '../utils/types/conditions'
+import { type ConditionColor, type ParkingConditions } from '../utils/types/conditions'
 import { legend } from './legend'
 
 export function getColor(condition: string | null | undefined): ConditionColor | undefined {

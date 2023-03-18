@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { RawOsmData } from './types/osm-data'
-import { ParsedOsmData } from './types/osm-data-storage'
+import { type RawOsmData } from './types/osm-data'
+import { type ParsedOsmData } from './types/osm-data-storage'
 
 export const osmData: ParsedOsmData = {
     ways: {},

@@ -1,14 +1,14 @@
 import L from 'leaflet'
-import { ParkingConditions } from '../utils/types/conditions'
-import { ParkingPolylineOptions } from '../utils/types/leaflet'
-import { OsmWay } from '../utils/types/osm-data'
-import { ParkingAreas } from '../utils/types/parking'
+import { type ParkingConditions } from '../utils/types/conditions'
+import { type ParkingPolylineOptions } from '../utils/types/leaflet'
+import { type OsmWay } from '../utils/types/osm-data'
+import { type ParkingAreas } from '../utils/types/parking'
 import { getConditions } from './access-condition'
 import { getColor, getColorByDate } from './condition-color'
 
 export function parseParkingArea(
     way: OsmWay,
-    nodes: { [key: number]: number[] },
+    nodes: Record<number, number[]>,
     zoom: number,
     editorMode: boolean): ParkingAreas | undefined {
     const polylineNodes = way.nodes.map(x => nodes[x])

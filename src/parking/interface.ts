@@ -32,10 +32,10 @@ import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
 import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '../utils/changes-store'
 import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-client'
-import { OurWindow } from '../utils/types/interfaces'
-import { OsmDataSource, OsmWay } from '../utils/types/osm-data'
-import { ParsedOsmData } from '../utils/types/osm-data-storage'
-import { ParkingAreas, ParkingPoint, ParkingLanes } from '../utils/types/parking'
+import { type OurWindow } from '../utils/types/interfaces'
+import { OsmDataSource, type OsmWay } from '../utils/types/osm-data'
+import { type ParsedOsmData } from '../utils/types/osm-data-storage'
+import { type ParkingAreas, type ParkingPoint, type ParkingLanes } from '../utils/types/parking'
 import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
 import { parseParkingPoint, updatePointColorsByDate, updatePointStylesByZoom } from './parking-point'
 
@@ -157,7 +157,7 @@ function handleDataSourceChange(newDataSource: OsmDataSource) {
 const lanes: ParkingLanes = {}
 const areas: ParkingAreas = {}
 const points: ParkingPoint = {}
-const markers: { [key: string]: L.Marker<any>} = {}
+const markers: Record<string, L.Marker<any>> = {}
 
 async function downloadParkingLanes(map: L.Map): Promise<void> {
     fetchControl.setFetchDataBtnText('Fetching data...')
@@ -252,6 +252,7 @@ function closeLaneInfo() {
 
     for (const marker in markers) {
         markers[marker].remove()
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete markers[marker]
     }
 
@@ -311,6 +312,8 @@ function handleMapMoveEnd() {
     if (zoom < viewMinZoom)
         return
 
+    // Eslint: This worked before, so lets keep it; adding await will create new TS issues.
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     downloadParkingLanes(map)
 }
 
@@ -359,6 +362,7 @@ async function handleEditorModeCheckboxChange(e: Event | any) {
         for (const lane in lanes) {
             if (lane.startsWith('empty')) {
                 lanes[lane].remove()
+                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete lanes[lane]
             }
         }
@@ -389,6 +393,7 @@ async function handleSaveClick() {
             for (const side of ['right', 'left', 'empty']) {
                 if (lanes[side + oldId]) {
                     lanes[side + changedIdMap[oldId]] = lanes[side + oldId]
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                     delete lanes[side + oldId]
                 }
             }
@@ -452,6 +457,7 @@ function cutWay(arg: any) {
 
     for (const marker in markers) {
         markers[marker].remove()
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete markers[marker]
     }
 

@@ -1,4 +1,4 @@
-import { OsmTags } from './osm-data'
+import { type OsmTags } from './osm-data'
 
 export type Side = 'left' | 'right'
 
@@ -10,17 +10,11 @@ export interface StyleMapInterface {
     offsetMinor?: number
 }
 
-export interface ParkingLanes {
-    [key: string]: L.Polyline | any
-}
+export type ParkingLanes = Record<string, L.Polyline | any>
 
-export interface ParkingAreas {
-    [key: string]: L.Polyline | any
-}
+export type ParkingAreas = Record<string, L.Polyline | any>
 
-export interface ParkingPoint {
-    [key: string]: L.Marker | any
-}
+export type ParkingPoint = Record<string, L.Marker | any>
 
 export interface ParkingTagInfo {
     template: string

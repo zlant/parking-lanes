@@ -21,8 +21,9 @@ module.exports = {
         '@typescript-eslint/brace-style': ['error', '1tbs', { allowSingleLine: false }],
         '@typescript-eslint/comma-dangle': ['error', 'always-multiline'],
         '@typescript-eslint/space-before-function-paren': ['error', 'never'],
+        '@typescript-eslint/no-confusing-void-expression': ['error', { ignoreArrowShorthand: true, ignoreVoidOperator: false }],
 
-        '@typescript-eslint/ban-ts-comment': 'warn',
+        '@typescript-eslint/ban-ts-comment': 'off', // was 'warn' which now requires an explainaint per occurrence
         '@typescript-eslint/no-floating-promises': 'warn',
         '@typescript-eslint/no-dynamic-delete': 'warn',
         '@typescript-eslint/consistent-type-assertions': 'warn',

@@ -1,5 +1,5 @@
-import { ChangesStore } from './types/changes-store'
-import { OsmWay } from './types/osm-data'
+import { type ChangesStore } from './types/changes-store'
+import { type OsmWay } from './types/osm-data'
 
 export const changesStore: ChangesStore = {
     modify: {

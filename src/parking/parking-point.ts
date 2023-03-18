@@ -1,8 +1,8 @@
 import L from 'leaflet'
-import { ParkingConditions } from '../utils/types/conditions'
-import { ParkingPointOptions } from '../utils/types/leaflet'
-import { OsmNode } from '../utils/types/osm-data'
-import { ParkingPoint } from '../utils/types/parking'
+import { type ParkingConditions } from '../utils/types/conditions'
+import { type ParkingPointOptions } from '../utils/types/leaflet'
+import { type OsmNode } from '../utils/types/osm-data'
+import { type ParkingPoint } from '../utils/types/parking'
 import { getConditions } from './access-condition'
 import { getColor, getColorByDate } from './condition-color'
 

@@ -70,7 +70,7 @@ export function getConditions(tags: OsmTags, side?: string) {
         conditions.default = 'free'
 
     const maxstayValue = getValue(tags, 'maxstay', side)
-    if (maxstayValue)
+    if (maxstayValue && maxstayValue !== 'no')
         conditions.default = 'disc'
 
     const zoneValue = getValue(tags, 'zone', side)

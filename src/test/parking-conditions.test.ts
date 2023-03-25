@@ -89,6 +89,20 @@ describe('#getConditions()', () => {
         expect(expectedConditions).toStrictEqual(receivedConditions)
     })
 
+    test('maxstay=no', async() => {
+        const tags: OsmTags = {
+            'parking:right': 'street_side',
+            'parking:right:fee': 'no',
+            'parking:right:maxstay': 'no',
+        }
+        const receivedConditions = getConditions(tags, 'right')
+        const expectedConditions: ParkingConditions = {
+            default: 'free',
+            conditionalValues: [],
+        }
+        expect(expectedConditions).toStrictEqual(receivedConditions)
+    })
+
     test('access=private', async() => {
         const tags: OsmTags = {
             'parking:left': 'street_side',

@@ -73,6 +73,10 @@ export function getConditions(tags: OsmTags, side?: string) {
     if (maxstayValue)
         conditions.default = 'disc'
 
+    const zoneValue = getValue(tags, 'zone', side)
+    if (zoneValue)
+        conditions.default = 'residents'
+
     if (feeValue === 'yes')
         conditions.default = 'ticket'
 
@@ -84,10 +88,6 @@ export function getConditions(tags: OsmTags, side?: string) {
 
     if (accessValue)
         conditions.default = mapAccessValue(tags, accessValue, side)
-
-    const zoneValue = getValue(tags, 'zone', side)
-    if (zoneValue)
-        conditions.default = 'residents'
 
     const openingHoursValue = getValue(tags, 'opening_hours', side)
     if (openingHoursValue) {
@@ -109,6 +109,8 @@ function mapAccessValue(tags: OsmTags, accessValue: string | undefined, side?: s
             return getValue(tags, 'fee', side) === 'yes' ? 'ticket' : 'free'
 
         case 'private':
+            return getValue(tags, 'zone', side) ? 'residents' : 'no_stopping'
+
         case 'no':
         case 'permissive':
         case 'permit':

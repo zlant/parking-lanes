@@ -49,7 +49,7 @@ export function getConditions(tags: OsmTags, side?: string) {
             ...parseConditionalTag(accessConditionalValue)
                 .map(x => ({
                     condition: parseOpeningHours(x.condition),
-                    parkingCondition: mapAccessValue(tags, side, x.value),
+                    parkingCondition: mapAccessValue(tags, x.value, side),
                 })))
     }
 

@@ -43,6 +43,7 @@ module.exports = {
             patterns: [
                 { from: path.resolve(__dirname, './src/land.html') },
                 { from: path.resolve(__dirname, './src/assets'), to: './assets' },
+                { from: path.resolve(__dirname, './taginfo.json') },
             ],
         }),
         new CleanWebpackPlugin(),

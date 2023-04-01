@@ -4,9 +4,13 @@
     "project": {
         "name": "Parking lanes viewer",
         "description": "Parking lanes viewer from OpenStreetMap",
-        "project_url": "https://zlant.github.io/parking-lanes/"
+        "project_url": "https://zlant.github.io/parking-lanes/",
+        "icon_url": "https://zlant.github.io/parking-lanes/assets/free_parking/free_parking_russia.svg"
     },
     "tags": [
+        { "key": "amenity", "value": "parking", "object_types": ["node", "way"] },
+        { "key": "amenity", "value": "parking_entrance", "object_types": ["node"] },
+
         { "key": "highway", "value": "motorway", "object_types": ["way"], "description": "major road" },
         { "key": "highway", "value": "trunk", "object_types": ["way"], "description": "major road" },
         { "key": "highway", "value": "primary", "object_types": ["way"], "description": "major road" },
@@ -16,6 +20,55 @@
         { "key": "highway", "value": "residential", "object_types": ["way"], "description": "major road" },
         { "key": "highway", "value": "service", "object_types": ["way"], "description": "minor road" },
         { "key": "highway", "value": "living_street", "object_types": ["way"], "description": "minor road" },
+
+        { "key": "parking:left", "object_types": ["way"] },
+        { "key": "parking:right", "object_types": ["way"] },
+        { "key": "parking:both", "object_types": ["way"] },
+
+        { "key": "parking:left:reason", "object_types": ["way"] },
+        { "key": "parking:right:reason", "object_types": ["way"] },
+        { "key": "parking:both:reason", "object_types": ["way"] },
+
+        { "key": "parking:left:orientation", "object_types": ["way"] },
+        { "key": "parking:right:orientation", "object_types": ["way"] },
+        { "key": "parking:both:orientation", "object_types": ["way"] },
+
+        { "key": "parking:left:surface", "object_types": ["way"] },
+        { "key": "parking:right:surface", "object_types": ["way"] },
+        { "key": "parking:both:surface", "object_types": ["way"] },
+
+        { "key": "parking:left:fee", "object_types": ["way"] },
+        { "key": "parking:right:fee", "object_types": ["way"] },
+        { "key": "parking:both:fee", "object_types": ["way"] },
+
+        { "key": "parking:left:fee:conditional", "object_types": ["way"] },
+        { "key": "parking:right:fee:conditional", "object_types": ["way"] },
+        { "key": "parking:both:fee:conditional", "object_types": ["way"] },
+
+        { "key": "parking:left:maxstay", "object_types": ["way"] },
+        { "key": "parking:right:maxstay", "object_types": ["way"] },
+        { "key": "parking:both:maxstay", "object_types": ["way"] },
+
+        { "key": "parking:left:maxstay:conditional", "object_types": ["way"] },
+        { "key": "parking:right:maxstay:conditional", "object_types": ["way"] },
+        { "key": "parking:both:maxstay:conditional", "object_types": ["way"] },
+
+        { "key": "parking:left:access", "object_types": ["way"] },
+        { "key": "parking:right:access", "object_types": ["way"] },
+        { "key": "parking:both:access", "object_types": ["way"] },
+
+        { "key": "parking:left:access:conditional", "object_types": ["way"] },
+        { "key": "parking:right:access:conditional", "object_types": ["way"] },
+        { "key": "parking:both:access:conditional", "object_types": ["way"] },
+
+        { "key": "parking:left:restriction", "object_types": ["way"] },
+        { "key": "parking:right:restriction", "object_types": ["way"] },
+        { "key": "parking:both:restriction", "object_types": ["way"] },
+
+        { "key": "parking:left:restriction:conditional", "object_types": ["way"] },
+        { "key": "parking:right:restriction:conditional", "object_types": ["way"] },
+        { "key": "parking:both:restriction:conditional", "object_types": ["way"] },
+
 
         { "key": "parking:lane:left", "object_types": ["way"] },
         { "key": "parking:lane:right", "object_types": ["way"] },

@@ -1,0 +1,210 @@
+{
+    "data_format": 1,
+    "data_url": "https://zlant.github.io/parking-lanes/taginfo.json",
+    "project": {
+        "name": "Parking lanes viewer",
+        "description": "Parking lanes viewer from OpenStreetMap",
+        "project_url": "https://zlant.github.io/parking-lanes/",
+        "icon_url": "https://zlant.github.io/parking-lanes/assets/free_parking/free_parking_russia.svg"
+    },
+    "tags": [
+        { "key": "amenity", "value": "parking", "object_types": ["node", "way"] },
+        { "key": "amenity", "value": "parking_entrance", "object_types": ["node"] },
+
+        { "key": "highway", "value": "motorway", "object_types": ["way"], "description": "major road" },
+        { "key": "highway", "value": "trunk", "object_types": ["way"], "description": "major road" },
+        { "key": "highway", "value": "primary", "object_types": ["way"], "description": "major road" },
+        { "key": "highway", "value": "secondary", "object_types": ["way"], "description": "major road" },
+        { "key": "highway", "value": "tertiary", "object_types": ["way"], "description": "major road" },
+        { "key": "highway", "value": "unclassified", "object_types": ["way"], "description": "major road" },
+        { "key": "highway", "value": "residential", "object_types": ["way"], "description": "major road" },
+        { "key": "highway", "value": "service", "object_types": ["way"], "description": "minor road" },
+        { "key": "highway", "value": "living_street", "object_types": ["way"], "description": "minor road" },
+
+        { "key": "parking:left", "object_types": ["way"] },
+        { "key": "parking:right", "object_types": ["way"] },
+        { "key": "parking:both", "object_types": ["way"] },
+
+        { "key": "parking:left:reason", "object_types": ["way"] },
+        { "key": "parking:right:reason", "object_types": ["way"] },
+        { "key": "parking:both:reason", "object_types": ["way"] },
+
+        { "key": "parking:left:orientation", "object_types": ["way"] },
+        { "key": "parking:right:orientation", "object_types": ["way"] },
+        { "key": "parking:both:orientation", "object_types": ["way"] },
+
+        { "key": "parking:left:surface", "object_types": ["way"] },
+        { "key": "parking:right:surface", "object_types": ["way"] },
+        { "key": "parking:both:surface", "object_types": ["way"] },
+
+        { "key": "parking:left:fee", "object_types": ["way"] },
+        { "key": "parking:right:fee", "object_types": ["way"] },
+        { "key": "parking:both:fee", "object_types": ["way"] },
+
+        { "key": "parking:left:fee:conditional", "object_types": ["way"] },
+        { "key": "parking:right:fee:conditional", "object_types": ["way"] },
+        { "key": "parking:both:fee:conditional", "object_types": ["way"] },
+
+        { "key": "parking:left:maxstay", "object_types": ["way"] },
+        { "key": "parking:right:maxstay", "object_types": ["way"] },
+        { "key": "parking:both:maxstay", "object_types": ["way"] },
+
+        { "key": "parking:left:maxstay:conditional", "object_types": ["way"] },
+        { "key": "parking:right:maxstay:conditional", "object_types": ["way"] },
+        { "key": "parking:both:maxstay:conditional", "object_types": ["way"] },
+
+        { "key": "parking:left:access", "object_types": ["way"] },
+        { "key": "parking:right:access", "object_types": ["way"] },
+        { "key": "parking:both:access", "object_types": ["way"] },
+
+        { "key": "parking:left:access:conditional", "object_types": ["way"] },
+        { "key": "parking:right:access:conditional", "object_types": ["way"] },
+        { "key": "parking:both:access:conditional", "object_types": ["way"] },
+
+        { "key": "parking:left:restriction", "object_types": ["way"] },
+        { "key": "parking:right:restriction", "object_types": ["way"] },
+        { "key": "parking:both:restriction", "object_types": ["way"] },
+
+        { "key": "parking:left:restriction:conditional", "object_types": ["way"] },
+        { "key": "parking:right:restriction:conditional", "object_types": ["way"] },
+        { "key": "parking:both:restriction:conditional", "object_types": ["way"] },
+
+
+        { "key": "parking:lane:left", "object_types": ["way"] },
+        { "key": "parking:lane:right", "object_types": ["way"] },
+        { "key": "parking:lane:both", "object_types": ["way"] },
+
+        { "key": "parking:condition:left", "object_types": ["way"] },
+        { "key": "parking:condition:right", "object_types": ["way"] },
+        { "key": "parking:condition:both", "object_types": ["way"] },
+
+        { "key": "parking:condition:left:time_interval", "object_types": ["way"] },
+        { "key": "parking:condition:right:time_interval", "object_types": ["way"] },
+        { "key": "parking:condition:both:time_interval", "object_types": ["way"] },
+
+        { "key": "parking:condition:left:default", "object_types": ["way"] },
+        { "key": "parking:condition:right:default", "object_types": ["way"] },
+        { "key": "parking:condition:both:default", "object_types": ["way"] },
+
+        { "key": "parking:condition:left:maxstay", "object_types": ["way"], "description": "only editable for disc parking" },
+        { "key": "parking:condition:right:maxstay", "object_types": ["way"], "description": "only editable for disc parking" },
+        { "key": "parking:condition:both:maxstay", "object_types": ["way"], "description": "only editable for disc parking" },
+
+        { "key": "parking:lane:left:capacity", "object_types": ["way"] },
+        { "key": "parking:lane:right:capacity", "object_types": ["way"] },
+        { "key": "parking:lane:both:capacity", "object_types": ["way"] },
+
+
+        { "key": "parking:lane:left", "value": "parallel", "object_types": ["way"] },
+        { "key": "parking:lane:right", "value": "parallel", "object_types": ["way"] },
+        { "key": "parking:lane:both", "value": "parallel", "object_types": ["way"] },
+
+        { "key": "parking:lane:left", "value": "diagonal", "object_types": ["way"] },
+        { "key": "parking:lane:right", "value": "diagonal", "object_types": ["way"] },
+        { "key": "parking:lane:both", "value": "diagonal", "object_types": ["way"] },
+
+        { "key": "parking:lane:left", "value": "perpendicular", "object_types": ["way"] },
+        { "key": "parking:lane:right", "value": "perpendicular", "object_types": ["way"] },
+        { "key": "parking:lane:both", "value": "perpendicular", "object_types": ["way"] },
+
+        { "key": "parking:lane:left", "value": "marked", "object_types": ["way"] },
+        { "key": "parking:lane:right", "value": "marked", "object_types": ["way"] },
+        { "key": "parking:lane:both", "value": "marked", "object_types": ["way"] },
+
+        { "key": "parking:lane:left", "value": "no_stopping", "object_types": ["way"], "description": "colored salmon" },
+        { "key": "parking:lane:right", "value": "no_stopping", "object_types": ["way"], "description": "colored salmon" },
+        { "key": "parking:lane:both", "value": "no_stopping", "object_types": ["way"], "description": "colored salmon" },
+
+        { "key": "parking:lane:left", "value": "no_parking", "object_types": ["way"], "description": "colored orange" },
+        { "key": "parking:lane:right", "value": "no_parking", "object_types": ["way"], "description": "colored orange" },
+        { "key": "parking:lane:both", "value": "no_parking", "object_types": ["way"], "description": "colored orange" },
+
+        { "key": "parking:lane:both:type", "value": "on_street", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:type", "value": "half_on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:type", "value": "on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:type", "value": "lay_by", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:type", "value": "painted_area_only", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:type", "value": "on_street", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:type", "value": "half_on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:type", "value": "on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:type", "value": "lay_by", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:type", "value": "painted_area_only", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:type", "value": "on_street", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:type", "value": "half_on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:type", "value": "on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:type", "value": "lay_by", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:type", "value": "painted_area_only", "object_types": [ "way" ] },
+
+        { "key": "parking:lane:both:parallel", "value": "on_street", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:parallel", "value": "half_on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:parallel", "value": "on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:parallel", "value": "lay_by", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:parallel", "value": "painted_area_only", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:parallel", "value": "on_street", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:parallel", "value": "half_on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:parallel", "value": "on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:parallel", "value": "lay_by", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:parallel", "value": "painted_area_only", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:parallel", "value": "on_street", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:parallel", "value": "half_on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:parallel", "value": "on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:parallel", "value": "lay_by", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:parallel", "value": "painted_area_only", "object_types": [ "way" ] },
+
+        { "key": "parking:lane:both:diagonal", "value": "on_street", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:diagonal", "value": "half_on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:diagonal", "value": "on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:diagonal", "value": "lay_by", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:diagonal", "value": "painted_area_only", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:diagonal", "value": "on_street", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:diagonal", "value": "half_on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:diagonal", "value": "on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:diagonal", "value": "lay_by", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:diagonal", "value": "painted_area_only", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:diagonal", "value": "on_street", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:diagonal", "value": "half_on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:diagonal", "value": "on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:diagonal", "value": "lay_by", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:diagonal", "value": "painted_area_only", "object_types": [ "way" ] },
+
+        { "key": "parking:lane:both:perpendicular", "value": "on_street", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:perpendicular", "value": "half_on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:perpendicular", "value": "on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:perpendicular", "value": "lay_by", "object_types": [ "way" ] },
+        { "key": "parking:lane:both:perpendicular", "value": "painted_area_only", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:perpendicular", "value": "on_street", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:perpendicular", "value": "half_on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:perpendicular", "value": "on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:perpendicular", "value": "lay_by", "object_types": [ "way" ] },
+        { "key": "parking:lane:right:perpendicular", "value": "painted_area_only", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:perpendicular", "value": "on_street", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:perpendicular", "value": "half_on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:perpendicular", "value": "on_kerb", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:perpendicular", "value": "lay_by", "object_types": [ "way" ] },
+        { "key": "parking:lane:left:perpendicular", "value": "painted_area_only", "object_types": [ "way" ] },
+
+        { "key": "parking:condition:left", "value": "free", "object_types": ["way"], "description": "colored limegreen" },
+        { "key": "parking:condition:right", "value": "free", "object_types": ["way"], "description": "colored limegreen" },
+        { "key": "parking:condition:both", "value": "free", "object_types": ["way"], "description": "colored limegreen" },
+
+        { "key": "parking:condition:left", "value": "ticket", "object_types": ["way"], "description": "colored dodgerblue" },
+        { "key": "parking:condition:right", "value": "ticket", "object_types": ["way"], "description": "colored dodgerblue" },
+        { "key": "parking:condition:both", "value": "ticket", "object_types": ["way"], "description": "colored dodgerblue" },
+
+        { "key": "parking:condition:left", "value": "disc", "object_types": ["way"], "description": "colored yellowgreen" },
+        { "key": "parking:condition:right", "value": "disc", "object_types": ["way"], "description": "colored yellowgreen" },
+        { "key": "parking:condition:both", "value": "disc", "object_types": ["way"], "description": "colored yellowgreen" },
+
+        { "key": "parking:condition:left", "value": "residents", "object_types": ["way"], "description": "colored hotpink" },
+        { "key": "parking:condition:right", "value": "residents", "object_types": ["way"], "description": "colored hotpink" },
+        { "key": "parking:condition:both", "value": "residents", "object_types": ["way"], "description": "colored hotpink" },
+
+        { "key": "parking:condition:left", "value": "customers", "object_types": ["way"], "description": "colored greenyellow" },
+        { "key": "parking:condition:right", "value": "customers", "object_types": ["way"], "description": "colored greenyellow" },
+        { "key": "parking:condition:both", "value": "customers", "object_types": ["way"], "description": "colored greenyellow" },
+
+        { "key": "parking:condition:left", "value": "disabled", "object_types": ["way"], "description": "colored turquoise" },
+        { "key": "parking:condition:right", "value": "disabled", "object_types": ["way"], "description": "colored turquoise" },
+        { "key": "parking:condition:both", "value": "disabled", "object_types": ["way"], "description": "colored turquoise" }
+    ]
+}

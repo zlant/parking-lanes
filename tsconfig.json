@@ -13,14 +13,12 @@
     "strict": true,
     "strictNullChecks": true,
     "skipLibCheck": true,
+    "jsx": "react-jsx",
     "types": ["node", "jest"]
   },
   "include": [
-    "src/index.ts",
-    "src/parking/*.ts",
-    "src/utils/*.ts",
-    "src/utils/types/*.ts",
-    "src/test/*.test.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "node_modules/osm-parking-tag-updater/src/components/Tool/transpose/**/*.ts"
   ],
   "exclude": [

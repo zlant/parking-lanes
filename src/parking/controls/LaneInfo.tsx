@@ -2,7 +2,7 @@ import { type Root, createRoot } from 'react-dom/client'
 import L, { type LatLngLiteral } from 'leaflet'
 import { handleJosmLinkClick } from '../..//utils/josm'
 import { idEditorUrl, josmUrl, mapillaryUrl, overpassDeUrl } from '../../utils/links'
-import { LaneEditForm, setOsmChangeListener } from './editor/EditorForm'
+import { LaneEditForm } from './editor/EditorForm'
 import { type OsmTags, type OsmWay } from '../../utils/types/osm-data'
 
 export default L.Control.extend({
@@ -32,7 +32,7 @@ export default L.Control.extend({
         laneinfo.style.display = 'block'
     },
 
-    showEditForm(osm: OsmWay, waysInRelation: any, cutLaneListener: any, mapCenter: LatLngLiteral, osmChangeListener: (way: OsmWay) => void) {
+    showEditForm(osm: OsmWay, waysInRelation: any, cutLaneListener: (way: OsmWay) => void, mapCenter: LatLngLiteral, osmChangeListener: (way: OsmWay) => void) {
         const laneinfo = document.getElementById('lane-control')
         if (laneinfo === null)
             return
@@ -42,14 +42,9 @@ export default L.Control.extend({
             <Panel osm={osm}
                 mapCenter={mapCenter}
                 waysInRelation={waysInRelation}
-                cutLaneListener={cutLaneListener}
-                osmChangeListener={osmChangeListener} />)
+                onCutLane={cutLaneListener}
+                onChange={osmChangeListener} />)
         laneinfo.style.display = 'block'
-    },
-
-    setOsmChangeListener(listener: any) {
-        setOsmChangeListener(listener)
-        return this
     },
 
     closeLaneInfo() {
@@ -67,8 +62,8 @@ function Panel(props: {
     osm: OsmWay
     mapCenter: LatLngLiteral
     waysInRelation?: any
-    cutLaneListener?: any
-    osmChangeListener?: (way: OsmWay) => void
+    onCutLane?: any
+    onChange?: (way: OsmWay) => void
 }) {
     return (
         <div>
@@ -96,8 +91,8 @@ function Panel(props: {
             {props.waysInRelation ?
                 <LaneEditForm osm={props.osm}
                     waysInRelation={props.waysInRelation}
-                    cutLaneListener={props.cutLaneListener}
-                    changeListener={props.osmChangeListener} /> :
+                    onCutLane={props.onCutLane}
+                    onChange={props.onChange!} /> :
                 <LaneInfo osm={props.osm} />}
         </div>
     )

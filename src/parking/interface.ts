@@ -16,7 +16,7 @@ import GithubControl from './controls/github'
 import LegendControl from './controls/legend'
 import LaneInfoControl from './controls/LaneInfo'
 import AreaInfoControl from './controls/AreaInfo'
-import FetchControl from './controls/fetch'
+import FetchControl from './controls/Fetch'
 
 import {
     parseParkingLane,
@@ -33,11 +33,12 @@ import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '../utils/changes-store'
 import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-client'
 import { type OurWindow } from '../utils/types/interfaces'
-import { OsmDataSource, type OsmWay } from '../utils/types/osm-data'
+import { type OsmWay } from '../utils/types/osm-data'
 import { type ParsedOsmData } from '../utils/types/osm-data-storage'
 import { type ParkingAreas, type ParkingPoint, type ParkingLanes } from '../utils/types/parking'
 import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
 import { parseParkingPoint, updatePointColorsByDate, updatePointStylesByZoom } from './parking-point'
+import { state } from './state'
 
 const editorName = 'PLanes'
 const version = '0.8.6'
@@ -46,7 +47,6 @@ let editorMode = false
 const useDevServer = false
 let datetime = new Date()
 const viewMinZoom = 15
-let dataSource = OsmDataSource.OverpassVk
 
 const laneInfoControl = new LaneInfoControl({ position: 'topright' })
 const areaInfoControl = new AreaInfoControl({ position: 'topright' })
@@ -103,9 +103,7 @@ export function initMap(): L.Map {
         .setDatetime(datetime)
         .setDatetimeChangeListener(handleDatetimeChange)
     fetchControl.addTo(map)
-        .setFetchDataBtnClickListener(async() => await downloadParkingLanes(map))
-        .setDataSource(dataSource)
-        .setDataSourceChangeListener(handleDataSourceChange)
+        .render(async() => await downloadParkingLanes(map))
     new InfoControl({ position: 'topright' }).addTo(map)
     new SaveControl({ position: 'topright' }).addTo(map)
     laneInfoControl.addTo(map)
@@ -149,18 +147,14 @@ function handleDatetimeChange(newDatetime: Date) {
     updatePointColorsByDate(points, newDatetime)
 }
 
-function handleDataSourceChange(newDataSource: OsmDataSource) {
-    dataSource = newDataSource
-}
-
 const lanes: ParkingLanes = {}
 const areas: ParkingAreas = {}
 const points: ParkingPoint = {}
 const markers: Record<string, L.Marker<any>> = {}
 
 async function downloadParkingLanes(map: L.Map): Promise<void> {
-    fetchControl.setFetchDataBtnText('Fetching data...')
-    const url = getUrl(map.getBounds(), editorMode, useDevServer, dataSource)
+    state.setFetchButtonText('Fetching data...')
+    const url = getUrl(map.getBounds(), editorMode, useDevServer, state.osmDataSource)
 
     let newData: ParsedOsmData | null = null
     try {
@@ -169,10 +163,10 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
         const errorMessage = e?.message === 'Request failed with status code 429' ?
             'Error: Too many requests - try again soon' :
             'Unknown error, please try again'
-        fetchControl.setFetchDataBtnText(errorMessage)
+        state.setFetchButtonText(errorMessage)
         return
     }
-    fetchControl.setFetchDataBtnText('Fetch parking data')
+    state.setFetchButtonText('Fetch parking data')
 
     if (!newData)
         return

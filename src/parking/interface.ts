@@ -14,8 +14,8 @@ import { hyper } from 'hyperhtml/esm'
 import DatetimeControl from './controls/datetime'
 import GithubControl from './controls/github'
 import LegendControl from './controls/legend'
-import LaneInfoControl from './controls/lane-info'
-import AreaInfoControl from './controls/area-info'
+import LaneInfoControl from './controls/LaneInfo'
+import AreaInfoControl from './controls/AreaInfo'
 import FetchControl from './controls/fetch'
 
 import {
@@ -109,7 +109,6 @@ export function initMap(): L.Map {
     new InfoControl({ position: 'topright' }).addTo(map)
     new SaveControl({ position: 'topright' }).addTo(map)
     laneInfoControl.addTo(map)
-        .setOsmChangeListener(handleOsmChange)
     areaInfoControl.addTo(map)
 
     map.on('moveend', handleMapMoveEnd)
@@ -238,7 +237,8 @@ function handleLaneClick(e: Event | any) {
             osm,
             osmData.waysInRelation,
             handleCutLaneClick,
-            mapCenter)
+            mapCenter,
+            handleOsmChange)
     } else {
         laneInfoControl.showLaneInfo(osm, mapCenter)
     }

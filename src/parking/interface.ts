@@ -11,7 +11,7 @@ import 'font-awesome/css/font-awesome.min.css'
 
 import { hyper } from 'hyperhtml/esm'
 
-import DatetimeControl from './controls/datetime'
+import DatetimeControl from './controls/Datetime'
 import GithubControl from './controls/github'
 import LegendControl from './controls/legend'
 import LaneInfoControl from './controls/LaneInfo'
@@ -38,14 +38,13 @@ import { type ParsedOsmData } from '../utils/types/osm-data-storage'
 import { type ParkingAreas, type ParkingPoint, type ParkingLanes } from '../utils/types/parking'
 import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
 import { parseParkingPoint, updatePointColorsByDate, updatePointStylesByZoom } from './parking-point'
-import { state } from './state'
+import { state, subscribe } from './state'
 
 const editorName = 'PLanes'
 const version = '0.8.6'
 
 let editorMode = false
 const useDevServer = false
-let datetime = new Date()
 const viewMinZoom = 15
 
 const laneInfoControl = new LaneInfoControl({ position: 'topright' })
@@ -100,14 +99,14 @@ export function initMap(): L.Map {
         .setEditorModeCheckboxListener(handleEditorModeCheckboxChange)
     new LegendControl({ position: 'bottomleft' }).addTo(map)
     new DatetimeControl({ position: 'topright' }).addTo(map)
-        .setDatetime(datetime)
-        .setDatetimeChangeListener(handleDatetimeChange)
     fetchControl.addTo(map)
         .render(async() => await downloadParkingLanes(map))
     new InfoControl({ position: 'topright' }).addTo(map)
     new SaveControl({ position: 'topright' }).addTo(map)
     laneInfoControl.addTo(map)
     areaInfoControl.addTo(map)
+
+    subscribe(handleDatetimeChange)
 
     map.on('moveend', handleMapMoveEnd)
     map.on('click', closeLaneInfo)
@@ -140,11 +139,12 @@ export const SaveControl = L.Control.extend({
         </button>`,
 })
 
-function handleDatetimeChange(newDatetime: Date) {
-    datetime = newDatetime
-    updateLaneColorsByDate(lanes, newDatetime)
-    updateAreaColorsByDate(areas, newDatetime)
-    updatePointColorsByDate(points, newDatetime)
+function handleDatetimeChange(field?: string) {
+    if (field === 'datetime') {
+        updateLaneColorsByDate(lanes, state.datetime)
+        updateAreaColorsByDate(areas, state.datetime)
+        updatePointColorsByDate(points, state.datetime)
+    }
 }
 
 const lanes: ParkingLanes = {}
@@ -202,7 +202,7 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
 }
 
 function addNewLanes(newLanes: ParkingLanes, map: L.Map): void {
-    updateLaneColorsByDate(newLanes, datetime)
+    updateLaneColorsByDate(newLanes, state.datetime)
     Object.assign(lanes, newLanes)
     for (const newLane of Object.values<L.Polyline>(newLanes)) {
         newLane.on('click', handleLaneClick)
@@ -255,7 +255,7 @@ function closeLaneInfo() {
 }
 
 function addNewAreas(newAreas: ParkingAreas, map: L.Map): void {
-    updateAreaColorsByDate(newAreas, datetime)
+    updateAreaColorsByDate(newAreas, state.datetime)
     Object.assign(areas, newAreas)
     for (const newArea of Object.values<L.Polyline>(newAreas)) {
         newArea.on('click', handleAreaClick)
@@ -275,7 +275,7 @@ function handleAreaClick(e: Event | any) {
 }
 
 function addNewPoint(newPoints: ParkingPoint, map: L.Map): void {
-    updatePointColorsByDate(newPoints, datetime)
+    updatePointColorsByDate(newPoints, state.datetime)
     Object.assign(points, newPoints)
     for (const newPoint of Object.values<L.Marker>(newPoints)) {
         newPoint.on('click', handleAreaClick)
@@ -365,8 +365,8 @@ async function handleEditorModeCheckboxChange(e: Event | any) {
 
 function handleOsmChange(newOsm: OsmWay) {
     const { map } = (window as OurWindow)
-    const newLanes = parseChangedParkingLane(newOsm, lanes, datetime, map.getZoom())
-    updateLaneColorsByDate(newLanes, datetime)
+    const newLanes = parseChangedParkingLane(newOsm, lanes, state.datetime, map.getZoom())
+    updateLaneColorsByDate(newLanes, state.datetime)
     for (const newLane of newLanes) {
         newLane.on('click', handleLaneClick)
         newLane.addTo(map)

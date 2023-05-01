@@ -12,7 +12,7 @@ import 'font-awesome/css/font-awesome.min.css'
 import { hyper } from 'hyperhtml/esm'
 
 import DatetimeControl from './controls/Datetime'
-import GithubControl from './controls/github'
+import AppInfoControl from './controls/AppInfo'
 import LegendControl from './controls/legend'
 import LaneInfoControl from './controls/LaneInfo'
 import AreaInfoControl from './controls/AreaInfo'
@@ -27,7 +27,6 @@ import {
 } from './parking-lane'
 
 import { getLocationFromCookie, setLocationToCookie } from '../utils/location-cookie'
-import { idEditorUrl, josmUrl, overpassDeUrl } from '../utils/links'
 import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
 import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '../utils/changes-store'
@@ -38,12 +37,11 @@ import { type ParsedOsmData } from '../utils/types/osm-data-storage'
 import { type ParkingAreas, type ParkingPoint, type ParkingLanes } from '../utils/types/parking'
 import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
 import { parseParkingPoint, updatePointColorsByDate, updatePointStylesByZoom } from './parking-point'
-import { state, subscribe } from './state'
+import { AuthState, state, subscribe } from './state'
 
 const editorName = 'PLanes'
 const version = '0.8.6'
 
-let editorMode = false
 const useDevServer = false
 const viewMinZoom = 15
 
@@ -95,8 +93,7 @@ export function initMap(): L.Map {
 
     L.control.locate({ drawCircle: false, drawMarker: true }).addTo(map)
 
-    new GithubControl({ position: 'bottomright' }).addTo(map)
-        .setEditorModeCheckboxListener(handleEditorModeCheckboxChange)
+    new AppInfoControl({ position: 'bottomright' }).addTo(map)
     new LegendControl({ position: 'bottomleft' }).addTo(map)
     new DatetimeControl({ position: 'topright' }).addTo(map)
     fetchControl.addTo(map)
@@ -107,6 +104,7 @@ export function initMap(): L.Map {
     areaInfoControl.addTo(map)
 
     subscribe(handleDatetimeChange)
+    subscribe(handleEditorChange)
 
     map.on('moveend', handleMapMoveEnd)
     map.on('click', closeLaneInfo)
@@ -154,7 +152,7 @@ const markers: Record<string, L.Marker<any>> = {}
 
 async function downloadParkingLanes(map: L.Map): Promise<void> {
     state.setFetchButtonText('Fetching data...')
-    const url = getUrl(map.getBounds(), editorMode, useDevServer, state.osmDataSource)
+    const url = getUrl(map.getBounds(), state.editorMode, useDevServer, state.osmDataSource)
 
     let newData: ParsedOsmData | null = null
     try {
@@ -176,14 +174,14 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
             if (lanes['right' + way.id] || lanes['left' + way.id] || lanes['empty' + way.id])
                 continue
 
-            const newLanes = parseParkingLane(way, newData.nodeCoords, map.getZoom(), editorMode)
+            const newLanes = parseParkingLane(way, newData.nodeCoords, map.getZoom(), state.editorMode)
             if (newLanes !== undefined)
                 addNewLanes(newLanes, map)
         } else if (way.tags?.amenity === 'parking') {
             if (areas[way.id])
                 continue
 
-            const newAreas = parseParkingArea(way, newData.nodeCoords, map.getZoom(), editorMode)
+            const newAreas = parseParkingArea(way, newData.nodeCoords, map.getZoom(), state.editorMode)
             if (newAreas !== undefined)
                 addNewAreas(newAreas, map)
         }
@@ -194,7 +192,7 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
             if (points[node.id])
                 continue
 
-            const newPoints = parseParkingPoint(node, map.getZoom(), editorMode)
+            const newPoints = parseParkingPoint(node, map.getZoom(), state.editorMode)
             if (newPoints !== undefined)
                 addNewPoint(newPoints, map)
         }
@@ -226,7 +224,7 @@ function handleLaneClick(e: Event | any) {
     lanes.right = backligntPolylines.right.addTo(map)
     lanes.left = backligntPolylines.left.addTo(map)
 
-    if (editorMode) {
+    if (state.editorMode) {
         laneInfoControl.showEditForm(
             osm,
             osmData.waysInRelation,
@@ -290,11 +288,19 @@ function addNewPoint(newPoints: ParkingPoint, map: L.Map): void {
 function handleMapMoveEnd() {
     const { map } = (window as OurWindow)
     const zoom = map.getZoom()
-    const center = map.getCenter();
+    const center = map.getCenter()
+    const bounds = map.getBounds()
 
-    (document.getElementById('ghc-josm') as HTMLLinkElement).href = josmUrl + overpassDeUrl + getHighwaysOverpassQuery();
-    (document.getElementById('ghc-id') as HTMLLinkElement).href = idEditorUrl({ zoom, center })
-
+    state.setMapState({
+        zoom,
+        center,
+        bounds: {
+            south: bounds.getSouth(),
+            west: bounds.getWest(),
+            north: bounds.getNorth(),
+            east: bounds.getEast(),
+        },
+    })
     setLocationToCookie(center, zoom)
 
     updateLaneStylesByZoom(lanes, zoom)
@@ -311,21 +317,15 @@ function handleMapMoveEnd() {
     downloadParkingLanes(map)
 }
 
-function getHighwaysOverpassQuery() {
-    const { map } = (window as OurWindow)
-    const bounds = map.getBounds()
-    const bbox = [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()].join(',')
-    const tag = 'highway~"^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street"'
-    return '[out:xml];(way[' + tag + '](' + bbox + ');>;way[' + tag + '](' + bbox + ');<;);out meta;'
-}
-
 // Editor
 
-async function handleEditorModeCheckboxChange(e: Event | any) {
-    const { map } = (window as OurWindow)
-    const editorModeLabel = document.getElementById('ghc-editor-mode-label') as HTMLLabelElement
+async function handleEditorChange(field?: string) {
+    if (field !== 'editorMode')
+        return
 
-    if (e.currentTarget.checked) {
+    const { map } = (window as OurWindow)
+
+    if (state.editorMode) {
         try {
             await authenticate(useDevServer)
             try {
@@ -334,24 +334,22 @@ async function handleEditorModeCheckboxChange(e: Event | any) {
                 logout()
                 await authenticate(useDevServer)
             }
-            editorMode = true
-            editorModeLabel.style.color = 'green'
+            state.setAuthState(AuthState.success)
             resetLastBounds()
             handleMapMoveEnd()
         } catch (err) {
-            editorModeLabel.style.color = 'red'
+            state.setAuthState(AuthState.fail)
+            state.setEditorMode(false)
             alert(err)
         }
     } else {
-        editorMode = false
-
         if (map.hasLayer(tileLayers.esri)) {
             map.removeLayer(tileLayers.esri)
             map.addLayer(tileLayers.mapnik)
             tileLayers.mapnik.addTo(map)
         }
 
-        editorModeLabel.style.color = 'black'
+        state.setAuthState(AuthState.initial)
 
         for (const lane in lanes) {
             if (lane.startsWith('empty')) {
@@ -457,7 +455,7 @@ function cutWay(arg: any) {
 
     osmData.ways[newWay.id] = newWay
     const { map } = (window as OurWindow)
-    const newLanes = parseParkingLane(newWay, osmData.nodeCoords, map.getZoom(), editorMode)
+    const newLanes = parseParkingLane(newWay, osmData.nodeCoords, map.getZoom(), state.editorMode)
     if (newLanes !== undefined)
         addNewLanes(newLanes, map)
 

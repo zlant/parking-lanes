@@ -1,7 +1,18 @@
 module.exports = {
-    extends: 'standard-with-typescript',
+    plugins: [
+        'react',
+    ],
+    extends: [
+        'standard-with-typescript',
+        'plugin:react/recommended',
+        'plugin:react/jsx-runtime',
+        'plugin:react-hooks/recommended',
+    ],
     parserOptions: {
         project: './tsconfig.json',
+        ecmaFeatures: {
+            jsx: true,
+        },
     },
     env: {
         node: true,

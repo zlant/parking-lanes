@@ -27,7 +27,7 @@ module.exports = {
         hashDigestLength: 8,
     },
     resolve: {
-        extensions: ['.ts', '.js'],
+        extensions: ['.ts', '.tsx', '.js'],
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -53,7 +53,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.ts?$/,
+                test: /\.(ts|tsx)?$/,
                 use: 'ts-loader',
             },
             {

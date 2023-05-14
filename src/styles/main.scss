@@ -10,12 +10,15 @@ html, body, #map {
 }
 
 
-.legend-element {
-    display: inline-block;
+.legend__element {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.legend__line {
     width: 30px;
     height: 3px;
-    vertical-align: middle;
-    overflow: hidden;
 }
 
 .control-padding {
@@ -216,6 +219,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .fetch-control_button {
+    border: none;
+    background: none;
     padding: 4px 7px;
     cursor: pointer;
 }
@@ -226,15 +231,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .fetch-control_items {
-    display: none;
     position: absolute;
     left: 0;
     width: 100%;
     background: #fff;
-}
-
-.fetch-control.opened > .fetch-control_items {
-    display: block;
 }
 
 .fetch-control_item {
@@ -269,7 +269,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .modal {
-    display: none;
     position: fixed;
     left: 50%;
     top: 50%;

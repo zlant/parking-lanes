@@ -13,7 +13,7 @@ import { hyper } from 'hyperhtml/esm'
 
 import DatetimeControl from './controls/Datetime'
 import AppInfoControl from './controls/AppInfo'
-import LegendControl from './controls/legend'
+import LegendControl from './controls/Legend'
 import LaneInfoControl from './controls/LaneInfo'
 import AreaInfoControl from './controls/AreaInfo'
 import FetchControl from './controls/Fetch'

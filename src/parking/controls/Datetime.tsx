@@ -1,6 +1,6 @@
 import L from 'leaflet'
 import { createRoot } from 'react-dom/client'
-import { useDatetime } from '../state'
+import { useAppStateStore } from '../state'
 import dayjs from 'dayjs'
 
 export default L.Control.extend({
@@ -19,7 +19,9 @@ export default L.Control.extend({
 })
 
 function DatetimeInput() {
-    const [datetime, setDatetime] = useDatetime()
+    const datetime = useAppStateStore(state => state.datetime)
+    const setDatetime = useAppStateStore(state => state.setDatetime)
+
     return (
         <input id="datetime-input"
             value={dayjs(datetime).format('YYYY-MM-DDTHH:mm')}

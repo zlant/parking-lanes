@@ -2,7 +2,7 @@ import L from 'leaflet'
 import { createRoot } from 'react-dom/client'
 import { handleJosmLinkClick } from '../../utils/josm'
 import { useState } from 'react'
-import { AuthState, useAuthState, useEditorMode, useMapState } from '../state'
+import { AuthState, useAppStateStore } from '../state'
 import { idEditorUrl, josmUrl, overpassDeUrl } from '../../utils/links'
 
 export default L.Control.extend({
@@ -22,9 +22,11 @@ export default L.Control.extend({
 
 function AppInfoPanel() {
     const [editorLinkShown, setEditorLinkShown] = useState(false)
-    const [editorMode, setEditorMode] = useEditorMode()
-    const [authState] = useAuthState()
-    const [mapState] = useMapState()
+    const editorMode = useAppStateStore(state => state.editorMode)
+    const setEditorMode = useAppStateStore(state => state.setEditorMode)
+    const authState = useAppStateStore(state => state.authState)
+    const mapState = useAppStateStore(state => state.mapState)
+
     const editorModeLabelColor = authState === AuthState.initial ?
         'black' :
         authState === AuthState.fail ? 'red' : 'green'
@@ -36,14 +38,18 @@ function AppInfoPanel() {
             <span style={{ display: editorLinkShown ? '' : 'none' }}>
                 <a href="https://wiki.openstreetmap.org/wiki/Street_parking" target="_blank" rel="noreferrer">Tagging</a>
                 <span> | </span>
-                <a href={idEditorUrl({ zoom: mapState.zoom, center: mapState.center })}
-                    target="_blank" rel="noreferrer">iD</a>
-                <span>, </span>
-                <a href={josmUrl + overpassDeUrl + getHighwaysOverpassQuery(mapState.bounds)}
-                    target="_blank" rel="noreferrer"
-                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                    onClick={e => handleJosmLinkClick(e.nativeEvent)}>Josm</a>
-                <span> </span>
+                {mapState != null &&
+                    <>
+                        <a href={idEditorUrl({ zoom: mapState.zoom, center: mapState.center })}
+                            target="_blank" rel="noreferrer">iD</a>
+                        <span>, </span>
+                        <a href={josmUrl + overpassDeUrl + getHighwaysOverpassQuery(mapState.bounds)}
+                            target="_blank" rel="noreferrer"
+                            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                            onClick={e => handleJosmLinkClick(e.nativeEvent)}>Josm</a>
+                        <span> </span>
+                    </>
+                }
             </span>
             <label className="editor-mode"
                 style={{ color: editorModeLabelColor }}>

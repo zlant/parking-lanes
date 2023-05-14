@@ -37,7 +37,7 @@ import { type ParsedOsmData } from '../utils/types/osm-data-storage'
 import { type ParkingAreas, type ParkingPoint, type ParkingLanes } from '../utils/types/parking'
 import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
 import { parseParkingPoint, updatePointColorsByDate, updatePointStylesByZoom } from './parking-point'
-import { AuthState, state, subscribe } from './state'
+import { type AppStateStore, useAppStateStore, AuthState } from './state'
 
 const editorName = 'PLanes'
 const version = '0.8.6'
@@ -103,8 +103,9 @@ export function initMap(): L.Map {
     laneInfoControl.addTo(map)
     areaInfoControl.addTo(map)
 
-    subscribe(handleDatetimeChange)
-    subscribe(handleEditorChange)
+    useAppStateStore.subscribe(handleDatetimeChange)
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    useAppStateStore.subscribe(handleEditorChange)
 
     map.on('moveend', handleMapMoveEnd)
     map.on('click', closeLaneInfo)
@@ -137,8 +138,8 @@ export const SaveControl = L.Control.extend({
         </button>`,
 })
 
-function handleDatetimeChange(field?: string) {
-    if (field === 'datetime') {
+function handleDatetimeChange(state: AppStateStore, prevState: AppStateStore) {
+    if (state.datetime !== prevState.datetime) {
         updateLaneColorsByDate(lanes, state.datetime)
         updateAreaColorsByDate(areas, state.datetime)
         updatePointColorsByDate(points, state.datetime)
@@ -151,8 +152,10 @@ const points: ParkingPoint = {}
 const markers: Record<string, L.Marker<any>> = {}
 
 async function downloadParkingLanes(map: L.Map): Promise<void> {
-    state.setFetchButtonText('Fetching data...')
-    const url = getUrl(map.getBounds(), state.editorMode, useDevServer, state.osmDataSource)
+    const setFetchButtonText = useAppStateStore.getState().setFetchButtonText
+    setFetchButtonText('Fetching data...')
+    const { editorMode, osmDataSource } = useAppStateStore.getState()
+    const url = getUrl(map.getBounds(), editorMode, useDevServer, osmDataSource)
 
     let newData: ParsedOsmData | null = null
     try {
@@ -161,10 +164,10 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
         const errorMessage = e?.message === 'Request failed with status code 429' ?
             'Error: Too many requests - try again soon' :
             'Unknown error, please try again'
-        state.setFetchButtonText(errorMessage)
+        setFetchButtonText(errorMessage)
         return
     }
-    state.setFetchButtonText('Fetch parking data')
+    setFetchButtonText('Fetch parking data')
 
     if (!newData)
         return
@@ -174,14 +177,14 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
             if (lanes['right' + way.id] || lanes['left' + way.id] || lanes['empty' + way.id])
                 continue
 
-            const newLanes = parseParkingLane(way, newData.nodeCoords, map.getZoom(), state.editorMode)
+            const newLanes = parseParkingLane(way, newData.nodeCoords, map.getZoom(), editorMode)
             if (newLanes !== undefined)
                 addNewLanes(newLanes, map)
         } else if (way.tags?.amenity === 'parking') {
             if (areas[way.id])
                 continue
 
-            const newAreas = parseParkingArea(way, newData.nodeCoords, map.getZoom(), state.editorMode)
+            const newAreas = parseParkingArea(way, newData.nodeCoords, map.getZoom(), editorMode)
             if (newAreas !== undefined)
                 addNewAreas(newAreas, map)
         }
@@ -192,7 +195,7 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
             if (points[node.id])
                 continue
 
-            const newPoints = parseParkingPoint(node, map.getZoom(), state.editorMode)
+            const newPoints = parseParkingPoint(node, map.getZoom(), editorMode)
             if (newPoints !== undefined)
                 addNewPoint(newPoints, map)
         }
@@ -200,7 +203,8 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
 }
 
 function addNewLanes(newLanes: ParkingLanes, map: L.Map): void {
-    updateLaneColorsByDate(newLanes, state.datetime)
+    const { datetime } = useAppStateStore.getState()
+    updateLaneColorsByDate(newLanes, datetime)
     Object.assign(lanes, newLanes)
     for (const newLane of Object.values<L.Polyline>(newLanes)) {
         newLane.on('click', handleLaneClick)
@@ -224,7 +228,8 @@ function handleLaneClick(e: Event | any) {
     lanes.right = backligntPolylines.right.addTo(map)
     lanes.left = backligntPolylines.left.addTo(map)
 
-    if (state.editorMode) {
+    const { editorMode } = useAppStateStore.getState()
+    if (editorMode) {
         laneInfoControl.showEditForm(
             osm,
             osmData.waysInRelation,
@@ -253,7 +258,8 @@ function closeLaneInfo() {
 }
 
 function addNewAreas(newAreas: ParkingAreas, map: L.Map): void {
-    updateAreaColorsByDate(newAreas, state.datetime)
+    const { datetime } = useAppStateStore.getState()
+    updateAreaColorsByDate(newAreas, datetime)
     Object.assign(areas, newAreas)
     for (const newArea of Object.values<L.Polyline>(newAreas)) {
         newArea.on('click', handleAreaClick)
@@ -273,7 +279,8 @@ function handleAreaClick(e: Event | any) {
 }
 
 function addNewPoint(newPoints: ParkingPoint, map: L.Map): void {
-    updatePointColorsByDate(newPoints, state.datetime)
+    const { datetime } = useAppStateStore.getState()
+    updatePointColorsByDate(newPoints, datetime)
     Object.assign(points, newPoints)
     for (const newPoint of Object.values<L.Marker>(newPoints)) {
         newPoint.on('click', handleAreaClick)
@@ -291,7 +298,7 @@ function handleMapMoveEnd() {
     const center = map.getCenter()
     const bounds = map.getBounds()
 
-    state.setMapState({
+    useAppStateStore.getState().setMapState({
         zoom,
         center,
         bounds: {
@@ -319,8 +326,8 @@ function handleMapMoveEnd() {
 
 // Editor
 
-async function handleEditorChange(field?: string) {
-    if (field !== 'editorMode')
+async function handleEditorChange(state: AppStateStore, prevState: AppStateStore) {
+    if (state.editorMode === prevState.editorMode)
         return
 
     const { map } = (window as OurWindow)
@@ -363,8 +370,9 @@ async function handleEditorChange(field?: string) {
 
 function handleOsmChange(newOsm: OsmWay) {
     const { map } = (window as OurWindow)
-    const newLanes = parseChangedParkingLane(newOsm, lanes, state.datetime, map.getZoom())
-    updateLaneColorsByDate(newLanes, state.datetime)
+    const { datetime } = useAppStateStore.getState()
+    const newLanes = parseChangedParkingLane(newOsm, lanes, datetime, map.getZoom())
+    updateLaneColorsByDate(newLanes, datetime)
     for (const newLane of newLanes) {
         newLane.on('click', handleLaneClick)
         newLane.addTo(map)
@@ -455,7 +463,8 @@ function cutWay(arg: any) {
 
     osmData.ways[newWay.id] = newWay
     const { map } = (window as OurWindow)
-    const newLanes = parseParkingLane(newWay, osmData.nodeCoords, map.getZoom(), state.editorMode)
+    const { editorMode } = useAppStateStore.getState()
+    const newLanes = parseParkingLane(newWay, osmData.nodeCoords, map.getZoom(), editorMode)
     if (newLanes !== undefined)
         addNewLanes(newLanes, map)
 

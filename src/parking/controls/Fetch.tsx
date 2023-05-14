@@ -2,7 +2,7 @@ import L from 'leaflet'
 import { OsmDataSource } from '../../utils/types/osm-data'
 import { createRoot } from 'react-dom/client'
 import { useState } from 'react'
-import { useFetchButtonText, useOsmDataSource } from '../state'
+import { useAppStateStore } from '../state'
 
 export default L.Control.extend({
     onAdd: () => {
@@ -32,8 +32,10 @@ function FetchButton(props: {
     onClick: () => void
 }) {
     const [sourcesShown, setSourcesShown] = useState(false)
-    const [dataSource, setDataSource] = useOsmDataSource()
-    const [fetchButtonText] = useFetchButtonText()
+    const fetchButtonText = useAppStateStore(state => state.fetchButtonText)
+    const dataSource = useAppStateStore(state => state.osmDataSource)
+    const setDataSource = useAppStateStore(state => state.setOsmDataSource)
+
     return (
         <div className={`fetch-control ${sourcesShown ? 'opened' : ''}`}
             tabIndex={-1}

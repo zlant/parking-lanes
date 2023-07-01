@@ -73,10 +73,6 @@ export function getConditions(tags: OsmTags, side?: string) {
     if (maxstayValue && maxstayValue !== 'no')
         conditions.default = 'disc'
 
-    const zoneValue = getValue(tags, 'zone', side)
-    if (zoneValue)
-        conditions.default = 'residents'
-
     if (feeValue === 'yes')
         conditions.default = 'ticket'
 

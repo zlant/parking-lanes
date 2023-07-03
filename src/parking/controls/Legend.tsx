@@ -34,7 +34,7 @@ function LegendPanel() {
                 legend.map(x =>
                     <div key={x.condition} className='legend__element'>
                         <div className="legend__line" style={{ backgroundColor: x.color }} />
-                        <span title={`parking:condition:<Side>=${x.condition}`}>{x.text}</span>
+                        <span>{x.text}</span>
                     </div>) :
                 <span>Legend</span>
             }

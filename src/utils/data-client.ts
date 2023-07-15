@@ -3,6 +3,7 @@ import { type RawOsmData } from './types/osm-data'
 import { type ParsedOsmData } from './types/osm-data-storage'
 
 export const osmData: ParsedOsmData = {
+    relations: {},
     ways: {},
     nodes: {},
     nodeCoords: {},
@@ -40,6 +41,13 @@ export async function downloadBbox(bounds: L.LatLngBounds, url: string): Promise
             else
                 osmData.ways[wayId] = newData.ways[wayId]
         }
+
+        for (const relationId in newData.relations) {
+            if (osmData.relations[relationId]?.version >= newData.relations[relationId].version)
+                continue
+            else
+                osmData.relations[relationId] = newData.relations[relationId]
+        }
     }
 
     return newData
@@ -70,6 +78,7 @@ async function downloadContent(url: string): Promise<RawOsmData> {
 
 function parseOsmResp(osmResp: RawOsmData): ParsedOsmData {
     const newData: ParsedOsmData = {
+        relations: {},
         ways: {},
         nodes: {},
         nodeCoords: {},
@@ -91,6 +100,8 @@ function parseOsmResp(osmResp: RawOsmData): ParsedOsmData {
                 break
 
             case 'relation':
+                newData.relations[el.id] = el
+
                 for (const member of el.members) {
                     if (member.type === 'way' && newData.ways[member.ref])
                         newData.waysInRelation[member.ref] = true

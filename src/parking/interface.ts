@@ -35,7 +35,7 @@ import { type OurWindow } from '../utils/types/interfaces'
 import { type OsmWay } from '../utils/types/osm-data'
 import { type ParsedOsmData } from '../utils/types/osm-data-storage'
 import { type ParkingAreas, type ParkingPoint, type ParkingLanes } from '../utils/types/parking'
-import { parseParkingArea, updateAreaColorsByDate } from './parking-area'
+import { parseParkingArea, parseParkingRelation, updateAreaColorsByDate } from './parking-area'
 import { parseParkingPoint, updatePointColorsByDate, updatePointStylesByZoom } from './parking-point'
 import { type AppStateStore, useAppStateStore, AuthState } from './state'
 
@@ -172,6 +172,17 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
     if (!newData)
         return
 
+    for (const relation of Object.values(newData.relations)) {
+        if (relation.tags?.amenity === 'parking') {
+            if (areas[relation.type + relation.id])
+                continue
+
+            const newAreas = parseParkingRelation(relation, newData.nodeCoords, newData.ways, map.getZoom(), editorMode)
+            if (newAreas !== undefined)
+                addNewAreas(newAreas, map)
+        }
+    }
+
     for (const way of Object.values(newData.ways)) {
         if (way.tags?.highway) {
             if (lanes['right' + way.id] || lanes['left' + way.id] || lanes['empty' + way.id])
@@ -181,7 +192,7 @@ async function downloadParkingLanes(map: L.Map): Promise<void> {
             if (newLanes !== undefined)
                 addNewLanes(newLanes, map)
         } else if (way.tags?.amenity === 'parking') {
-            if (areas[way.id])
+            if (areas[way.type + way.id])
                 continue
 
             const newAreas = parseParkingArea(way, newData.nodeCoords, map.getZoom(), editorMode)

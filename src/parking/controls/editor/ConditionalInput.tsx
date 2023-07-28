@@ -27,7 +27,7 @@ export function ConditionalInput(props: {
                         {parsedConditionalTag
                             .map((conditionalValue, i) =>
                                 <ConditionalPartInput
-                                    key={props.tag}
+                                    key={i}
                                     osm={props.osm}
                                     tag={props.tag}
                                     part={conditionalValue}
@@ -60,13 +60,13 @@ function ConditionalPartInput(props: {
                             value={props.part.value}
                             values={props.values}
                             data-partindex={props.partindex.toString()}
-                            data-tokenname="partindex"
+                            data-tokenname="condition"
                             onChange={e => props.onChange(e, props.osm)} /> :
                         <TextInput
                             tag={props.tag}
                             value={props.part.value}
                             data-partindex={props.partindex.toString()}
-                            data-tokenname="partindex"
+                            data-tokenname="condition"
                             onChange={e => props.onChange(e, props.osm)} />
                 }
             </td>

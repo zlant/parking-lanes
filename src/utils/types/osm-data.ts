@@ -1,7 +1,10 @@
 export type OsmTags = Record<string, string>
 
+type OsmType = 'node' | 'way' | 'relation'
+
 interface OsmObject {
     id: number
+    type: OsmType
     uid?: number
     user?: string
     /** ISO8601 string */
@@ -11,9 +14,15 @@ interface OsmObject {
     tags: OsmTags
 }
 
+interface RelationMember {
+    type: OsmType
+    ref: number
+    role: string
+}
+
 export interface OsmRelation extends OsmObject {
     type: 'relation'
-    members: any[]
+    members: RelationMember[]
 }
 
 export interface OsmNode extends OsmObject {

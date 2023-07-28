@@ -12,7 +12,7 @@ export function SelectInput(props: {
 
     return (
         <select name={props.tag}
-            defaultValue={props.value}
+            value={props.value}
             data-partindex={props['data-partindex']}
             data-tokenname={props['data-tokenname']}
             className="editor-form__select-input"

@@ -194,4 +194,17 @@ describe('#getConditions()', () => {
         }
         expect(expectedConditions).toStrictEqual(receivedConditions)
     })
+
+    test('disabled', async() => {
+        const tags: OsmTags = {
+            'parking:right:access': 'no',
+            'parking:right:disabled': 'designated',
+        }
+        const receivedConditions = getConditions(tags, 'right')
+        const expectedConditions: ParkingConditions = {
+            default: 'disabled',
+            conditionalValues: [],
+        }
+        expect(expectedConditions).toStrictEqual(receivedConditions)
+    })
 })

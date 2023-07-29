@@ -108,6 +108,8 @@ function mapAccessValue(tags: OsmTags, accessValue: string | undefined, side?: s
             return getValue(tags, 'zone', side) ? 'residents' : 'no_stopping'
 
         case 'no':
+            return getValue(tags, 'disabled', side) === 'designated' ? 'disabled' : 'no_stopping'
+
         case 'permissive':
         case 'permit':
             return 'no_stopping'

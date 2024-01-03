@@ -1,43 +1,43 @@
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-import 'leaflet.locatecontrol'
-import 'leaflet-polylineoffset'
 import 'leaflet-hash'
+import 'leaflet-polylineoffset'
 import 'leaflet-touch-helper'
+import 'leaflet.locatecontrol'
 
-import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css'
 import 'font-awesome/css/font-awesome.min.css'
+import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css'
 
 import { hyper } from 'hyperhtml/esm'
 
-import DatetimeControl from './controls/Datetime'
 import AppInfoControl from './controls/AppInfo'
-import LegendControl from './controls/Legend'
-import LaneInfoControl from './controls/LaneInfo'
 import AreaInfoControl from './controls/AreaInfo'
+import DatetimeControl from './controls/Datetime'
 import FetchControl from './controls/Fetch'
+import LaneInfoControl from './controls/LaneInfo'
+import LegendControl from './controls/Legend'
 
 import {
-    parseParkingLane,
+    getBacklights,
     parseChangedParkingLane,
+    parseParkingLane,
     updateLaneColorsByDate,
     updateLaneStylesByZoom,
-    getBacklights,
 } from './parking-lane'
 
-import { getLocationFromCookie, setLocationToCookie } from '../utils/location-cookie'
-import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
-import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '../utils/changes-store'
-import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-client'
+import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
+import { getLocationFromCookie, setLocationToCookie } from '../utils/location-cookie'
+import { authenticate, logout, uploadChanges, userInfo } from '../utils/osm-client'
 import { type OurWindow } from '../utils/types/interfaces'
 import { type OsmWay } from '../utils/types/osm-data'
 import { type ParsedOsmData } from '../utils/types/osm-data-storage'
-import { type ParkingAreas, type ParkingPoint, type ParkingLanes } from '../utils/types/parking'
+import { type ParkingAreas, type ParkingLanes, type ParkingPoint } from '../utils/types/parking'
+import { getUrl } from './data-url'
 import { parseParkingArea, parseParkingRelation, updateAreaColorsByDate } from './parking-area'
 import { parseParkingPoint, updatePointColorsByDate, updatePointStylesByZoom } from './parking-point'
-import { type AppStateStore, useAppStateStore, AuthState } from './state'
+import { AuthState, useAppStateStore, type AppStateStore } from './state'
 
 const editorName = 'PLanes'
 const version = '0.8.8'

@@ -34,6 +34,7 @@ import { type OurWindow } from '../utils/types/interfaces'
 import { type OsmWay } from '../utils/types/osm-data'
 import { type ParsedOsmData } from '../utils/types/osm-data-storage'
 import { type ParkingAreas, type ParkingLanes, type ParkingPoint } from '../utils/types/parking'
+import { addBingImagery } from './bing-imagery'
 import { getUrl } from './data-url'
 import { parseParkingArea, parseParkingRelation, updateAreaColorsByDate } from './parking-area'
 import { parseParkingPoint, updatePointColorsByDate, updatePointStylesByZoom } from './parking-point'
@@ -50,7 +51,7 @@ const areaInfoControl = new AreaInfoControl({ position: 'topright' })
 const fetchControl = new FetchControl({ position: 'topright' })
 
 // Reminder: Check `maxMaxZoomFromTileLayers` in `generateStyleMapByZoom()`
-const tileLayers = {
+const tileLayers: Record<string, L.TileLayer> = {
     mapnik: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 21,
@@ -72,7 +73,9 @@ const layersControl = L.control.layers(
     undefined,
     { position: 'bottomright' })
 
-export function initMap(): L.Map {
+void addBingImagery(layersControl)
+
+export function initMap() {
     const root = document.querySelector('#map') as HTMLElement
     const map = L.map(root, { fadeAnimation: false })
 

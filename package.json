@@ -76,7 +76,7 @@
     "leaflet.locatecontrol": "^0.79.0",
     "normalize.css": "^8.0.1",
     "opening_hours": "^3.8.0",
-    "osm-auth": "^1.1.0",
+    "osm-auth": "^2.4.0",
     "osm-parking-tag-updater": "github:osmberlin/osm-tag-updater",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

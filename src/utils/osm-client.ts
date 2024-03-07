@@ -1,27 +1,30 @@
 import * as JXON from 'jxon'
-import osmAuth from 'osm-auth'
+import { osmAuth } from 'osm-auth'
 import { osmProdUrl, osmDevUrl } from './links'
 
 import { type OsmWay } from './types/osm-data'
 import { type ChangedIdMap, type ChangesStore, type JxonOsmWay } from './types/changes-store'
 
-let auth: OSMAuth.OSMAuthInstance | null = null
+let auth: OSMAuth.osmAuth | null = null
 
 function craeteOsmAuth(useDevServer: boolean) {
     return useDevServer ?
-        // Used to not have these new keywords
         // eslint-disable-next-line new-cap
         new osmAuth({
             url: osmDevUrl,
-            oauth_consumer_key: 'FhbDyU5roZ0wAPffly1yfiYChg8RaNuFlJTB0SE1',
-            oauth_secret: 'gTzuFDWUqmZnwho2NIaVoxpgSX47Xyqq65lTw8do',
+            client_id: 'lX6vX5gKHEfLV9kybjRpy2L7BTqtwZ5c_G7sjKscVw0',
+            access_token: localStorage.getItem('https://master.apis.dev.openstreetmap.orgoauth2_access_token') ?? undefined,
+            redirect_uri: window.location.origin + window.location.pathname + 'land.html',
+            scope: 'read_prefs write_api',
             auto: true,
         }) :
         // eslint-disable-next-line new-cap
         new osmAuth({
             url: osmProdUrl,
-            oauth_consumer_key: 'Np0gmfYoqo6Ronla4wuFTXEUgypODL0jPRzjiFW6',
-            oauth_secret: 'KnUDQ3sL3T7LZjvwi5OJj1hxNBz0UiSpTr0T0fLs',
+            client_id: 'wwP2hKLF5LAWQgZTcd8SjYXsCzd8zYvl7muuQm1V3Jo',
+            access_token: localStorage.getItem('https://openstreetmap.orgoauth2_access_token') ?? undefined,
+            redirect_uri: window.location.origin + window.location.pathname + 'land.html',
+            scope: 'read_prefs write_api',
             auto: true,
         })
 }
@@ -65,7 +68,7 @@ export function userInfo(): Promise<any> {
     return osmXhr({
         method: 'GET',
         path: '/api/0.6/user/details',
-        options: { header: { Accept: 'application/json' } },
+        headers: { Accept: 'application/json' },
     })
 }
 
@@ -122,7 +125,7 @@ function createChangeset(editorName: string, editorVersion: string): Promise<str
     return osmXhr({
         method: 'PUT',
         path: '/api/0.6/changeset/create',
-        options: { header: { 'Content-Type': 'text/xml' } },
+        headers: { 'Content-Type': 'text/xml' },
         content: JXON.jsToString(change),
     })
 }
@@ -146,7 +149,7 @@ function saveChangesets(changesStore: ChangesStore, changesetId: string, editorN
     return osmXhr({
         method: 'POST',
         path: '/api/0.6/changeset/' + changesetId + '/upload',
-        options: { header: { 'Content-Type': 'text/xml' } },
+        headers: { 'Content-Type': 'text/xml' },
         content: JXON.jsToString(change),
     })
 }
@@ -155,7 +158,7 @@ function closeChangeset(changesetId: string) {
     return osmXhr({
         method: 'PUT',
         path: '/api/0.6/changeset/' + changesetId + '/close',
-        options: { header: { 'Content-Type': 'text/xml' } },
+        headers: { 'Content-Type': 'text/xml' },
     })
 }
 

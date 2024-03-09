@@ -26,18 +26,20 @@ html, body, #map {
 }
 
 .control-bigfont {
-    font-size: 110%;
+    font-size: 14px;
 }
 
 .mapnik_gray {
     filter: grayscale(1);
 }
 
-.leaflet-control.control-button {
+.control-button {
     cursor: pointer;
+    border: none;
+    border-radius: 3px;
 }
 
-.leaflet-control.control-button:hover {
+.control-button:hover {
     background-color: #f4f4f4;
 }
 
@@ -199,19 +201,21 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 // save control
 
-.leaflet-control.save-control {
+.save-control {
+    font-weight: bold;
     background-color: yellow;
+    padding: 4px 7px;
 }
 
-.leaflet-control.save-control:hover {
+.save-control:hover {
     background-color: #f4f400;
 }
 
 // fetch control
 
 .fetch-control {
-    position: relative;
-    z-index: 801;
+    background: #f5f5f5;
+    border-radius: 3px;
 }
 
 .fetch-control_wrapper {
@@ -227,7 +231,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .fetch-control_button:hover {
     border-radius: 5px 0 0 5px;
-    background-color: #f4f4f4;
+    background-color: #ececec;
 }
 
 .fetch-control_items {
@@ -257,7 +261,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .fetch-control_toggle:hover {
     border-radius: 0 5px 5px 0;
-    background-color: #f4f4f4;
+    background-color: #ececec;
 }
 
 .fetch-control_toggle::after {

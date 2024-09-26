@@ -51,9 +51,18 @@ export function LaneEditForm(props: {
                 </div>
             </div>
             <div id="tags-block">
-                {bothBlockShown ? <SideGroup osm={props.osm} side='both' onChange={handleInputChange} /> : null}
-                {!bothBlockShown ? <SideGroup osm={props.osm} side='right' onChange={handleInputChange} /> : null}
-                {!bothBlockShown ? <SideGroup osm={props.osm} side='left' onChange={handleInputChange} /> : null}
+                <SideGroup osm={props.osm}
+                    side='both'
+                    shown={bothBlockShown}
+                    onChange={handleInputChange} />
+                <SideGroup osm={props.osm}
+                    side='right'
+                    shown={!bothBlockShown}
+                    onChange={handleInputChange} />
+                <SideGroup osm={props.osm}
+                    side='left'
+                    shown={!bothBlockShown}
+                    onChange={handleInputChange} />
                 <AllTagsBlock tags={props.osm.tags} />
             </div>
 

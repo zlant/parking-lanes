@@ -9,11 +9,13 @@ import { parkingLaneTags } from './lane-tags'
 export function SideGroup(props: {
     osm: OsmWay
     side: 'both' | 'left' | 'right'
+    shown: boolean
     onChange: (e: React.SyntheticEvent, way: OsmWay) => void
 }) {
     return (
         <div id={props.side}
-            className={`tags-block tags-block_${props.side}`}>
+            className={`tags-block tags-block_${props.side}`}
+            style={{ display: props.shown ? undefined : 'none' }} >
             <table>
                 <TagInputs
                     osm={props.osm}

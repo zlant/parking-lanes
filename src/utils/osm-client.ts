@@ -12,6 +12,7 @@ function craeteOsmAuth(useDevServer: boolean) {
         // eslint-disable-next-line new-cap
         new osmAuth({
             url: osmDevUrl,
+            apiUrl: osmDevUrl,
             client_id: 'lX6vX5gKHEfLV9kybjRpy2L7BTqtwZ5c_G7sjKscVw0',
             access_token: localStorage.getItem('https://master.apis.dev.openstreetmap.orgoauth2_access_token') ?? undefined,
             redirect_uri: window.location.origin + window.location.pathname + 'land.html',
@@ -21,6 +22,7 @@ function craeteOsmAuth(useDevServer: boolean) {
         // eslint-disable-next-line new-cap
         new osmAuth({
             url: osmProdUrl,
+            apiUrl: osmProdUrl,
             client_id: 'wwP2hKLF5LAWQgZTcd8SjYXsCzd8zYvl7muuQm1V3Jo',
             access_token: localStorage.getItem('https://openstreetmap.orgoauth2_access_token') ?? undefined,
             redirect_uri: window.location.origin + window.location.pathname + 'land.html',

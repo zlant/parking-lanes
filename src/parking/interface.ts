@@ -58,7 +58,12 @@ const tileLayers: Record<string, L.TileLayer> = {
         maxNativeZoom: 19,
         className: 'mapnik_gray',
     }),
-    esri: L.tileLayer('https://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    esri: L.tileLayer('https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?blankTile=false', {
+        attribution: "<a href='https://wiki.openstreetmap.org/wiki/Esri'>Terms & Feedback</a>",
+        maxZoom: 21,
+        maxNativeZoom: 19,
+    }),
+    esriClarity: L.tileLayer('https://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         attribution: "<a href='https://wiki.openstreetmap.org/wiki/Esri'>Terms & Feedback</a>",
         maxZoom: 21,
         maxNativeZoom: 19,
@@ -68,7 +73,8 @@ const tileLayers: Record<string, L.TileLayer> = {
 const layersControl = L.control.layers(
     {
         Mapnik: tileLayers.mapnik,
-        'Esri Clarity': tileLayers.esri,
+        Esri: tileLayers.esri,
+        'Esri Clarity': tileLayers.esriClarity,
     },
     undefined,
     { position: 'bottomright' })

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { type ConditionalValue, parseConditionalTag } from '../../../utils/conditional-tag'
 import { type OsmWay } from '../../../utils/types/osm-data'
 import { SelectInput } from './SelectInput'
@@ -9,10 +10,18 @@ export function ConditionalInput(props: {
     label: string
     hide: boolean
     values?: string[]
-    onChange: (e: React.SyntheticEvent, way: OsmWay) => void
+    onChange: (tagValue: string) => void
 }) {
     const parsedConditionalTag = props.osm.tags[props.tag] ? parseConditionalTag(props.osm.tags[props.tag]) : []
     parsedConditionalTag.push({ value: '', condition: null })
+
+    const buildTagValue = (newConditionalValue: ConditionalValue, index: number) => {
+        return parsedConditionalTag
+            .map((cv, i) => index === i ? newConditionalValue : cv)
+            .filter(cv => cv.value && cv.condition)
+            .map(cv => buildConditionalValue(cv.value, cv.condition))
+            .join('; ')
+    }
 
     return (
         <tr id={props.tag}
@@ -25,31 +34,46 @@ export function ConditionalInput(props: {
                 <table>
                     <tbody>
                         {parsedConditionalTag
-                            .map((conditionalValue, i) =>
+                            .map((conditionalValue, index) =>
                                 <ConditionalPartInput
-                                    key={i}
-                                    osm={props.osm}
+                                    key={index}
                                     tag={props.tag}
                                     part={conditionalValue}
-                                    partindex={i}
                                     values={props.values}
-                                    onChange={props.onChange} />)
+                                    onChange={vp => props.onChange(buildTagValue(vp, index))} />)
                         }
                     </tbody>
                 </table>
             </td>
         </tr>
     )
+
+    function buildConditionalValue(value: string, condition: string | null) {
+        return condition == null || condition === '' ? value : `${value} @ (${condition})`
+    }
 }
 
 function ConditionalPartInput(props: {
-    osm: OsmWay
     tag: string
     part: ConditionalValue
-    partindex: number
     values?: string[]
-    onChange: (e: React.SyntheticEvent, way: OsmWay) => void
+    onChange: (tagValuePart: ConditionalValue) => void
 }) {
+    const [value, setValue] = useState(props.part.value)
+    const [condition, setCondition] = useState(props.part.condition)
+
+    const handleChangeValue = newValue => {
+        setValue(newValue)
+        if (newValue && condition)
+            props.onChange({ value: newValue, condition })
+    }
+
+    const handleChangeCondition = newCondition => {
+        setCondition(newCondition)
+        if (value && newCondition)
+            props.onChange({ value, condition: newCondition })
+    }
+
     return (
         <tr>
             <td>
@@ -57,17 +81,13 @@ function ConditionalPartInput(props: {
                     props.values ?
                         <SelectInput
                             tag={props.tag}
-                            value={props.part.value}
+                            value={value}
                             values={props.values}
-                            data-partindex={props.partindex.toString()}
-                            data-tokenname="condition"
-                            onChange={e => props.onChange(e, props.osm)} /> :
+                            onChange={handleChangeValue} /> :
                         <TextInput
                             tag={props.tag}
-                            value={props.part.value}
-                            data-partindex={props.partindex.toString()}
-                            data-tokenname="condition"
-                            onChange={e => props.onChange(e, props.osm)} />
+                            value={value}
+                            onChange={handleChangeValue} />
                 }
             </td>
             <td>
@@ -75,10 +95,8 @@ function ConditionalPartInput(props: {
                 <input type="text"
                     placeholder="time interval"
                     name={props.tag}
-                    value={props.part.condition ?? undefined}
-                    data-partindex={props.partindex.toString()}
-                    data-tokenname="time_interval"
-                    onInput={(e) => props.onChange(e, props.osm)} />
+                    value={condition ?? undefined}
+                    onInput={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCondition(e.target.value)} />
             </td>
         </tr>
     )

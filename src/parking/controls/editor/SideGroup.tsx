@@ -10,7 +10,7 @@ export function SideGroup(props: {
     osm: OsmWay
     side: 'both' | 'left' | 'right'
     shown: boolean
-    onChange: (e: React.SyntheticEvent, way: OsmWay) => void
+    onChange: (key: string, value: string) => void
 }) {
     return (
         <div id={props.side}
@@ -29,7 +29,7 @@ export function SideGroup(props: {
 function TagInputs(props: {
     osm: OsmWay
     side: 'both' | 'left' | 'right'
-    onChange: (e: React.SyntheticEvent, way: OsmWay) => void
+    onChange: (key: string, value: string) => void
 }) {
     const unsupportedTags = Object.keys(props.osm.tags)
         .filter(x => x.startsWith('parking:'))
@@ -52,7 +52,7 @@ function TagInput(props: {
     osm: OsmWay
     side: 'both' | 'left' | 'right'
     tagInfo: ParkingTagInfo
-    onChange: (e: React.SyntheticEvent, way: OsmWay) => void
+    onChange: (key: string, value: string) => void
 }) {
     const tag = props.tagInfo.template.replace('{side}', props.side)
     const label = props.tagInfo.template.startsWith('parking:{side}') ?
@@ -60,6 +60,6 @@ function TagInput(props: {
         tag
     const hide = !props.tagInfo.checkForNeedShowing(props.osm.tags, props.side)
     return tag.endsWith(':conditional') ?
-        <ConditionalInput osm={props.osm} tag={tag} label={label} hide={hide} values={props.tagInfo.values} onChange={props.onChange} /> :
-        <SimpleTagInput osm={props.osm} tag={tag} label={label} hide={hide} values={props.tagInfo.values} onChange={props.onChange} />
+        <ConditionalInput osm={props.osm} tag={tag} label={label} hide={hide} values={props.tagInfo.values} onChange={v => props.onChange(tag, v)} /> :
+        <SimpleTagInput osm={props.osm} tag={tag} label={label} hide={hide} values={props.tagInfo.values} onChange={v => props.onChange(tag, v)} />
 }

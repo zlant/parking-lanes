@@ -8,7 +8,7 @@ export function SimpleTagInput(props: {
     label: string
     hide: boolean
     values?: string[]
-    onChange: (e: React.SyntheticEvent, way: OsmWay) => void
+    onChange: (value: string) => void
 }) {
     const value = props.osm.tags[props.tag]
 
@@ -23,11 +23,11 @@ export function SimpleTagInput(props: {
                             tag={props.tag}
                             value={value}
                             values={props.values}
-                            onChange={e => props.onChange(e, props.osm)} /> :
+                            onChange={e => props.onChange(e)} /> :
                         <TextInput
                             tag={props.tag}
                             value={value}
-                            onChange={e => props.onChange(e, props.osm)} />
+                            onChange={e => props.onChange(e)} />
                 }
             </td>
         </tr>

@@ -2,9 +2,7 @@ export function SelectInput(props: {
     tag: string
     value: string
     values: string[]
-    'data-partindex'?: string
-    'data-tokenname'?: string
-    onChange: (e: React.ChangeEvent) => void
+    onChange: (tagValue: string) => void
 }) {
     const options = !props.value || props.values.includes(props.value) ?
         ['', ...props.values] :
@@ -13,10 +11,8 @@ export function SelectInput(props: {
     return (
         <select name={props.tag}
             value={props.value}
-            data-partindex={props['data-partindex']}
-            data-tokenname={props['data-tokenname']}
             className="editor-form__select-input"
-            onChange={e => props.onChange(e)}>
+            onChange={e => props.onChange(e.target.value)}>
             {options.map(o => <option
                 key={o}
                 value={o}>

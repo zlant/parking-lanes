@@ -1,4 +1,3 @@
-import type React from 'react'
 import { useState } from 'react'
 import { type OsmTags, type OsmWay } from '../../../utils/types/osm-data'
 import { type WaysInRelation } from '../../../utils/types/osm-data-storage'
@@ -75,13 +74,13 @@ export function LaneEditForm(props: {
         </form>
     )
 
-    function handleInputChange(e: React.SyntheticEvent, osm: OsmWay) {
-        if (!(e.currentTarget instanceof HTMLInputElement || e.currentTarget instanceof HTMLSelectElement) ||
-            e.currentTarget.form == null)
-            return
-
-        const newOsm = formToOsmWay(osm, e.currentTarget.form)
-        props.onChange(newOsm)
+    function handleInputChange(key: string, value: string) {
+        if (value)
+            props.osm.tags[key] = value
+        else
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+            delete props.osm.tags[key]
+        props.onChange(props.osm)
 
         forceUpdate()
     }
@@ -115,43 +114,4 @@ function existsSideTags(tags: OsmTags, side: string) {
 function canUpdateTags(way: OsmWay) {
     const updateInfo = transpose(Object.entries(way.tags).map(x => `${x[0]}=${x[1]}`))
     return Object.keys(updateInfo.newTagObjects).length > 0
-}
-
-function formToOsmWay(osm: OsmWay, form: HTMLFormElement) {
-    const regex = /^parking:(?!.*conditional$)/
-
-    for (const tagKey of Object.keys(osm.tags).filter(x => x.startsWith('parking:'))) {
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete osm.tags[tagKey]
-    }
-
-    const conditionals: Record<string, string[][]> = {}
-
-    for (const input of Array.from(form.elements)) {
-        if (input instanceof HTMLInputElement || input instanceof HTMLSelectElement) {
-            if (regex.test(input.name) && input.value)
-                osm.tags[input.name] = input.value
-
-            if (input.dataset.partindex) {
-                if (!conditionals[input.name])
-                    conditionals[input.name] = []
-
-                if (conditionals[input.name].length < parseInt(input.dataset.partindex) + 1)
-                    conditionals[input.name].push(['', ''])
-
-                conditionals[input.name][parseInt(input.dataset.partindex)][input.dataset.tokenname === 'condition' ? 0 : 1] = input.value
-            }
-        }
-    }
-
-    for (const conditionalTag in conditionals) {
-        if (conditionals[conditionalTag].length > 0 && conditionals[conditionalTag][0][0]) {
-            osm.tags[conditionalTag] = conditionals[conditionalTag]
-                .filter(x => x[0])
-                .map(x => x[1] ? `${x[0]} @ (${x[1]})` : x[0])
-                .join('; ')
-        }
-    }
-
-    return osm
 }

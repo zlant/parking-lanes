@@ -16,9 +16,14 @@ export type ParkingAreas = Record<string, L.Polyline | any>
 
 export type ParkingPoint = Record<string, L.Marker | any>
 
+export interface TagValue {
+    value: string
+    imgSrc?: string
+}
+
 export interface ParkingTagInfo {
     template: string
-    values?: string[]
+    values?: TagValue[]
     dependentTags?: string[]
     checkForNeedShowing: (tags: OsmTags, side: string) => boolean
 }

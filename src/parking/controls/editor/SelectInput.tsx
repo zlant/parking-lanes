@@ -1,12 +1,15 @@
+import { type TagValue } from '../../../utils/types/parking'
+
 export function SelectInput(props: {
     tag: string
     value: string
-    values: string[]
+    values: TagValue[]
     onChange: (tagValue: string) => void
 }) {
-    const options = !props.value || props.values.includes(props.value) ?
-        ['', ...props.values] :
-        ['', props.value, ...props.values]
+    const values = props.values.map(v => v.value)
+    const options = !props.value || values.includes(props.value) ?
+        ['', ...values] :
+        ['', props.value, ...values]
 
     return (
         <select name={props.tag}

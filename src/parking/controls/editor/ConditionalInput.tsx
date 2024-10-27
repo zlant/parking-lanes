@@ -3,13 +3,14 @@ import { type ConditionalValue, parseConditionalTag } from '../../../utils/condi
 import { type OsmWay } from '../../../utils/types/osm-data'
 import { SelectInput } from './SelectInput'
 import { TextInput } from './TextInput'
+import { type TagValue } from '../../../utils/types/parking'
 
 export function ConditionalInput(props: {
     osm: OsmWay
     tag: string
     label: string
     hide: boolean
-    values?: string[]
+    values?: TagValue[]
     onChange: (tagValue: string) => void
 }) {
     const parsedConditionalTag = props.osm.tags[props.tag] ? parseConditionalTag(props.osm.tags[props.tag]) : []
@@ -56,7 +57,7 @@ export function ConditionalInput(props: {
 function ConditionalPartInput(props: {
     tag: string
     part: ConditionalValue
-    values?: string[]
+    values?: TagValue[]
     onChange: (tagValuePart: ConditionalValue) => void
 }) {
     const [value, setValue] = useState(props.part.value)

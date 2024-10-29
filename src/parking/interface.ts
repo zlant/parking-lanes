@@ -41,8 +41,6 @@ const version = '0.8.10'
 const useDevServer = false
 const viewMinZoom = 15
 
-const panel = new Panel({ position: 'topright' })
-
 // Reminder: Check `maxMaxZoomFromTileLayers` in `generateStyleMapByZoom()`
 const tileLayers: Record<string, L.TileLayer> = {
     mapnik: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -91,11 +89,11 @@ export function initMap() {
 
     new AppInfoControl({ position: 'bottomright' }).addTo(map)
     new LegendControl({ position: 'bottomleft' }).addTo(map)
-    panel.addTo(map)
-        .render(async() => await downloadParkingLanes(map),
-            handleCutLaneClick,
-            handleOsmChange,
-            async() => await handleSaveClick())
+    Panel(async() => await downloadParkingLanes(map),
+        handleCutLaneClick,
+        handleOsmChange,
+        async() => await handleSaveClick(),
+        closeLaneInfo)
 
     useAppStateStore.subscribe(handleDatetimeChange)
     // eslint-disable-next-line @typescript-eslint/no-misused-promises

@@ -37,13 +37,12 @@ export function SimpleTagInput(props: {
 
     return (
         <tr id={props.tag}
+            className="tag-editor"
             style={{ display: props.hide && !value ? 'none' : undefined }}>
-            <td><label title={props.tag}>{props.label}</label></td>
-            <td style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 3,
-            }}>
+            <td className='tag-editor__key'>
+                <label title={props.tag}>{props.label}</label>
+            </td>
+            <td className='tag-editor__inputs'>
                 {
                     props.values ?
                         <SelectInput

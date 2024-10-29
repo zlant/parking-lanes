@@ -8,6 +8,7 @@ import { osmData } from '../../utils/data-client'
 export function OsmObjectPanel(props: {
     onCutLane?: any
     onChange?: (way: OsmWay) => void
+    onClose?: () => void
 }) {
     const mapState = useAppStateStore(state => state.mapState)
     const selectedOsmObject = useAppStateStore(state => state.selectedOsmObject)
@@ -19,8 +20,8 @@ export function OsmObjectPanel(props: {
     const isStreetParking = Object.keys(selectedOsmObject.tags).some(t => t.startsWith('parking:'))
 
     return (
-        <div>
-            <hr />
+        <div className='osm-entity'>
+            <hr className='osm-entity__top-hr' />
             <div style={{
                 minWidth: '250px',
                 display: 'flex',
@@ -31,7 +32,7 @@ export function OsmObjectPanel(props: {
                     <a href={`https://openstreetmap.org/way/${selectedOsmObject.id}`} target="_blank" rel="noreferrer">OSM</a><span>, </span>
                     <a href={`${mapillaryUrl(mapState!.center)}`} target="_blank" rel="noreferrer">Mapillary</a>
                 </span>
-                <span>
+                <span className='osm-entity__editors'>
                     <span>Edit: </span>
                     <a href={`${josmUrl + overpassDeUrl + getWayWithRelationsOverpassQuery(selectedOsmObject.id).replace(/\s+/g, ' ')}`}
                         target="_blank" rel="noreferrer"
@@ -40,6 +41,10 @@ export function OsmObjectPanel(props: {
                     <a href={`${idEditorUrl({ osmObjectType: 'way', osmObjectId: selectedOsmObject.id })}`}
                         target="_blank" rel="noreferrer">iD</a>
                 </span>
+                <button className='osm-entity__close'
+                    onClick={props.onClose}>
+                    +
+                </button>
             </div>
             <hr />
             {isStreetParking ?

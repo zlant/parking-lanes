@@ -26,25 +26,21 @@ export function ConditionalInput(props: {
 
     return (
         <tr id={props.tag}
-            className="conditional-tag"
+            className="tag-editor"
             style={{ display: props.hide ? 'none' : undefined }}>
-            <td style={{ verticalAlign: 'top' }}>
+            <td className='tag-editor__key'>
                 <label title={props.tag}>{props.label}</label>
             </td>
-            <td>
-                <table>
-                    <tbody>
-                        {parsedConditionalTag
-                            .map((conditionalValue, index) =>
-                                <ConditionalPartInput
-                                    key={index}
-                                    tag={props.tag}
-                                    part={conditionalValue}
-                                    values={props.values}
-                                    onChange={vp => props.onChange(buildTagValue(vp, index))} />)
-                        }
-                    </tbody>
-                </table>
+            <td className='tag-editor__inputs tag-editor__inputs--conditional'>
+                {parsedConditionalTag
+                    .map((conditionalValue, index) =>
+                        <ConditionalPartInput
+                            key={index}
+                            tag={props.tag}
+                            part={conditionalValue}
+                            values={props.values}
+                            onChange={vp => props.onChange(buildTagValue(vp, index))} />)
+                }
             </td>
         </tr>
     )
@@ -76,8 +72,8 @@ function ConditionalPartInput(props: {
     }
 
     return (
-        <tr>
-            <td>
+        <div className='conditional-tag-part'>
+            <div className='conditional-tag-part__value'>
                 {
                     props.values ?
                         <SelectInput
@@ -90,15 +86,15 @@ function ConditionalPartInput(props: {
                             value={value}
                             onChange={handleChangeValue} />
                 }
-            </td>
-            <td>
+            </div>
+            <div className='conditional-tag-part__condition'>
                 @
                 <input type="text"
                     placeholder="time interval"
                     name={props.tag}
                     value={condition ?? undefined}
                     onInput={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCondition(e.target.value)} />
-            </td>
-        </tr>
+            </div>
+        </div>
     )
 }

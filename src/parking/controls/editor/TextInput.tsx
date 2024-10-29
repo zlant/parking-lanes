@@ -6,7 +6,7 @@ export function TextInput(props: {
 }) {
     return (
         <input type="text"
-            className="editor-form__text-input"
+            className="tag-editor__input"
             placeholder={props.tag}
             name={props.tag}
             value={props.value ?? ''}

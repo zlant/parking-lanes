@@ -8,8 +8,7 @@ export function DatetimeInput() {
     return (
         <input id="datetime-input"
             value={dayjs(datetime).format('YYYY-MM-DDTHH:mm')}
-            className="control-padding control-bigfont"
-            style={{ width: '150px' }}
+            className="datetime"
             type="datetime-local"
             title="If parking:condition present, show kind of parking at this time of day and day of week."
             onChange={(e) => setDatetime(new Date(e.target.value))} />

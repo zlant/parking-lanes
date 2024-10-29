@@ -16,7 +16,7 @@ export function SideGroup(props: {
         <div id={props.side}
             className={`tags-block tags-block_${props.side}`}
             style={{ display: props.shown ? undefined : 'none' }} >
-            <table>
+            <table className='tags-inputs-table'>
                 <TagInputs
                     osm={props.osm}
                     side={props.side}

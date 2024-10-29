@@ -8,8 +8,10 @@ export function SaveButton(props: { onClick: () => void }) {
 
     return (
         <button
-            className="control-padding control-bigfont control-button save-control"
+            className="save-control"
             onClick={props.onClick}>
-            Save ({changesCount})
+            <img src="./assets/icons/upload.svg"
+                width={16} height={16} />
+            <span><span className='save-control_button-text'>Save</span>({changesCount})</span>
         </button>)
 }

@@ -18,7 +18,9 @@ export function FetchButton(props: {
                 <div className="fetch-control_wrapper">
                     <button className="fetch-control_button"
                         onClick={props.onClick}>
-                        {fetchButtonText}
+                        <img src="./assets/icons/download.svg"
+                            width={16} height={16} />
+                        <span className='fetch-control_button-text'>{fetchButtonText}</span>
                     </button>
                     <div className="fetch-control_toggle"
                         onClick={() => setSourcesShown(!sourcesShown)} />

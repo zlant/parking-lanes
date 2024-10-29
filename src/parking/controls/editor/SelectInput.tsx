@@ -14,7 +14,7 @@ export function SelectInput(props: {
     return (
         <select name={props.tag}
             value={props.value}
-            className="editor-form__select-input"
+            className="tag-editor__select"
             onChange={e => props.onChange(e.target.value)}>
             {options.map(o => <option
                 key={o}

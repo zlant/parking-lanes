@@ -22,7 +22,8 @@ export function LaneEditForm(props: {
     const forceUpdate = useForceUpdate()
 
     return (
-        <form id={props.osm.id.toString()}
+        <form id={props.osm.type + props.osm.id}
+            key={props.osm.type + props.osm.id}
             className="editor-form">
             <div className="editor-form__header">
                 <label className="editor-form__side-switcher">

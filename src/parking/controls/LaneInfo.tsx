@@ -17,7 +17,8 @@ export function OsmObjectPanel(props: {
     if (!selectedOsmObject)
         return null
 
-    const isStreetParking = Object.keys(selectedOsmObject.tags).some(t => t.startsWith('parking:'))
+    const isStreetParking = selectedOsmObject.tags.amenity !== 'parking' &&
+        Object.keys(selectedOsmObject.tags).some(t => t.startsWith('parking:'))
 
     return (
         <div className='osm-entity'>

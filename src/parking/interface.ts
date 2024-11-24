@@ -246,6 +246,7 @@ function addNewAreas(newAreas: ParkingAreas, map: L.Map): void {
 }
 
 function handleAreaClick(e: Event | any) {
+    removeBacklights()
     const osm: OsmWay = e.target.options.osm
     useAppStateStore.getState().setSelectedOsmObject(osm)
     L.DomEvent.stopPropagation(e)

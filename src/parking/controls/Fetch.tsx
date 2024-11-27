@@ -1,34 +1,8 @@
-import L from 'leaflet'
 import { OsmDataSource } from '../../utils/types/osm-data'
-import { createRoot } from 'react-dom/client'
 import { useState } from 'react'
 import { useAppStateStore } from '../state'
 
-export default L.Control.extend({
-    onAdd: () => {
-        const control = document.createElement('div')
-        control.id = 'fetch-control'
-        control.onmousedown = L.DomEvent.stopPropagation
-        control.ondblclick = L.DomEvent.stopPropagation
-        control.onpointerdown = L.DomEvent.stopPropagation
-        control.onclick = L.DomEvent.stopPropagation
-
-        return control
-    },
-
-    render(fetchBtnClickListener: () => any) {
-        const control = document.getElementById('fetch-control')
-        if (control === null)
-            return
-
-        const reactRoot = createRoot(control)
-        reactRoot.render(<FetchButton onClick={fetchBtnClickListener} />)
-
-        return control
-    },
-})
-
-function FetchButton(props: {
+export function FetchButton(props: {
     onClick: () => void
 }) {
     const [sourcesShown, setSourcesShown] = useState(false)
@@ -40,11 +14,13 @@ function FetchButton(props: {
         <div className={`fetch-control ${sourcesShown ? 'opened' : ''}`}
             tabIndex={-1}
             onBlur={() => setSourcesShown(false)}>
-            <div className="leaflet-control-layers control-bigfont control-button">
+            <div className="control-bigfont control-button">
                 <div className="fetch-control_wrapper">
                     <button className="fetch-control_button"
                         onClick={props.onClick}>
-                        {fetchButtonText}
+                        <img src="./assets/icons/download.svg"
+                            width={16} height={16} />
+                        <span className='fetch-control_button-text'>{fetchButtonText}</span>
                     </button>
                     <div className="fetch-control_toggle"
                         onClick={() => setSourcesShown(!sourcesShown)} />

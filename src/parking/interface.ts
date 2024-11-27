@@ -9,14 +9,9 @@ import 'leaflet.locatecontrol'
 import 'font-awesome/css/font-awesome.min.css'
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css'
 
-import { hyper } from 'hyperhtml/esm'
-
 import AppInfoControl from './controls/AppInfo'
-import AreaInfoControl from './controls/AreaInfo'
-import DatetimeControl from './controls/Datetime'
-import FetchControl from './controls/Fetch'
-import LaneInfoControl from './controls/LaneInfo'
 import LegendControl from './controls/Legend'
+import Panel from './controls/Panel'
 
 import {
     getBacklights,
@@ -45,10 +40,6 @@ const version = '0.8.10'
 
 const useDevServer = false
 const viewMinZoom = 15
-
-const laneInfoControl = new LaneInfoControl({ position: 'topright' })
-const areaInfoControl = new AreaInfoControl({ position: 'topright' })
-const fetchControl = new FetchControl({ position: 'topright' })
 
 // Reminder: Check `maxMaxZoomFromTileLayers` in `generateStyleMapByZoom()`
 const tileLayers: Record<string, L.TileLayer> = {
@@ -98,21 +89,19 @@ export function initMap() {
 
     new AppInfoControl({ position: 'bottomright' }).addTo(map)
     new LegendControl({ position: 'bottomleft' }).addTo(map)
-    new DatetimeControl({ position: 'topright' }).addTo(map)
-    fetchControl.addTo(map)
-        .render(async() => await downloadParkingLanes(map))
-    new InfoControl({ position: 'topright' }).addTo(map)
-    new SaveControl({ position: 'topright' }).addTo(map)
-    laneInfoControl.addTo(map)
-    areaInfoControl.addTo(map)
+    Panel(async() => await downloadParkingLanes(map),
+        handleCutLaneClick,
+        handleOsmChange,
+        async() => await handleSaveClick(),
+        closeLaneInfo)
 
     useAppStateStore.subscribe(handleDatetimeChange)
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     useAppStateStore.subscribe(handleEditorChange)
+    globalThis.appState = useAppStateStore
 
     map.on('moveend', handleMapMoveEnd)
     map.on('click', closeLaneInfo)
-    map.on('click', areaInfoControl.closeAreaInfo)
 
     layersControl.addTo(map)
 
@@ -121,25 +110,6 @@ export function initMap() {
     const hash = new L.Hash(map)
     return map
 }
-
-export const InfoControl = L.Control.extend({
-    onAdd: (map: L.Map) => hyper`
-        <div id="min-zoom-btn"
-             class="leaflet-control-layers control-padding control-bigfont control-button"
-             onclick=${() => map.setZoom(viewMinZoom)}>
-            Zoom in on the map
-        </div>`,
-})
-
-export const SaveControl = L.Control.extend({
-    onAdd: () => hyper`
-        <button id="save-btn"
-                class="leaflet-control-layers control-padding control-bigfont control-button save-control"
-                style="display: none"
-                onclick=${handleSaveClick}>
-            Save
-        </button>`,
-})
 
 function handleDatetimeChange(state: AppStateStore, prevState: AppStateStore) {
     if (state.datetime !== prevState.datetime) {
@@ -231,36 +201,27 @@ function addNewLanes(newLanes: ParkingLanes, map: L.Map): void {
 
 function handleLaneClick(e: Event | any) {
     const { map } = (window as OurWindow)
-    closeLaneInfo()
+    removeBacklights()
 
     const osm: OsmWay = e.target.options.osm
 
     const osmId = osm.id
     const lane = lanes['right' + osmId] || lanes['left' + osmId] || lanes['empty' + osmId]
     const backligntPolylines = getBacklights(lane.getLatLngs(), map.getZoom())
-    const mapCenter = map.getCenter()
     lanes.right = backligntPolylines.right.addTo(map)
     lanes.left = backligntPolylines.left.addTo(map)
-
-    const { editorMode } = useAppStateStore.getState()
-    if (editorMode) {
-        laneInfoControl.showEditForm(
-            osm,
-            osmData.waysInRelation,
-            handleCutLaneClick,
-            mapCenter,
-            handleOsmChange)
-    } else {
-        laneInfoControl.showLaneInfo(osm, mapCenter)
-    }
+    useAppStateStore.getState().setSelectedOsmObject(osm)
 
     L.DomEvent.stopPropagation(e)
 }
 
 function closeLaneInfo() {
-    laneInfoControl.closeLaneInfo()
-    areaInfoControl.closeAreaInfo()
+    useAppStateStore.getState().setSelectedOsmObject(null)
 
+    removeBacklights()
+}
+
+function removeBacklights() {
     for (const marker in markers) {
         markers[marker].remove()
         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
@@ -285,10 +246,9 @@ function addNewAreas(newAreas: ParkingAreas, map: L.Map): void {
 }
 
 function handleAreaClick(e: Event | any) {
-    areaInfoControl.closeAreaInfo()
-    closeLaneInfo()
+    removeBacklights()
     const osm: OsmWay = e.target.options.osm
-    areaInfoControl.showAreaInfo(osm)
+    useAppStateStore.getState().setSelectedOsmObject(osm)
     L.DomEvent.stopPropagation(e)
 }
 
@@ -325,10 +285,7 @@ function handleMapMoveEnd() {
     setLocationToCookie(center, zoom)
 
     updateLaneStylesByZoom(lanes, zoom)
-    updatePointStylesByZoom(points, zoom);
-
-    (document.getElementById('min-zoom-btn') as HTMLButtonElement).style.display =
-        zoom < viewMinZoom ? 'block' : 'none'
+    updatePointStylesByZoom(points, zoom)
 
     if (zoom < viewMinZoom)
         return
@@ -395,9 +352,7 @@ function handleOsmChange(newOsm: OsmWay) {
     }
 
     const changesCount = addChangedEntity(newOsm)
-    const saveBtn = (document.getElementById('save-btn') as HTMLButtonElement)
-    saveBtn.innerText = 'Save (' + changesCount + ')'
-    saveBtn.style.display = 'block'
+    useAppStateStore.getState().setChangesCount(changesCount)
 }
 
 async function handleSaveClick() {
@@ -412,7 +367,7 @@ async function handleSaveClick() {
                 }
             }
         }
-        (document.getElementById('save-btn') as HTMLButtonElement).style.display = 'none'
+        useAppStateStore.getState().setChangesCount(0)
     } catch (err) {
         if (err instanceof XMLHttpRequest)
             alert(err.responseText || err)
@@ -484,7 +439,5 @@ function cutWay(arg: any) {
 
     addChangedEntity(newWay)
     const changesCount = addChangedEntity(oldWay)
-    const saveBtn = document.getElementById('save-btn') as HTMLButtonElement
-    saveBtn.innerText = 'Save (' + changesCount + ')'
-    saveBtn.style.display = 'block'
+    useAppStateStore.getState().setChangesCount(changesCount)
 }

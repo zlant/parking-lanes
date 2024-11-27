@@ -2,7 +2,7 @@ export type OsmTags = Record<string, string>
 
 type OsmType = 'node' | 'way' | 'relation'
 
-interface OsmObject {
+export interface OsmObject {
     id: number
     type: OsmType
     uid?: number

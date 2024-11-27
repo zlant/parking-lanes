@@ -1,22 +1,21 @@
+import { type TagValue } from '../../../utils/types/parking'
+
 export function SelectInput(props: {
     tag: string
     value: string
-    values: string[]
-    'data-partindex'?: string
-    'data-tokenname'?: string
-    onChange: (e: React.ChangeEvent) => void
+    values: TagValue[]
+    onChange: (tagValue: string) => void
 }) {
-    const options = !props.value || props.values.includes(props.value) ?
-        ['', ...props.values] :
-        ['', props.value, ...props.values]
+    const values = props.values.map(v => v.value)
+    const options = !props.value || values.includes(props.value) ?
+        ['', ...values] :
+        ['', props.value, ...values]
 
     return (
         <select name={props.tag}
             value={props.value}
-            data-partindex={props['data-partindex']}
-            data-tokenname={props['data-tokenname']}
-            className="editor-form__select-input"
-            onChange={e => props.onChange(e)}>
+            className="tag-editor__select"
+            onChange={e => props.onChange(e.target.value)}>
             {options.map(o => <option
                 key={o}
                 value={o}>

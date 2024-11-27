@@ -2,11 +2,17 @@ $font-size: 1rem;
 
 html {
     font-size: $font-size;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
 
-html, body, #map {
+body {
     margin: 0;
     height: 100%;
+    height: 100dvh;
+}
+
+body * {
+    box-sizing: border-box;
 }
 
 
@@ -26,18 +32,20 @@ html, body, #map {
 }
 
 .control-bigfont {
-    font-size: 110%;
+    font-size: 14px;
 }
 
 .mapnik_gray {
     filter: grayscale(1);
 }
 
-.leaflet-control.control-button {
+.control-button {
     cursor: pointer;
+    border: none;
+    border-radius: 3px;
 }
 
-.leaflet-control.control-button:hover {
+.control-button:hover {
     background-color: #f4f4f4;
 }
 
@@ -65,7 +73,86 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     border: 2px solid darkgreen;
 }
 
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+}
+
+#map {
+    margin: 0;
+    height: 100%;
+}
+
 // lane-info
+
+.panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    background: #fff;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    background-clip: padding-box;
+    border-radius: 5px;
+}
+
+.datetime {
+    max-width: 150px;
+    min-width: 0;
+}
+
+.osm-entity__close {
+    display: none;
+}
+
+@media (max-width: 499px) {
+    .osm-entity {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 99999;
+        max-height: 50vh;
+        overflow: scroll;
+        padding: 14px 7px 4px;
+        border-radius: 6px 6px 0 0;
+        box-shadow: 0px 4px 20px rgba(0,20,36,.1);
+        background: #fff;
+    }
+
+    .osm-entity__top-hr {
+        display: none;
+    }
+
+    .osm-entity__editors {
+        display:  none;
+    }
+    
+    .osm-entity__close {
+        display: unset;
+        border: none;
+        background: transparent;
+        transform: rotate(45deg);
+        font-size: 20px;
+    }
+}
+
+.data-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    max-width: calc(100vw - 100px);
+    gap: 5px;
+}
+
+.data-controls__right {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
 
 #lane-control {
     max-width: calc(100vw - 40px);
@@ -125,7 +212,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     gap: 5px;
 }
 
-.leaflet-control-layers .editor-form__side-switcher {
+.editor-form__side-switcher {
     display: flex;
     align-items: center;
     gap: 3px;
@@ -152,8 +239,42 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     background: #f4f4f4;
 }
 
-.editor-form__select-input {
-    width: 100%;
+.tag-editor__key {
+    vertical-align: baseline;
+}
+
+.tag-editor__inputs {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.tag-editor__inputs--conditional {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+@media (max-width: 499px) {
+    .tag-editor__key {
+        max-width: 30vw;
+        overflow: auto;
+    }
+    .tag-editor__inputs {
+        max-width: 60vw;
+        overflow: auto;
+    }
+    .tag-editor__input {
+        width: unset;
+        max-width: 100%;
+    }
+    .tag-editor__select {
+        width: unset;
+    }
+    .tag-editor__inputs--conditional .tag-editor__input,
+    .tag-editor__inputs--conditional .tag-editor__select {
+        max-width: 30vw;
+    }
 }
 
 .sign-preset {
@@ -161,12 +282,16 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
 }
 
-.conditional-tag > td {
-    padding: 0;
+.conditional-tag-part {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
 }
 
-.conditional-tag table {
-    border-spacing: 0;
+.conditional-tag-part__condition {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
 }
 
 .updated-tags__table {
@@ -199,19 +324,34 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 // save control
 
-.leaflet-control.save-control {
+.save-control {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border: none;
+    border-radius: 3px;
+    font-weight: bold;
     background-color: yellow;
+    padding: 4px 7px;
+    cursor: pointer;
 }
 
-.leaflet-control.save-control:hover {
+.save-control:hover {
     background-color: #f4f400;
+}
+
+@media (max-width: 499px) {
+    .save-control_button-text {
+        display: none;
+    }
 }
 
 // fetch control
 
 .fetch-control {
     position: relative;
-    z-index: 801;
+    background: #f5f5f5;
+    border-radius: 3px;
 }
 
 .fetch-control_wrapper {
@@ -219,6 +359,9 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .fetch-control_button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
     border: none;
     background: none;
     padding: 4px 7px;
@@ -227,19 +370,25 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .fetch-control_button:hover {
     border-radius: 5px 0 0 5px;
-    background-color: #f4f4f4;
+    background-color: #ececec;
+}
+
+@media (max-width: 499px) {
+    .fetch-control_button-text {
+        display: none;
+    }
 }
 
 .fetch-control_items {
     position: absolute;
-    left: 0;
-    width: 100%;
+    right: 0;
     background: #fff;
 }
 
 .fetch-control_item {
     padding: 4px 7px;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .fetch-control_item:hover {
@@ -257,7 +406,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .fetch-control_toggle:hover {
     border-radius: 0 5px 5px 0;
-    background-color: #f4f4f4;
+    background-color: #ececec;
 }
 
 .fetch-control_toggle::after {

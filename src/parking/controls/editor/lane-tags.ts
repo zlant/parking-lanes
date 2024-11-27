@@ -31,7 +31,7 @@ export const parkingLaneTags: ParkingTagInfo[] = [
     },
     {
         template: 'parking:{side}:fee',
-        values: ['yes', 'no'],
+        values: [{ value: 'yes' }, { value: 'no' }],
         checkForNeedShowing: (tags: OsmTags, side: string) => true,
         dependentTags: [
             'parking:{side}:fee:conditional',
@@ -39,7 +39,7 @@ export const parkingLaneTags: ParkingTagInfo[] = [
     },
     {
         template: 'parking:{side}:fee:conditional',
-        values: ['yes', 'no'],
+        values: [{ value: 'yes' }, { value: 'no' }],
         checkForNeedShowing: (tags: OsmTags, side: string) => true,
     },
     {

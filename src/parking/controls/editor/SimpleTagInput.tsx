@@ -1,4 +1,5 @@
 import { type OsmWay } from '../../../utils/types/osm-data'
+import { type TagValue } from '../../../utils/types/parking'
 import { SelectInput } from './SelectInput'
 import { TextInput } from './TextInput'
 
@@ -7,28 +8,54 @@ export function SimpleTagInput(props: {
     tag: string
     label: string
     hide: boolean
-    values?: string[]
-    onChange: (e: React.SyntheticEvent, way: OsmWay) => void
+    values?: TagValue[]
+    onChange: (value: string) => void
 }) {
     const value = props.osm.tags[props.tag]
 
+    const buttons = props.values
+        ?.filter(v => v.imgSrc)
+        .map(v =>
+            <button type='button'
+                key={v.value}
+                title={v.value}
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    border: '2px solid',
+                    borderRadius: 3,
+                    padding: 0,
+                    background: 'none',
+                    cursor: 'pointer',
+                    borderColor: v.value === value ? 'dodgerblue' : 'transparent',
+                }}
+                onClick={e => props.onChange(v.value)}>
+                <img src={v.imgSrc}
+                    height="15"
+                    alt={v.value} />
+            </button>)
+
     return (
         <tr id={props.tag}
+            className="tag-editor"
             style={{ display: props.hide && !value ? 'none' : undefined }}>
-            <td><label title={props.tag}>{props.label}</label></td>
-            <td>
+            <td className='tag-editor__key'>
+                <label title={props.tag}>{props.label}</label>
+            </td>
+            <td className='tag-editor__inputs'>
                 {
                     props.values ?
                         <SelectInput
                             tag={props.tag}
                             value={value}
                             values={props.values}
-                            onChange={e => props.onChange(e, props.osm)} /> :
+                            onChange={e => props.onChange(e)} /> :
                         <TextInput
                             tag={props.tag}
                             value={value}
-                            onChange={e => props.onChange(e, props.osm)} />
+                            onChange={e => props.onChange(e)} />
                 }
+                {buttons}
             </td>
         </tr>
     )

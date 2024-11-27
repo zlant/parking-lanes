@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { OsmDataSource } from '../utils/types/osm-data'
+import { OsmDataSource, type OsmObject } from '../utils/types/osm-data'
 import { type LatLng } from 'leaflet'
 
 export enum AuthState {
@@ -24,6 +24,8 @@ export interface AppStateStore {
             east: number
         }
     }
+    selectedOsmObject: OsmObject | null
+    changesCount: number
 
     setFetchButtonText: (value: this['fetchButtonText']) => void
     setOsmDataSource: (value: this['osmDataSource']) => void
@@ -31,6 +33,8 @@ export interface AppStateStore {
     setEditorMode: (value: this['editorMode']) => void
     setAuthState: (value: this['authState']) => void
     setMapState: (value: this['mapState']) => void
+    setSelectedOsmObject: (value: this['selectedOsmObject']) => void
+    setChangesCount: (value: this['changesCount']) => void
 }
 
 export const useAppStateStore = create<AppStateStore>((set) => ({
@@ -39,6 +43,8 @@ export const useAppStateStore = create<AppStateStore>((set) => ({
     datetime: new Date(),
     editorMode: false,
     authState: AuthState.initial,
+    selectedOsmObject: null,
+    changesCount: 0,
 
     setFetchButtonText: (value) => set({ fetchButtonText: value }),
     setOsmDataSource: (value) => set({ osmDataSource: value }),
@@ -46,4 +52,6 @@ export const useAppStateStore = create<AppStateStore>((set) => ({
     setEditorMode: (value) => set({ editorMode: value }),
     setAuthState: (value) => set({ authState: value }),
     setMapState: (value) => set({ mapState: value }),
+    setSelectedOsmObject: (value) => set({ selectedOsmObject: value }),
+    setChangesCount: (value) => set({ changesCount: value }),
 }))

@@ -36,7 +36,7 @@ import { parseParkingPoint, updatePointColorsByDate, updatePointStylesByZoom } f
 import { AuthState, useAppStateStore, type AppStateStore } from './state'
 
 const editorName = 'PLanes'
-const version = '0.8.10'
+const version = '0.9.0'
 
 const useDevServer = false
 const viewMinZoom = 15
